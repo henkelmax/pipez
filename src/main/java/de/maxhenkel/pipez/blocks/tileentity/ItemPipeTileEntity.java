@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,10 +32,6 @@ public class ItemPipeTileEntity extends UpgradeTileEntity {
     public void tick() {
         super.tick();
 
-        if (world.getGameTime() % getSpeed() != 0) {
-            return;
-        }
-
         BlockState blockState = getBlockState();
         Block block = blockState.getBlock();
         if (!(block instanceof PipeBlock)) {
@@ -43,6 +40,10 @@ public class ItemPipeTileEntity extends UpgradeTileEntity {
         PipeBlock pipe = (PipeBlock) block;
 
         for (Direction direction : Direction.values()) {
+            if (world.getGameTime() % getSpeed(direction) != 0) {
+                continue;
+            }
+
             if (!pipe.isExtracting(blockState, direction)) {
                 continue;
             }
@@ -53,7 +54,7 @@ public class ItemPipeTileEntity extends UpgradeTileEntity {
 
             List<Connection> connections = getConnections().stream().sorted(Comparator.comparingInt(Connection::getDistance)).collect(Collectors.toList());
 
-            int itemsToTransfer = getAmount();
+            int itemsToTransfer = getAmount(direction);
 
             connectionLoop:
             for (Connection connection : connections) {
@@ -86,13 +87,40 @@ public class ItemPipeTileEntity extends UpgradeTileEntity {
         return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).orElse(null);
     }
 
-    public int getSpeed() {
-        return 20;
+    public int getSpeed(Direction direction) {
+        Upgrade upgrade = getUpgrade(direction);
+        if (upgrade == null) {
+            return 20;
+        }
+        switch (upgrade) {
+            case BASIC:
+                return 15;
+            case IMPROVED:
+                return 10;
+            case ADVANCED:
+                return 5;
+            case ULTIMATE:
+            default:
+                return 1;
+        }
     }
 
-    public int getAmount() {
-        return 8;
+    public int getAmount(Direction direction) {
+        Upgrade upgrade = getUpgrade(direction);
+        if (upgrade == null) {
+            return 4;
+        }
+        switch (upgrade) {
+            case BASIC:
+                return 8;
+            case IMPROVED:
+                return 16;
+            case ADVANCED:
+                return 32;
+            case ULTIMATE:
+            default:
+                return 64;
+        }
     }
-
 
 }

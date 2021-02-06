@@ -42,7 +42,10 @@ public class ItemPipeBlock extends PipeBlock {
     @Override
     public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity instanceof ItemPipeTileEntity && player instanceof ServerPlayerEntity && isExtracting(state, direction)) {
+        if (tileEntity instanceof ItemPipeTileEntity && isExtracting(state, direction)) {
+            if (worldIn.isRemote) {
+                return ActionResultType.SUCCESS;
+            }
             ItemPipeTileEntity pipe = (ItemPipeTileEntity) tileEntity;
             PipeContainerProvider.openGui(player, pipe, direction, (i, playerInventory, playerEntity) -> new ExtractContainer(i, playerInventory, pipe, direction));
             return ActionResultType.SUCCESS;

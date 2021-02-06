@@ -3,6 +3,7 @@ package de.maxhenkel.pipez;
 import de.maxhenkel.corelib.CommonRegistry;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
+import de.maxhenkel.pipez.events.StitchEvents;
 import de.maxhenkel.pipez.gui.Containers;
 import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
@@ -47,7 +48,10 @@ public class Main {
         SERVER_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.SERVER, ServerConfig.class);
         CLIENT_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.CLIENT, ClientConfig.class);
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().addListener(Main.this::clientSetup));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(Main.this::clientSetup);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(StitchEvents::onStitch);
+        });
     }
 
     @SubscribeEvent
