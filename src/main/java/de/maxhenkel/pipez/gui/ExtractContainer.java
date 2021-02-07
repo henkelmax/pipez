@@ -10,7 +10,7 @@ public class ExtractContainer extends ContainerBase {
     public ExtractContainer(int id, IInventory playerInventory, UpgradeTileEntity pipe, Direction direction) {
         super(Containers.EXTRACT, id, playerInventory, null);
 
-        addSlot(new UpgradeSlot(pipe.getInventory(), direction.getIndex(), 80, 18));
+        addSlot(new UpgradeSlot(pipe.getUpgradeInventory(), direction.getIndex(), 80, 18));
 
         addPlayerInventorySlots();
     }

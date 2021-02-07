@@ -23,7 +23,7 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         upgradeInventory = NonNullList.withSize(6, ItemStack.EMPTY);
     }
 
-    public IInventory getInventory() {
+    public IInventory getUpgradeInventory() {
         return new ItemListInventory(upgradeInventory, this::markDirty);
     }
 

@@ -1,9 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.pipez.Upgrade;
-import de.maxhenkel.pipez.blocks.PipeBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -32,19 +29,12 @@ public class ItemPipeTileEntity extends UpgradeTileEntity {
     public void tick() {
         super.tick();
 
-        BlockState blockState = getBlockState();
-        Block block = blockState.getBlock();
-        if (!(block instanceof PipeBlock)) {
-            return;
-        }
-        PipeBlock pipe = (PipeBlock) block;
-
         for (Direction direction : Direction.values()) {
             if (world.getGameTime() % getSpeed(direction) != 0) {
                 continue;
             }
 
-            if (!pipe.isExtracting(blockState, direction)) {
+            if (!isExtracting(direction)) {
                 continue;
             }
             IItemHandler itemHandler = getItemHandler(pos.offset(direction), direction.getOpposite());

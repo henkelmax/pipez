@@ -1,41 +1,23 @@
 {
     "multipart": [
         {   "apply": { "model": "pipez:block/pipe_core" }},
-        {   "when": { "north": "true", "extract_north": "false" },
+        {   "when": { "north": "true" },
             "apply": { "model": "pipez:block/pipe_part", "uvlock": false }
         },
-        {   "when": { "east": "true", "extract_east": "false" },
+        {   "when": { "east": "true" },
             "apply": { "model": "pipez:block/pipe_part", "y": 90, "uvlock": false }
         },
-        {   "when": { "south": "true", "extract_south": "false" },
+        {   "when": { "south": "true" },
             "apply": { "model": "pipez:block/pipe_part", "y": 180, "uvlock": false }
         },
-        {   "when": { "west": "true", "extract_west": "false" },
+        {   "when": { "west": "true" },
             "apply": { "model": "pipez:block/pipe_part", "y": 270, "uvlock": false }
         },
-        {   "when": { "up": "true", "extract_up": "false" },
+        {   "when": { "up": "true" },
             "apply": { "model": "pipez:block/pipe_part", "x": 270, "uvlock": false }
         },
-        {   "when": { "down": "true", "extract_down": "false" },
+        {   "when": { "down": "true" },
             "apply": { "model": "pipez:block/pipe_part", "x": 90, "uvlock": false }
-        },
-        {   "when": { "extract_north": "true", "north": "true" },
-            "apply": { "model": "pipez:block/pipe_extract", "uvlock": false }
-        },
-        {   "when": { "extract_east": "true", "east": "true" },
-            "apply": { "model": "pipez:block/pipe_extract", "y": 90, "uvlock": false }
-        },
-        {   "when": { "extract_south": "true", "south": "true" },
-            "apply": { "model": "pipez:block/pipe_extract", "y": 180, "uvlock": false }
-        },
-        {   "when": { "extract_west": "true", "west": "true" },
-            "apply": { "model": "pipez:block/pipe_extract", "y": 270, "uvlock": false }
-        },
-        {   "when": { "extract_up": "true", "up": "true" },
-            "apply": { "model": "pipez:block/pipe_extract", "x": 270, "uvlock": false }
-        },
-        {   "when": { "extract_down": "true", "down": "true" },
-            "apply": { "model": "pipez:block/pipe_extract", "x": 90, "uvlock": false }
         }
     ]
 }
