@@ -7,6 +7,7 @@ import de.maxhenkel.corelib.helpers.Triple;
 import de.maxhenkel.pipez.ModItemGroups;
 import de.maxhenkel.pipez.blocks.tileentity.ItemPipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
+import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -73,9 +74,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         Direction side = getSelection(state, worldIn, pos, player).getKey();
-        if (player.isSneaking()) {
+        if (WrenchItem.isWrench(player.getHeldItem(handIn))) {
             if (side != null) {
-                //TODO wrench
                 if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
                     boolean extracting = isExtracting(worldIn, pos, side);
                     if (extracting) {
@@ -361,8 +361,9 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         }
 
         if (world.getBlockState(pos.offset(selection.getKey())).getBlock() == this) {
-            //return getShape(world, pos, state, true);
-            //TODO wrench only
+            if (!WrenchItem.isHoldingWrench(player)) {
+                return getShape(world, pos, state, true);
+            }
         }
 
         return selection.getValue();

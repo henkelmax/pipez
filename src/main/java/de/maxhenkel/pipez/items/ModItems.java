@@ -10,13 +10,15 @@ public class ModItems {
     public static final UpgradeItem IMPROVED_UPGRADE = new UpgradeItem(Upgrade.IMPROVED);
     public static final UpgradeItem ADVANCED_UPGRADE = new UpgradeItem(Upgrade.ADVANCED);
     public static final UpgradeItem ULTIMATE_UPGRADE = new UpgradeItem(Upgrade.ULTIMATE);
+    public static final WrenchItem WRENCH = new WrenchItem();
 
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(
                 BASIC_UPGRADE,
                 IMPROVED_UPGRADE,
                 ADVANCED_UPGRADE,
-                ULTIMATE_UPGRADE
+                ULTIMATE_UPGRADE,
+                WRENCH
         );
     }
 
