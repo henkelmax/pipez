@@ -25,10 +25,12 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
     @Nullable
     protected List<Connection> connectionCache;
     protected boolean[] extractingSides;
+    protected boolean[] disconnectedSides;
 
     public PipeTileEntity(TileEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);
         extractingSides = new boolean[Direction.values().length];
+        disconnectedSides = new boolean[Direction.values().length];
     }
 
     public List<Connection> getConnections() {
@@ -52,6 +54,18 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
             return;
         }
         PipeBlock pipeBlock = (PipeBlock) block;
+
+        PipeTileEntity pipeTe = pipeBlock.getTileEntity(world, pos);
+        if (pipeTe != null) {
+            for (Direction side : Direction.values()) {
+                if (pipeTe.isExtracting(side)) {
+                    if (!pipeBlock.canConnectTo(world, pos, side)) {
+                        pipeTe.setExtracting(side, false);
+                    }
+                }
+            }
+        }
+
         travelPositions.add(pos);
         addToDirtyList(world, pos, pipeBlock, travelPositions, queue);
         while (queue.size() > 0) {
@@ -167,8 +181,20 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
     }
 
     public boolean isExtracting() {
-        for (boolean extractingSide : extractingSides) {
-            if (extractingSide) {
+        for (boolean extract : extractingSides) {
+            if (extract) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasReasonToStay() {
+        if (isExtracting()) {
+            return true;
+        }
+        for (boolean disconnected : disconnectedSides) {
+            if (disconnected) {
                 return true;
             }
         }
@@ -177,6 +203,15 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
 
     public void setExtracting(Direction side, boolean extracting) {
         extractingSides[side.getIndex()] = extracting;
+        markDirty();
+    }
+
+    public boolean isDisconnected(Direction side) {
+        return disconnectedSides[side.getIndex()];
+    }
+
+    public void setDisconnected(Direction side, boolean disconnected) {
+        disconnectedSides[side.getIndex()] = disconnected;
         markDirty();
     }
 
@@ -191,6 +226,15 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
                 extractingSides[i] = b.getByte() != 0;
             }
         }
+
+        disconnectedSides = new boolean[Direction.values().length];
+        ListNBT disconnectedList = compound.getList("DisconnectedSides", Constants.NBT.TAG_BYTE);
+        if (disconnectedList.size() >= disconnectedSides.length) {
+            for (int i = 0; i < disconnectedSides.length; i++) {
+                ByteNBT b = (ByteNBT) disconnectedList.get(i);
+                disconnectedSides[i] = b.getByte() != 0;
+            }
+        }
     }
 
     @Override
@@ -200,6 +244,12 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
             extractingList.add(ByteNBT.valueOf(extractingSide));
         }
         compound.put("ExtractingSides", extractingList);
+
+        ListNBT disconnectedList = new ListNBT();
+        for (boolean disconnected : disconnectedSides) {
+            disconnectedList.add(ByteNBT.valueOf(disconnected));
+        }
+        compound.put("DisconnectedSides", disconnectedList);
         return super.write(compound);
     }
 
@@ -282,7 +332,6 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
             }
             return direction == that.direction;
         }
-
     }
 
 }

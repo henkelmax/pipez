@@ -73,22 +73,66 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         Direction side = getSelection(state, worldIn, pos, player).getKey();
-        if (side != null) {
-            if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
-                if (player.isSneaking()) { //TODO wrench
-                    setExtracting(worldIn, pos, side, !isExtracting(worldIn, pos, side));
-                    PipeTileEntity.markPipesDirty(worldIn, pos);
-                    return ActionResultType.SUCCESS;
+        if (player.isSneaking()) {
+            if (side != null) {
+                //TODO wrench
+                if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
+                    boolean extracting = isExtracting(worldIn, pos, side);
+                    if (extracting) {
+                        setExtracting(worldIn, pos, side, false);
+                        setDisconnected(worldIn, pos, side, true);
+                    } else {
+                        setExtracting(worldIn, pos, side, true);
+                        setDisconnected(worldIn, pos, side, false);
+                    }
                 } else {
-                    return onPipeSideActivated(state, worldIn, pos, player, handIn, hit, side);
+                    setDisconnected(worldIn, pos, side, true);
+                }
+            } else {
+                // Core
+                side = hit.getFace();
+                if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
+                    setExtracting(worldIn, pos, side, false);
+                    if (isAbleToConnect(worldIn, pos, side)) {
+                        setDisconnected(worldIn, pos, side, false);
+                    }
+                } else {
+                    setDisconnected(worldIn, pos, side, false);
+                    setDisconnected(worldIn, pos.offset(side), side.getOpposite(), false);
                 }
             }
+
+            PipeTileEntity.markPipesDirty(worldIn, pos);
+            return ActionResultType.SUCCESS;
+        } else {
+            if (side != null) {
+                return onPipeSideActivated(state, worldIn, pos, player, handIn, hit, side);
+            } else {
+                return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            }
         }
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
     }
 
     public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+    }
+
+    public BooleanProperty getProperty(Direction side) {
+        switch (side) {
+            case NORTH:
+                return NORTH;
+            case SOUTH:
+                return SOUTH;
+            case EAST:
+                return EAST;
+            case WEST:
+                return WEST;
+            case UP:
+                return UP;
+            case DOWN:
+            default:
+                return DOWN;
+        }
     }
 
     public boolean isExtracting(IWorldReader world, BlockPos pos, Direction side) {
@@ -99,11 +143,19 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         return pipe.isExtracting(side);
     }
 
+    public boolean isDisconnected(IWorldReader world, BlockPos pos, Direction side) {
+        PipeTileEntity pipe = getTileEntity(world, pos);
+        if (pipe == null) {
+            return false;
+        }
+        return pipe.isDisconnected(side);
+    }
+
     public void setHasData(World world, BlockPos pos, boolean hasData) {
         BlockState blockState = world.getBlockState(pos);
-        if (blockState.get(HAS_DATA) != hasData) {
-            world.setBlockState(pos, blockState.with(HAS_DATA, hasData));
-        }
+        //if (blockState.get(HAS_DATA) != hasData) {
+        world.setBlockState(pos, blockState.with(HAS_DATA, hasData));
+        //}
     }
 
     public void setExtracting(World world, BlockPos pos, Direction side, boolean extracting) {
@@ -118,9 +170,29 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             }
         } else {
             pipe.setExtracting(side, extracting);
-            if (!pipe.isExtracting()) {
+            if (!pipe.hasReasonToStay()) {
                 setHasData(world, pos, false);
             }
+        }
+    }
+
+    public void setDisconnected(World world, BlockPos pos, Direction side, boolean disconnected) {
+        PipeTileEntity pipe = getTileEntity(world, pos);
+        if (pipe == null) {
+            if (disconnected) {
+                setHasData(world, pos, true);
+                pipe = getTileEntity(world, pos);
+                if (pipe != null) {
+                    pipe.setDisconnected(side, disconnected);
+                    world.setBlockState(pos, world.getBlockState(pos).with(getProperty(side), false));
+                }
+            }
+        } else {
+            pipe.setDisconnected(side, disconnected);
+            if (!pipe.hasReasonToStay()) {
+                setHasData(world, pos, false);
+            }
+            world.setBlockState(pos, world.getBlockState(pos).with(getProperty(side), !disconnected));
         }
     }
 
@@ -156,6 +228,21 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     public boolean isConnected(IWorldReader world, BlockPos pos, Direction facing) {
+        PipeTileEntity pipe = getTileEntity(world, pos);
+        PipeTileEntity other = getTileEntity(world, pos.offset(facing));
+
+        if (!isAbleToConnect(world, pos, facing)) {
+            return false;
+        }
+        boolean canSelfConnect = pipe == null || !pipe.isDisconnected(facing);
+        if (!canSelfConnect) {
+            return false;
+        }
+        boolean canSideConnect = other == null || !other.isDisconnected(facing.getOpposite());
+        return canSideConnect;
+    }
+
+    public boolean isAbleToConnect(IWorldReader world, BlockPos pos, Direction facing) {
         return isPipe(world, pos, facing) || canConnectTo(world, pos, facing);
     }
 
@@ -274,7 +361,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         }
 
         if (world.getBlockState(pos.offset(selection.getKey())).getBlock() == this) {
-            return getShape(world, pos, state, true);
+            //return getShape(world, pos, state, true);
+            //TODO wrench only
         }
 
         return selection.getValue();
@@ -373,6 +461,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
                 worldIn.removeTileEntity(pos);
                 // TODO drop items
             }
+        } else {
+            super.onReplaced(state, worldIn, pos, newState, isMoving);
         }
     }
 
