@@ -10,11 +10,13 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ItemPipeTileEntity extends UpgradeTileEntity {
+public class ItemPipeTileEntity extends UpgradeLogicTileEntity {
 
     public ItemPipeTileEntity() {
         super(ModTileEntities.ITEM_PIPE);
@@ -48,42 +50,112 @@ public class ItemPipeTileEntity extends UpgradeTileEntity {
             return;
         }
 
-        for (Direction direction : Direction.values()) {
-            if (world.getGameTime() % getSpeed(direction) != 0) {
+        for (Direction side : Direction.values()) {
+            if (world.getGameTime() % getSpeed(side) != 0) {
                 continue;
             }
-
-            if (!isExtracting(direction)) {
+            if (!isExtracting(side)) {
                 continue;
             }
-            IItemHandler itemHandler = getItemHandler(pos.offset(direction), direction.getOpposite());
+            if (!shouldWork(side)) {
+                continue;
+            }
+            IItemHandler itemHandler = getItemHandler(pos.offset(side), side.getOpposite());
             if (itemHandler == null) {
                 continue;
             }
 
-            List<Connection> connections = getConnections().stream().sorted(Comparator.comparingInt(Connection::getDistance)).collect(Collectors.toList());
+            List<Connection> connections = getSortedConnections(side);
 
-            int itemsToTransfer = getAmount(direction);
+            if (getDistribution(side).equals(Distribution.ROUND_ROBIN)) {
+                insertEqually(side, connections, itemHandler);
+            } else {
+                insertOrdered(side, connections, itemHandler);
+            }
+        }
+    }
 
-            connectionLoop:
-            for (Connection connection : connections) {
-                IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
-                if (destination == null) {
-                    continue;
-                }
+    private final int[] rrIndex = new int[Direction.values().length];
 
-                for (int i = 0; i < itemHandler.getSlots(); i++) {
-                    if (itemsToTransfer <= 0) {
-                        break connectionLoop;
-                    }
-                    ItemStack simulatedExtract = itemHandler.extractItem(i, itemsToTransfer, true);
-
+    protected void insertEqually(Direction side, List<Connection> connections, IItemHandler itemHandler) {
+        if (connections.isEmpty()) {
+            return;
+        }
+        int itemsToTransfer = getAmount(side);
+        boolean[] inventoriesFull = new boolean[connections.size()];
+        int p = rrIndex[side.getIndex()] % connections.size();
+        while (itemsToTransfer > 0 && hasNotInserted(inventoriesFull)) {
+            Connection connection = connections.get(p);
+            IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
+            boolean hasInserted = false;
+            if (destination != null) {
+                for (int j = 0; j < itemHandler.getSlots(); j++) {
+                    ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
                     ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
                     int insertedAmount = simulatedExtract.getCount() - stack.getCount();
-                    itemsToTransfer -= insertedAmount;
-                    itemHandler.extractItem(i, insertedAmount, false);
+                    if (insertedAmount > 0) {
+                        itemsToTransfer -= insertedAmount;
+                        itemHandler.extractItem(j, insertedAmount, false);
+                        hasInserted = true;
+                        break;
+                    }
                 }
             }
+            if (!hasInserted) {
+                inventoriesFull[p] = true;
+            }
+            p = (p + 1) % connections.size();
+        }
+
+        rrIndex[side.getIndex()] = p;
+    }
+
+    private boolean hasNotInserted(boolean[] inventoriesFull) {
+        for (int i = 0; i < inventoriesFull.length; i++) {
+            if (!inventoriesFull[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void insertOrdered(Direction side, List<Connection> connections, IItemHandler itemHandler) {
+        int itemsToTransfer = getAmount(side);
+
+        connectionLoop:
+        for (Connection connection : connections) {
+            IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
+            if (destination == null) {
+                continue;
+            }
+
+            for (int i = 0; i < itemHandler.getSlots(); i++) {
+                if (itemsToTransfer <= 0) {
+                    break connectionLoop;
+                }
+                ItemStack simulatedExtract = itemHandler.extractItem(i, itemsToTransfer, true);
+
+                ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
+                int insertedAmount = simulatedExtract.getCount() - stack.getCount();
+                itemsToTransfer -= insertedAmount;
+                itemHandler.extractItem(i, insertedAmount, false);
+            }
+        }
+    }
+
+    public List<Connection> getSortedConnections(Direction side) {
+        Distribution distribution = getDistribution(side);
+        switch (distribution) {
+            case FURTHEST:
+                return getConnections().stream().sorted((o1, o2) -> Integer.compare(o2.getDistance(), o1.getDistance())).collect(Collectors.toList());
+            case RANDOM:
+                ArrayList<Connection> shuffle = new ArrayList<>(getConnections());
+                Collections.shuffle(shuffle);
+                return shuffle;
+            case NEAREST:
+            case ROUND_ROBIN:
+            default:
+                return getConnections().stream().sorted(Comparator.comparingInt(Connection::getDistance)).collect(Collectors.toList());
         }
     }
 
