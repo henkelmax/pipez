@@ -8,6 +8,7 @@ import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.net.CycleDistributionMessage;
 import de.maxhenkel.pipez.net.CycleFilterModeMessage;
 import de.maxhenkel.pipez.net.CycleRedstoneModeMessage;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -31,6 +32,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     private HoverArea sortArea;
     private HoverArea filterArea;
 
+    private WidgetBase filterList;
+
     public ExtractScreen(ExtractContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(BACKGROUND, container, playerInventory, title);
         xSize = 176;
@@ -40,6 +43,10 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     @Override
     protected void init() {
         super.init();
+        hoverAreas.clear();
+        buttons.clear();
+        children.clear();
+
         UpgradeTileEntity pipe = getContainer().getPipe();
         Direction side = getContainer().getSide();
         Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getContainer().getSide()).ordinal();
@@ -60,8 +67,6 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         addButton(redstoneButton);
         addButton(sortButton);
         addButton(filterButton);
-
-        hoverAreas.clear();
 
         redstoneArea = new HoverArea(7, 7, 20, 20, () -> {
             if (redstoneButton.active) {
@@ -89,12 +94,15 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         hoverAreas.add(filterArea);
 
         checkButtons();
+
+        filterList = new FilterList(this, 32, 8, 136, 66, Arrays.asList());
     }
 
     @Override
     public void tick() {
         super.tick();
         checkButtons();
+        filterList.tick();
     }
 
     private void checkButtons() {
@@ -123,6 +131,48 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
         font.func_243248_b(matrixStack, playerInventory.getDisplayName(), 8F, (float) (ySize - 96 + 3), FONT_COLOR);
 
+        filterList.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
+
         drawHoverAreas(matrixStack, mouseX, mouseY);
+
+    }
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+        filterList.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (filterList.mouseClicked(mouseX, mouseY, button)) {
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (filterList.mouseReleased(mouseX, mouseY, button)) {
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        if (filterList.mouseScrolled(mouseX, mouseY, delta)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public <T extends Widget> T addButton(T button) {
+        return super.addButton(button);
+    }
+
+    public void addHoverArea(HoverArea hoverArea) {
+        hoverAreas.add(hoverArea);
     }
 }

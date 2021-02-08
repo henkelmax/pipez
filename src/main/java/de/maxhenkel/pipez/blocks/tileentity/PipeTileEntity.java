@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -301,39 +302,6 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
                     ", direction=" + direction +
                     ", distance=" + distance +
                     '}';
-        }
-    }
-
-    public static class DirectionalPosition {
-        private final BlockPos pos;
-        private final Direction direction;
-
-        public DirectionalPosition(BlockPos pos, Direction direction) {
-            this.pos = pos;
-            this.direction = direction;
-        }
-
-        public BlockPos getPos() {
-            return pos;
-        }
-
-        public Direction getDirection() {
-            return direction;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            DirectionalPosition that = (DirectionalPosition) o;
-            if (!pos.equals(that.pos)) {
-                return false;
-            }
-            return direction == that.direction;
         }
     }
 
