@@ -161,7 +161,17 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     public enum Distribution implements ICyclable<Distribution> {
-        NEAREST, FURTHEST, ROUND_ROBIN, RANDOM;
+        NEAREST("nearest"), FURTHEST("furthest"), ROUND_ROBIN("round_robin"), RANDOM("random");
+
+        private final String name;
+
+        Distribution(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
 
         public Distribution cycle() {
             return values()[Math.floorMod(ordinal() + 1, values().length)];
@@ -169,7 +179,16 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     public enum RedstoneMode implements ICyclable<RedstoneMode> {
-        IGNORED, OFF_WHEN_POWERED, ON_WHEN_POWERED;
+        IGNORED("ignored"), OFF_WHEN_POWERED("off_when_powered"), ON_WHEN_POWERED("on_when_powered");
+        private final String name;
+
+        RedstoneMode(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
 
         public RedstoneMode cycle() {
             return values()[Math.floorMod(ordinal() + 1, values().length)];
@@ -177,7 +196,16 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     public enum FilterMode implements ICyclable<FilterMode> {
-        WHITELIST, BLACKLIST;
+        WHITELIST("whitelist"), BLACKLIST("blacklist");
+        private final String name;
+
+        FilterMode(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
 
         @Override
         public FilterMode cycle() {

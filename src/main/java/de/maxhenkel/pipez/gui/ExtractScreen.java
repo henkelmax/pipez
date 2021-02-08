@@ -9,10 +9,13 @@ import de.maxhenkel.pipez.net.CycleDistributionMessage;
 import de.maxhenkel.pipez.net.CycleFilterModeMessage;
 import de.maxhenkel.pipez.net.CycleRedstoneModeMessage;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -24,6 +27,10 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     private CycleIconButton sortButton;
     private CycleIconButton filterButton;
 
+    private HoverArea redstoneArea;
+    private HoverArea sortArea;
+    private HoverArea filterArea;
+
     public ExtractScreen(ExtractContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(BACKGROUND, container, playerInventory, title);
         xSize = 176;
@@ -34,6 +41,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     protected void init() {
         super.init();
         UpgradeTileEntity pipe = getContainer().getPipe();
+        Direction side = getContainer().getSide();
         Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getContainer().getSide()).ordinal();
         List<CycleIconButton.Icon> redstoneModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 16), new CycleIconButton.Icon(BACKGROUND, 192, 16), new CycleIconButton.Icon(BACKGROUND, 208, 16));
         redstoneButton = new CycleIconButton(guiLeft + 7, guiTop + 7, redstoneModeIcons, redstoneModeIndex, button -> {
@@ -52,6 +60,33 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         addButton(redstoneButton);
         addButton(sortButton);
         addButton(filterButton);
+
+        hoverAreas.clear();
+
+        redstoneArea = new HoverArea(7, 7, 20, 20, () -> {
+            if (redstoneButton.active) {
+                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.redstone_mode", new TranslationTextComponent("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side).getName())).func_241878_f());
+            } else {
+                return Collections.emptyList();
+            }
+        });
+        sortArea = new HoverArea(7, 31, 20, 20, () -> {
+            if (sortButton.active) {
+                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.distribution", new TranslationTextComponent("tooltip.pipez.distribution." + pipe.getDistribution(side).getName())).func_241878_f());
+            } else {
+                return Collections.emptyList();
+            }
+        });
+        filterArea = new HoverArea(7, 55, 20, 20, () -> {
+            if (filterButton.active) {
+                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.filter_mode", new TranslationTextComponent("tooltip.pipez.filter_mode." + pipe.getFilterMode(side).getName())).func_241878_f());
+            } else {
+                return Collections.emptyList();
+            }
+        });
+        hoverAreas.add(redstoneArea);
+        hoverAreas.add(sortArea);
+        hoverAreas.add(filterArea);
 
         checkButtons();
     }
@@ -87,5 +122,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
         font.func_243248_b(matrixStack, playerInventory.getDisplayName(), 8F, (float) (ySize - 96 + 3), FONT_COLOR);
+
+        drawHoverAreas(matrixStack, mouseX, mouseY);
     }
 }

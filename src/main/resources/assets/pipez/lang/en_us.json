@@ -6,5 +6,17 @@
   "item.pipez.advanced_upgrade": "Advanced Pipe Upgrade",
   "item.pipez.ultimate_upgrade": "Ultimate Pipe Upgrade",
   "item.pipez.wrench": "Pipe Wrench",
-  "tooltip.pipez.wrench": "Click on a pipe to configure"
+  "tooltip.pipez.wrench": "Click on a pipe to configure",
+  "tooltip.pipez.distribution": "Distribution: %s",
+  "tooltip.pipez.distribution.nearest": "Nearest First",
+  "tooltip.pipez.distribution.furthest": "Furthest First",
+  "tooltip.pipez.distribution.round_robin": "Round Robin",
+  "tooltip.pipez.distribution.random": "Random",
+  "tooltip.pipez.redstone_mode": "Redstone Mode: %s",
+  "tooltip.pipez.redstone_mode.ignored": "Ignored",
+  "tooltip.pipez.redstone_mode.off_when_powered": "Off When Powered",
+  "tooltip.pipez.redstone_mode.on_when_powered": "On When Powered",
+  "tooltip.pipez.filter_mode": "Filter Mode: %s",
+  "tooltip.pipez.filter_mode.whitelist": "Whitelist",
+  "tooltip.pipez.filter_mode.blacklist": "Blacklist"
 }
