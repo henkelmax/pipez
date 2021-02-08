@@ -26,8 +26,27 @@ public class ItemPipeTileEntity extends UpgradeTileEntity {
     }
 
     @Override
+    public Distribution getDefaultDistribution() {
+        return Distribution.NEAREST;
+    }
+
+    @Override
+    public RedstoneMode getDefaultRedstoneMode() {
+        return RedstoneMode.IGNORED;
+    }
+
+    @Override
+    public FilterMode getDefaultFilterMode() {
+        return FilterMode.WHITELIST;
+    }
+
+    @Override
     public void tick() {
         super.tick();
+
+        if (world.isRemote) {
+            return;
+        }
 
         for (Direction direction : Direction.values()) {
             if (world.getGameTime() % getSpeed(direction) != 0) {

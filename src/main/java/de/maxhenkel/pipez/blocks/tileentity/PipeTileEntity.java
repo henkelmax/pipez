@@ -61,6 +61,9 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
                 if (pipeTe.isExtracting(side)) {
                     if (!pipeBlock.canConnectTo(world, pos, side)) {
                         pipeTe.setExtracting(side, false);
+                        if (!pipeTe.hasReasonToStay()) {
+                            pipeBlock.setHasData(world, pos, false);
+                        }
                     }
                 }
             }

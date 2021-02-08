@@ -518,4 +518,9 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         }
     }
 
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return state.get(HAS_DATA);
+    }
+
 }
