@@ -7,9 +7,7 @@ import de.maxhenkel.pipez.events.StitchEvents;
 import de.maxhenkel.pipez.gui.Containers;
 import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
-import de.maxhenkel.pipez.net.CycleDistributionMessage;
-import de.maxhenkel.pipez.net.CycleFilterModeMessage;
-import de.maxhenkel.pipez.net.CycleRedstoneModeMessage;
+import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.tagproviders.WrenchTagProvider;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
@@ -66,6 +64,8 @@ public class Main {
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 0, CycleDistributionMessage.class);
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 1, CycleRedstoneModeMessage.class);
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 2, CycleFilterModeMessage.class);
+        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 3, AddFilterMessage.class);
+        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 4, RemoveFilterMessage.class);
     }
 
     public void gatherData(GatherDataEvent event) {

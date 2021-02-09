@@ -1,5 +1,7 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.pipez.Filter;
+import de.maxhenkel.pipez.ItemFilter;
 import de.maxhenkel.pipez.Upgrade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -25,6 +27,16 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity {
     @Override
     public boolean canInsert(TileEntity tileEntity, Direction direction) {
         return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent();
+    }
+
+    @Override
+    public Filter<?> createFilter() {
+        return new ItemFilter();
+    }
+
+    @Override
+    public String getFilterKey() {
+        return "ItemFilters";
     }
 
     @Override

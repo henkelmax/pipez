@@ -3,6 +3,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 import de.maxhenkel.corelib.CachedValue;
 import de.maxhenkel.corelib.inventory.ItemListInventory;
 import de.maxhenkel.corelib.item.ItemUtils;
+import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.items.UpgradeItem;
 import net.minecraft.block.BlockState;
@@ -10,12 +11,16 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class UpgradeTileEntity extends PipeTileEntity {
@@ -24,6 +29,7 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     protected CachedValue<Distribution>[] distributions;
     protected CachedValue<RedstoneMode>[] redstoneModes;
     protected CachedValue<FilterMode>[] filterModes;
+    protected CachedValue<List<Filter<?>>>[] filters;
 
     public UpgradeTileEntity(TileEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);
@@ -35,11 +41,13 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         distributions = new CachedValue[Direction.values().length];
         redstoneModes = new CachedValue[Direction.values().length];
         filterModes = new CachedValue[Direction.values().length];
+        filters = new CachedValue[Direction.values().length];
         for (int i = 0; i < Direction.values().length; i++) {
             int index = i;
             distributions[i] = new CachedValue<>(() -> deserialize(upgradeInventory.get(index), "Distribution", Distribution.class, this::getDefaultDistribution));
             redstoneModes[i] = new CachedValue<>(() -> deserialize(upgradeInventory.get(index), "RedstoneMode", RedstoneMode.class, this::getDefaultRedstoneMode));
             filterModes[i] = new CachedValue<>(() -> deserialize(upgradeInventory.get(index), "FilterMode", FilterMode.class, this::getDefaultFilterMode));
+            filters[i] = new CachedValue<>(() -> deserializeFilters(upgradeInventory.get(index)));
         }
     }
 
@@ -48,6 +56,7 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
             distributions[i].invalidate();
             redstoneModes[i].invalidate();
             filterModes[i].invalidate();
+            filters[i].invalidate();
         }
     }
 
@@ -80,31 +89,78 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         markDirty();
     }
 
+    private List<Filter<?>> deserializeFilters(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return Collections.emptyList();
+        }
+        CompoundNBT compound = stack.getTag();
+        if (compound == null) {
+            return Collections.emptyList();
+        }
+        if (!compound.contains(getFilterKey(), Constants.NBT.TAG_LIST)) {
+            return Collections.emptyList();
+        }
+        ListNBT list = compound.getList(getFilterKey(), Constants.NBT.TAG_COMPOUND);
+        List<Filter<?>> filters = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            Filter<?> filter = createFilter();
+            filter.deserializeNBT(list.getCompound(i));
+            filters.add(filter);
+        }
+        return filters;
+    }
+
+    private void serializeFilters(ItemStack stack, List<Filter<?>> filters) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        CompoundNBT tag = stack.getOrCreateTag();
+        ListNBT list = new ListNBT();
+        for (Filter<?> filter : filters) {
+            list.add(filter.serializeNBT());
+        }
+        tag.put(getFilterKey(), list);
+        markDirty();
+    }
+
+    public abstract Filter<?> createFilter();
+
+    public abstract String getFilterKey();
+
+    public List<Filter<?>> getFilters(Direction side) {
+        return filters[side.getIndex()].get();
+    }
+
+    public void setFilters(Direction side, List<Filter<?>> f) {
+        serializeFilters(upgradeInventory.get(side.getIndex()), f);
+        filters[side.getIndex()].invalidate();
+    }
+
     public void setDistribution(Direction side, Distribution dist) {
         serialize(upgradeInventory.get(side.getIndex()), "Distribution", dist);
-        distributions[side.ordinal()].invalidate();
+        distributions[side.getIndex()].invalidate();
     }
 
     public void setRedstoneMode(Direction side, RedstoneMode mode) {
         serialize(upgradeInventory.get(side.getIndex()), "RedstoneMode", mode);
-        redstoneModes[side.ordinal()].invalidate();
+        redstoneModes[side.getIndex()].invalidate();
     }
 
     public void setFilterMode(Direction side, FilterMode mode) {
         serialize(upgradeInventory.get(side.getIndex()), "FilterMode", mode);
-        filterModes[side.ordinal()].invalidate();
+        filterModes[side.getIndex()].invalidate();
     }
 
     public Distribution getDistribution(Direction side) {
-        return distributions[side.ordinal()].get();
+        return distributions[side.getIndex()].get();
     }
 
     public RedstoneMode getRedstoneMode(Direction side) {
-        return redstoneModes[side.ordinal()].get();
+        return redstoneModes[side.getIndex()].get();
     }
 
     public FilterMode getFilterMode(Direction side) {
-        return filterModes[side.ordinal()].get();
+        return filterModes[side.getIndex()].get();
     }
 
     public abstract Distribution getDefaultDistribution();

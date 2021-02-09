@@ -7,6 +7,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.UUID;
+
 public class ItemFilter extends Filter<Item> {
 
     @Override
@@ -33,6 +35,7 @@ public class ItemFilter extends Filter<Item> {
         if (invert) {
             compound.putBoolean("Invert", true);
         }
+        compound.putUniqueId("ID", id);
 
         return compound;
     }
@@ -72,6 +75,12 @@ public class ItemFilter extends Filter<Item> {
             invert = compound.getBoolean("Invert");
         } else {
             invert = false;
+        }
+
+        if (compound.contains("ID", Constants.NBT.TAG_INT_ARRAY)) {
+            id = compound.getUniqueId("ID");
+        } else {
+            id = UUID.randomUUID();
         }
     }
 

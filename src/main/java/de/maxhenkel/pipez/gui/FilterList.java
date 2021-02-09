@@ -23,13 +23,14 @@ import net.minecraft.util.text.*;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class FilterList extends WidgetBase {
 
     public static final ResourceLocation BACKGROUND = new ResourceLocation(Main.MODID, "textures/gui/container/extract.png");
 
-    protected List<Filter<?>> filters;
+    protected Supplier<List<Filter<?>>> filters;
     protected int offset;
     protected int selected;
     private ScreenBase.HoverArea[] hoverAreas;
@@ -39,11 +40,12 @@ public class FilterList extends WidgetBase {
     private int columnCount;
     private CachedMap<DirectionalPosition, Pair<BlockState, ItemStack>> filterPosCache;
 
-    public FilterList(ExtractScreen screen, int posX, int posY, int xSize, int ySize, List<Filter<?>> filters) {
+    public FilterList(ExtractScreen screen, int posX, int posY, int xSize, int ySize, Supplier<List<Filter<?>>> filters) {
         super(screen, posX, posY, xSize, ySize);
         this.filters = filters;
         columnHeight = 22;
         columnCount = 3;
+        selected = -1;
 
         hoverAreas = new ScreenBase.HoverArea[columnCount];
         itemHoverAreas = new ScreenBase.HoverArea[columnCount];
@@ -60,12 +62,12 @@ public class FilterList extends WidgetBase {
     @Override
     protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
-
+        List<Filter<?>> f = filters.get();
         for (int i = 0; i < hoverAreas.length; i++) {
-            if (offset + i >= filters.size()) {
+            if (getOffset() + i >= f.size()) {
                 break;
             }
-            Filter<?> filter = filters.get(offset + i);
+            Filter<?> filter = f.get(getOffset() + i);
             if (itemHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 ItemStack stack = getStack(filter);
                 if (stack != null && !stack.isEmpty()) {
@@ -124,12 +126,13 @@ public class FilterList extends WidgetBase {
     protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
 
-        for (int i = offset; i < filters.size() && i < offset + columnCount; i++) {
+        List<Filter<?>> f = filters.get();
+        for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
             mc.getTextureManager().bindTexture(BACKGROUND);
-            int pos = i - offset;
+            int pos = i - getOffset();
             int startY = guiTop + pos * columnHeight;
-            Filter<?> filter = filters.get(i);
-            if (i == selected) {
+            Filter<?> filter = f.get(i);
+            if (i == getSelected()) {
                 AbstractGui.blit(matrixStack, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
             } else {
                 AbstractGui.blit(matrixStack, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
@@ -166,9 +169,9 @@ public class FilterList extends WidgetBase {
 
         mc.getTextureManager().bindTexture(BACKGROUND);
 
-        if (filters.size() > columnCount) {
+        if (f.size() > columnCount) {
             float h = 66 - 17;
-            float perc = (float) offset / (float) (filters.size() - columnCount);
+            float perc = (float) getOffset() / (float) (f.size() - columnCount);
             int posY = guiTop + (int) (h * perc);
             AbstractGui.blit(matrixStack, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
         } else {
@@ -197,6 +200,23 @@ public class FilterList extends WidgetBase {
         filterPosCache.clear();
     }
 
+    public int getOffset() {
+        List<Filter<?>> f = filters.get();
+        if (f.size() <= columnCount) {
+            offset = 0;
+        } else if (offset > f.size() - columnCount) {
+            offset = f.size() - columnCount;
+        }
+        return offset;
+    }
+
+    public int getSelected() {
+        if (selected >= filters.get().size()) {
+            selected = -1;
+        }
+        return selected;
+    }
+
     private void drawStringSmall(MatrixStack matrixStack, int x, int y, ITextComponent text) {
         matrixStack.push();
         matrixStack.translate(x, y, 0);
@@ -213,11 +233,12 @@ public class FilterList extends WidgetBase {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        if (filters.size() > columnCount) {
+        List<Filter<?>> f = filters.get();
+        if (f.size() > columnCount) {
             if (delta < 0D) {
-                offset = Math.min(offset + 1, filters.size() - columnCount);
+                offset = Math.min(getOffset() + 1, f.size() - columnCount);
             } else {
-                offset = Math.max(offset - 1, 0);
+                offset = Math.max(getOffset() - 1, 0);
             }
             return true;
         }
@@ -226,15 +247,16 @@ public class FilterList extends WidgetBase {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        List<Filter<?>> f = filters.get();
         for (int i = 0; i < hoverAreas.length; i++) {
-            if (offset + i >= filters.size()) {
+            if (getOffset() + i >= f.size()) {
                 break;
             }
             if (!hoverAreas[i].isHovered(guiLeft, guiTop, (int) mouseX, (int) mouseY)) {
                 continue;
             }
-            Filter<?> filter = filters.get(offset + i);
-            selected = offset + i;
+            Filter<?> filter = f.get(getOffset() + i);
+            selected = getOffset() + i;
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

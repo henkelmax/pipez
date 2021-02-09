@@ -5,6 +5,7 @@ import net.minecraft.tags.ITag;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
 
@@ -18,9 +19,10 @@ public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
     @Nullable
     protected DirectionalPosition destination;
     protected boolean invert;
+    protected UUID id;
 
     public Filter() {
-
+        id = UUID.randomUUID();
     }
 
     @Nullable
@@ -73,5 +75,9 @@ public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
 
     public void setExactMetadata(boolean exactMetadata) {
         this.exactMetadata = exactMetadata;
+    }
+
+    public UUID getId() {
+        return id;
     }
 }

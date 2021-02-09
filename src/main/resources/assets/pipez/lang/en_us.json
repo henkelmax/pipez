@@ -37,5 +37,8 @@
   "message.pipez.direction.east": "East",
   "message.pipez.direction.west": "West",
   "message.pipez.direction.up": "Up",
-  "message.pipez.direction.down": "Down"
+  "message.pipez.direction.down": "Down",
+  "message.pipez.filter.add": "Add",
+  "message.pipez.filter.edit": "Edit",
+  "message.pipez.filter.remove": "Remove"
 }
