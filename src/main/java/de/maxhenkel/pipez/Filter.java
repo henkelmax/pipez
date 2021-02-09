@@ -12,8 +12,6 @@ public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
     @Nullable
     protected ITag.INamedTag<T> tag;
     @Nullable
-    protected T element;
-    @Nullable
     protected CompoundNBT metadata;
     protected boolean exactMetadata;
     @Nullable
@@ -32,15 +30,6 @@ public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
 
     public void setTag(@Nullable ITag.INamedTag<T> tag) {
         this.tag = tag;
-    }
-
-    @Nullable
-    public T getElement() {
-        return element;
-    }
-
-    public void setElement(@Nullable T element) {
-        this.element = element;
     }
 
     @Nullable

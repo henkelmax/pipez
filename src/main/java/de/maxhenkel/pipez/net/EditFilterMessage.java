@@ -3,23 +3,23 @@ package de.maxhenkel.pipez.net;
 import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.gui.ExtractContainer;
+import de.maxhenkel.pipez.gui.FilterContainer;
+import de.maxhenkel.pipez.gui.containerfactory.FilterContainerProvider;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.List;
-
-public class AddFilterMessage implements Message<AddFilterMessage> {
+public class EditFilterMessage implements Message<EditFilterMessage> {
 
     private CompoundNBT filter;
 
-    public AddFilterMessage() {
+    public EditFilterMessage() {
 
     }
 
-    public AddFilterMessage(Filter<?> filter) {
+    public EditFilterMessage(Filter<?> filter) {
         this.filter = filter.serializeNBT();
     }
 
@@ -33,16 +33,14 @@ public class AddFilterMessage implements Message<AddFilterMessage> {
         Container container = context.getSender().openContainer;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
-            List<Filter<?>> filters = extractContainer.getPipe().getFilters(extractContainer.getSide());
             Filter<?> f = extractContainer.getPipe().createFilter();
             f.deserializeNBT(filter);
-            filters.add(f);
-            extractContainer.getPipe().setFilters(extractContainer.getSide(), filters);
+            FilterContainerProvider.openGui(context.getSender(), extractContainer.getPipe(), extractContainer.getSide(), f, (id, playerInventory, playerEntity) -> new FilterContainer(id, playerInventory, extractContainer.getPipe(), extractContainer.getSide(), f));
         }
     }
 
     @Override
-    public AddFilterMessage fromBytes(PacketBuffer packetBuffer) {
+    public EditFilterMessage fromBytes(PacketBuffer packetBuffer) {
         filter = packetBuffer.readCompoundTag();
         return this;
     }

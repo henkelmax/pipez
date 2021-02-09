@@ -2,20 +2,15 @@ package de.maxhenkel.pipez.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
-import de.maxhenkel.pipez.DirectionalPosition;
-import de.maxhenkel.pipez.ItemFilter;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -73,17 +68,12 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleFilterModeMessage());
         });
         addFilterButton = new Button(guiLeft + 31, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.add"), button -> {
-            ItemFilter test = new ItemFilter();
-            test.setElement(ModItems.ADVANCED_UPGRADE);
-            CompoundNBT compoundNBT = new CompoundNBT();
-            compoundNBT.putBoolean("Test", true);
-            test.setMetadata(compoundNBT);
-            test.setInvert(true);
-            test.setDestination(new DirectionalPosition(new BlockPos(153, 4, -182), Direction.WEST));
-            Main.SIMPLE_CHANNEL.sendToServer(new AddFilterMessage(test));
+            Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.createFilter()));
         });
         editFilterButton = new Button(guiLeft + 80, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.edit"), button -> {
-
+            if (filterList.getSelected() >= 0) {
+                Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.getFilters(side).get(filterList.getSelected())));
+            }
         });
         removeFilterButton = new Button(guiLeft + 129, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {

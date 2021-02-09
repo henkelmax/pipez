@@ -3,6 +3,7 @@ package de.maxhenkel.pipez;
 import de.maxhenkel.corelib.CommonRegistry;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
+import de.maxhenkel.pipez.events.BlockEvents;
 import de.maxhenkel.pipez.events.StitchEvents;
 import de.maxhenkel.pipez.gui.Containers;
 import de.maxhenkel.pipez.integration.IMC;
@@ -16,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -60,12 +62,16 @@ public class Main {
     }
 
     public void commonSetup(FMLCommonSetupEvent event) {
+        MinecraftForge.EVENT_BUS.register(new BlockEvents());
+
         SIMPLE_CHANNEL = CommonRegistry.registerChannel(Main.MODID, "default");
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 0, CycleDistributionMessage.class);
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 1, CycleRedstoneModeMessage.class);
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 2, CycleFilterModeMessage.class);
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 3, AddFilterMessage.class);
+        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 3, UpdateFilterMessage.class);
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 4, RemoveFilterMessage.class);
+        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 5, EditFilterMessage.class);
+        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 6, OpenExtractMessage.class);
     }
 
     public void gatherData(GatherDataEvent event) {

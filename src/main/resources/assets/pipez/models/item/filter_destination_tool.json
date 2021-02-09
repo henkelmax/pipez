@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "pipez:item/wrench"
+        "layer0": "pipez:item/filter_destination_tool"
     }
 }

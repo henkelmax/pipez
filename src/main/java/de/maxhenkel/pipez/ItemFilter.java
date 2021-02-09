@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez;
 
+import de.maxhenkel.corelib.tag.SingleElementTag;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.ItemTags;
@@ -15,12 +16,13 @@ public class ItemFilter extends Filter<Item> {
     public CompoundNBT serializeNBT() {
         CompoundNBT compound = new CompoundNBT();
         if (tag != null) {
-            compound.putString("Tag", tag.getName().toString());
-        }
-        if (element != null) {
-            ResourceLocation key = ForgeRegistries.ITEMS.getKey(element);
-            if (key != null) {
-                compound.putString("Item", key.toString());
+            if (tag instanceof SingleElementTag) {
+                ResourceLocation key = ForgeRegistries.ITEMS.getKey(((SingleElementTag<Item>) tag).getElement());
+                if (key != null) {
+                    compound.putString("Item", key.toString());
+                }
+            } else {
+                compound.putString("Tag", tag.getName().toString());
             }
         }
         if (metadata != null) {
@@ -42,16 +44,15 @@ public class ItemFilter extends Filter<Item> {
 
     @Override
     public void deserializeNBT(CompoundNBT compound) {
+        tag = null;
+        if (compound.contains("Item", Constants.NBT.TAG_STRING)) {
+            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("Item")));
+            if (item != null) {
+                tag = new SingleElementTag<>(item);
+            }
+        }
         if (compound.contains("Tag", Constants.NBT.TAG_STRING)) {
             tag = ItemTags.createOptional(new ResourceLocation(compound.getString("Tag")));
-        } else {
-            tag = null;
-        }
-
-        if (compound.contains("Item", Constants.NBT.TAG_STRING)) {
-            element = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("Item")));
-        } else {
-            element = null;
         }
 
         if (compound.contains("Metadata", Constants.NBT.TAG_COMPOUND)) {

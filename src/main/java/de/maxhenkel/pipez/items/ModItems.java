@@ -11,6 +11,7 @@ public class ModItems {
     public static final UpgradeItem ADVANCED_UPGRADE = new UpgradeItem(Upgrade.ADVANCED);
     public static final UpgradeItem ULTIMATE_UPGRADE = new UpgradeItem(Upgrade.ULTIMATE);
     public static final WrenchItem WRENCH = new WrenchItem();
+    public static final FilterDestinationToolItem FILTER_DESTINATION_TOOL = new FilterDestinationToolItem();
 
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(
@@ -18,7 +19,8 @@ public class ModItems {
                 IMPROVED_UPGRADE,
                 ADVANCED_UPGRADE,
                 ULTIMATE_UPGRADE,
-                WRENCH
+                WRENCH,
+                FILTER_DESTINATION_TOOL
         );
     }
 
