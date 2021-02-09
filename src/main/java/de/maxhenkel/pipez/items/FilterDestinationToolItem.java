@@ -24,10 +24,10 @@ public class FilterDestinationToolItem extends Item {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool"));
+        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool").mergeStyle(TextFormatting.GRAY));
         DirectionalPosition dst = getDestination(stack);
         if (dst != null) {
-            tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslationTextComponent("message.pipez.direction." + dst.getDirection().getName2()).mergeStyle(TextFormatting.GREEN)));
+            tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslationTextComponent("message.pipez.direction." + dst.getDirection().getName2()).mergeStyle(TextFormatting.GREEN)).mergeStyle(TextFormatting.GRAY));
         }
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
