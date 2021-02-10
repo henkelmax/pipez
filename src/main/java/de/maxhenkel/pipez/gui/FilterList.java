@@ -11,6 +11,9 @@ import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.utils.WrappedGasStack;
+import mekanism.api.chemical.gas.Gas;
+import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -129,7 +132,11 @@ public class FilterList extends WidgetBase {
                 stack.setTag(filter.getMetadata());
             }
             return new WrappedFluidStack(stack);
+        } else if (o instanceof Gas) {
+            GasStack stack = new GasStack((Gas) o, 1000);
+            return new WrappedGasStack(stack);
         }
+
         return null;
     }
 
@@ -151,10 +158,7 @@ public class FilterList extends WidgetBase {
 
             AbstractStack<?> stack = getStack(filter);
             if (stack != null && !stack.isEmpty()) {
-                matrixStack.push();
-                matrixStack.translate(guiLeft + 3, startY + 3, 0D);
-                stack.render(matrixStack);
-                matrixStack.pop();
+                stack.render(matrixStack, guiLeft + 3, startY + 3);
                 if (filter.getTag() != null) {
                     if (filter.getTag() instanceof SingleElementTag) {
                         drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.item", new TranslationTextComponent(stack.getDisplayName().getString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.WHITE));

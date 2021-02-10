@@ -11,6 +11,8 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
+import de.maxhenkel.pipez.utils.GasUtils;
+import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
@@ -78,15 +80,15 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         });
         addButton(invertButton);
 
-        submitButton = new Button(guiLeft + 25, guiTop + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.cancel"), button -> {
+        cancelButton = new Button(guiLeft + 25, guiTop + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.cancel"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage());
         });
-        addButton(submitButton);
+        addButton(cancelButton);
 
-        cancelButton = new Button(guiLeft + 91, guiTop + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.submit"), button -> {
+        submitButton = new Button(guiLeft + 91, guiTop + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.submit"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter));
         });
-        addButton(cancelButton);
+        addButton(submitButton);
 
         item = new TextFieldWidget(font, guiLeft + 30, guiTop + 18, 138, 16, StringTextComponent.EMPTY);
         item.setTextColor(TextFormatting.WHITE.getColor());
@@ -114,6 +116,8 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         nbt.setMaxStringLength(1024);
         nbt.setText(filter.getMetadata() != null ? filter.getMetadata().toString() : "");
         nbt.setResponder(this::onNbtTextChanged);
+        nbt.visible = hasNBT();
+
         addButton(nbt);
 
         nbtButton.active = filter.getMetadata() != null;
@@ -127,7 +131,6 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                 if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                     tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(filter.getTag().getName().toString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.GRAY));
                 }
-
             }
             return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
         });
@@ -140,7 +143,11 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         hoverAreas.add(itemTextHoverArea);
         nbtTextHoverArea = new HoverArea(7, 49, 162, 18, () -> {
             List<ITextComponent> tooltip = new ArrayList<>();
-            tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.nbt_string.description"));
+            if (hasNBT()) {
+                tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.nbt_string.description"));
+            } else {
+                tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.nbt_string.no_nbt"));
+            }
             return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
         });
         hoverAreas.add(nbtTextHoverArea);
@@ -185,6 +192,10 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         hoverAreas.add(destinationTextHoverArea);
     }
 
+    private boolean hasNBT() {
+        return !(filter instanceof GasFilter);
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -207,6 +218,14 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             }
         } else if (filter instanceof FluidFilter) {
             ITag.INamedTag tag = TagUtils.getFluid(text, true);
+            filter.setTag(tag);
+            if (filter.getTag() == null) {
+                item.setTextColor(TextFormatting.DARK_RED.getColor());
+            } else {
+                item.setTextColor(TextFormatting.WHITE.getColor());
+            }
+        } else if (filter instanceof GasFilter) {
+            ITag.INamedTag tag = GasUtils.getGas(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
                 item.setTextColor(TextFormatting.DARK_RED.getColor());
@@ -254,6 +273,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                     nbt.setText("");
                 }
             });
+        } else if (filter instanceof GasFilter) {
+            GasStack gas = GasUtils.getGasContained(stack);
+            if (gas != null) {
+                item.setText(gas.getType().getRegistryName().toString());
+                nbt.setText("");
+            }
         }
     }
 
@@ -283,10 +308,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
 
         AbstractStack<?> stack = FilterList.getStack(filter);
         if (stack != null) {
-            matrixStack.push();
-            matrixStack.translate(guiLeft + 8, guiTop + 18, 0D);
-            stack.render(matrixStack);
-            matrixStack.pop();
+            stack.render(matrixStack, guiLeft + 8, guiTop + 18);
         }
 
         matrixStack.push();
