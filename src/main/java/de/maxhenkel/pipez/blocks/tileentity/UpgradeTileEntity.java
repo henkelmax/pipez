@@ -3,6 +3,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 import de.maxhenkel.corelib.CachedValue;
 import de.maxhenkel.corelib.inventory.ItemListInventory;
 import de.maxhenkel.corelib.item.ItemUtils;
+import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.items.UpgradeItem;
@@ -11,6 +12,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
@@ -18,10 +20,9 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
 
@@ -91,14 +92,14 @@ public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
 
     private List<Filter<T>> deserializeFilters(ItemStack stack) {
         if (stack.isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         CompoundNBT compound = stack.getTag();
         if (compound == null) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         if (!compound.contains(getFilterKey(), Constants.NBT.TAG_LIST)) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         ListNBT list = compound.getList(getFilterKey(), Constants.NBT.TAG_COMPOUND);
         List<Filter<T>> filters = new ArrayList<>();
@@ -214,6 +215,102 @@ public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
             return ((UpgradeItem) stack.getItem()).getTier();
         }
         return null;
+    }
+
+    public List<Connection> getSortedConnections(Direction side) {
+        Distribution distribution = getDistribution(side);
+        switch (distribution) {
+            case FURTHEST:
+                return getConnections().stream().sorted((o1, o2) -> Integer.compare(o2.getDistance(), o1.getDistance())).collect(Collectors.toList());
+            case RANDOM:
+                ArrayList<Connection> shuffle = new ArrayList<>(getConnections());
+                Collections.shuffle(shuffle);
+                return shuffle;
+            case NEAREST:
+            case ROUND_ROBIN:
+            default:
+                return getConnections().stream().sorted(Comparator.comparingInt(Connection::getDistance)).collect(Collectors.toList());
+        }
+    }
+
+    public boolean matchesConnection(Connection connection, Filter<T> filter) {
+        if (filter.getDestination() == null) {
+            return true;
+        }
+        return filter.getDestination().equals(new DirectionalPosition(connection.getPos(), connection.getDirection()));
+    }
+
+    public boolean deepExactCompare(INBT meta, INBT item) {
+        if (meta instanceof CompoundNBT) {
+            if (!(item instanceof CompoundNBT)) {
+                return false;
+            }
+            CompoundNBT c = (CompoundNBT) meta;
+            CompoundNBT i = (CompoundNBT) item;
+            Set<String> allKeys = new HashSet<>();
+            allKeys.addAll(c.keySet());
+            allKeys.addAll(i.keySet());
+            for (String key : allKeys) {
+                if (c.contains(key)) {
+                    if (i.contains(key)) {
+                        INBT nbt = c.get(key);
+                        if (!deepExactCompare(nbt, i.get(key))) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        } else if (meta instanceof ListNBT) {
+            ListNBT l = (ListNBT) meta;
+            if (!(item instanceof ListNBT)) {
+                return false;
+            }
+            ListNBT il = (ListNBT) item;
+            if (!l.stream().allMatch(inbt -> il.stream().anyMatch(inbt1 -> deepExactCompare(inbt, inbt1)))) {
+                return false;
+            }
+            if (!il.stream().allMatch(inbt -> l.stream().anyMatch(inbt1 -> deepExactCompare(inbt, inbt1)))) {
+                return false;
+            }
+            return true;
+        } else {
+            return meta != null && meta.equals(item);
+        }
+    }
+
+    public boolean deepFuzzyCompare(INBT meta, INBT item) {
+        if (meta instanceof CompoundNBT) {
+            if (!(item instanceof CompoundNBT)) {
+                return false;
+            }
+            CompoundNBT c = (CompoundNBT) meta;
+            CompoundNBT i = (CompoundNBT) item;
+            for (String key : c.keySet()) {
+                INBT nbt = c.get(key);
+                if (i.contains(key, nbt.getId())) {
+                    if (!deepFuzzyCompare(nbt, i.get(key))) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        } else if (meta instanceof ListNBT) {
+            ListNBT l = (ListNBT) meta;
+            if (!(item instanceof ListNBT)) {
+                return false;
+            }
+            ListNBT il = (ListNBT) item;
+            return l.stream().allMatch(inbt -> il.stream().anyMatch(inbt1 -> deepFuzzyCompare(inbt, inbt1)));
+        } else {
+            return meta != null && meta.equals(item);
+        }
     }
 
     public enum Distribution implements ICyclable<Distribution> {

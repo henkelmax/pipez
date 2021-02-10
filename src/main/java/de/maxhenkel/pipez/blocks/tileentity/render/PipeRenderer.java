@@ -3,7 +3,6 @@ package de.maxhenkel.pipez.blocks.tileentity.render;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import de.maxhenkel.corelib.CachedValue;
-import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -23,9 +22,7 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.List;
 
-public class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
-
-    public static final ResourceLocation EXTRACT_MODEL = new ResourceLocation(Main.MODID, "block/pipe_extract");
+public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
 
     protected Minecraft minecraft;
 
@@ -36,8 +33,8 @@ public class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
         minecraft = Minecraft.getInstance();
 
         cachedModel = new CachedValue<>(() -> {
-            IUnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(EXTRACT_MODEL);
-            return modelOrMissing.bakeModel(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, EXTRACT_MODEL);
+            IUnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(getModel());
+            return modelOrMissing.bakeModel(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, getModel());
         });
     }
 
@@ -89,5 +86,7 @@ public class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
                 return q;
         }
     }
+
+    abstract ResourceLocation getModel();
 
 }

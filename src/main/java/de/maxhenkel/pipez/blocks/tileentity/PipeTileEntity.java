@@ -36,12 +36,12 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
 
     public List<Connection> getConnections() {
         if (world == null) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         if (connectionCache == null) {
             updateCache();
             if (connectionCache == null) {
-                return Collections.emptyList();
+                return new ArrayList<>();
             }
         }
         return connectionCache;

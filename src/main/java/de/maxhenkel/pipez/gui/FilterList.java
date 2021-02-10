@@ -2,7 +2,10 @@ package de.maxhenkel.pipez.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import de.maxhenkel.corelib.CachedMap;
+import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.Pair;
+import de.maxhenkel.corelib.helpers.WrappedFluidStack;
+import de.maxhenkel.corelib.helpers.WrappedItemStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.pipez.DirectionalPosition;
@@ -11,6 +14,7 @@ import de.maxhenkel.pipez.Main;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -20,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.*;
+import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -70,9 +75,9 @@ public class FilterList extends WidgetBase {
             }
             Filter<?> filter = f.get(getOffset() + i);
             if (itemHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
-                ItemStack stack = getStack(filter);
+                AbstractStack<?> stack = getStack(filter);
                 if (stack != null && !stack.isEmpty()) {
-                    List<ITextComponent> tooltip = screen.getTooltipFromItem(stack);
+                    List<ITextComponent> tooltip = stack.getTooltip(screen);
                     if (filter.isInvert()) {
                         tooltip.set(0, new TranslationTextComponent("tooltip.pipez.filter.not").mergeStyle(TextFormatting.DARK_RED).appendString(" ").append(tooltip.get(0)));
                     }
@@ -105,7 +110,7 @@ public class FilterList extends WidgetBase {
     }
 
     @Nullable
-    public ItemStack getStack(Filter<?> filter) {
+    public static AbstractStack<?> getStack(Filter<?> filter) {
         Object o = null;
 
         if (filter.getTag() != null) {
@@ -117,7 +122,13 @@ public class FilterList extends WidgetBase {
             if (filter.getMetadata() != null) {
                 stack.setTag(filter.getMetadata());
             }
-            return stack;
+            return new WrappedItemStack(stack);
+        } else if (o instanceof Fluid) {
+            FluidStack stack = new FluidStack((Fluid) o, 1000);
+            if (filter.getMetadata() != null) {
+                stack.setTag(filter.getMetadata());
+            }
+            return new WrappedFluidStack(stack);
         }
         return null;
     }
@@ -138,9 +149,12 @@ public class FilterList extends WidgetBase {
                 AbstractGui.blit(matrixStack, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
             }
 
-            ItemStack stack = getStack(filter);
+            AbstractStack<?> stack = getStack(filter);
             if (stack != null && !stack.isEmpty()) {
-                mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, stack, guiLeft + 3, startY + 3);
+                matrixStack.push();
+                matrixStack.translate(guiLeft + 3, startY + 3, 0D);
+                stack.render(matrixStack);
+                matrixStack.pop();
                 if (filter.getTag() != null) {
                     if (filter.getTag() instanceof SingleElementTag) {
                         drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.item", new TranslationTextComponent(stack.getDisplayName().getString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.WHITE));

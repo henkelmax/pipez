@@ -5,7 +5,6 @@ import de.maxhenkel.corelib.block.VoxelUtils;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.helpers.Triple;
 import de.maxhenkel.pipez.ModItemGroups;
-import de.maxhenkel.pipez.blocks.tileentity.ItemPipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.block.*;
@@ -460,7 +459,6 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         if (state.isIn(newState.getBlock())) {
             if (!newState.get(HAS_DATA)) {
                 worldIn.removeTileEntity(pos);
-                // TODO drop items
             }
         } else {
             super.onReplaced(state, worldIn, pos, newState, isMoving);
@@ -512,11 +510,13 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         if (state.get(HAS_DATA)) {
-            return new ItemPipeTileEntity();
+            return createTileEntity();
         } else {
             return null;
         }
     }
+
+    abstract TileEntity createTileEntity();
 
     @Override
     public boolean hasTileEntity(BlockState state) {

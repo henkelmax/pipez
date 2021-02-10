@@ -1,46 +1,46 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.ItemFilter;
+import de.maxhenkel.pipez.FluidFilter;
 import de.maxhenkel.pipez.Upgrade;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
+public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
 
-    public ItemPipeTileEntity() {
-        super(ModTileEntities.ITEM_PIPE);
+    public FluidPipeTileEntity() {
+        super(ModTileEntities.FLUID_PIPE);
     }
 
     @Override
     public boolean canInsert(TileEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent();
+        return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()).isPresent();
     }
 
     @Override
-    public Filter<Item> createFilter() {
-        return new ItemFilter();
+    public Filter<Fluid> createFilter() {
+        return new FluidFilter();
     }
 
     @Override
     public String getFilterKey() {
-        return "ItemFilters";
+        return "FluidFilters";
     }
 
     @Override
     public Distribution getDefaultDistribution() {
-        return Distribution.NEAREST;
+        return Distribution.ROUND_ROBIN;
     }
 
     @Override
@@ -62,64 +62,60 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
         }
 
         for (Direction side : Direction.values()) {
-            if (world.getGameTime() % getSpeed(side) != 0) {
-                continue;
-            }
             if (!isExtracting(side)) {
                 continue;
             }
             if (!shouldWork(side)) {
                 continue;
             }
-            IItemHandler itemHandler = getItemHandler(pos.offset(side), side.getOpposite());
-            if (itemHandler == null) {
+            IFluidHandler fluidHandler = getFluidHandler(pos.offset(side), side.getOpposite());
+            if (fluidHandler == null) {
                 continue;
             }
 
             List<Connection> connections = getSortedConnections(side);
 
             if (getDistribution(side).equals(Distribution.ROUND_ROBIN)) {
-                insertEqually(side, connections, itemHandler);
+                insertEqually(side, connections, fluidHandler);
             } else {
-                insertOrdered(side, connections, itemHandler);
+                insertOrdered(side, connections, fluidHandler);
             }
         }
     }
 
     private final int[] rrIndex = new int[Direction.values().length];
 
-    protected void insertEqually(Direction side, List<Connection> connections, IItemHandler itemHandler) {
+    protected void insertEqually(Direction side, List<Connection> connections, IFluidHandler fluidHandler) {
         if (connections.isEmpty()) {
             return;
         }
-        int itemsToTransfer = getAmount(side);
-        boolean[] inventoriesFull = new boolean[connections.size()];
+        int mbToTransfer = getAmount(side);
+        boolean[] connectionsFull = new boolean[connections.size()];
         int p = rrIndex[side.getIndex()] % connections.size();
-        while (itemsToTransfer > 0 && hasNotInserted(inventoriesFull)) {
+        while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             Connection connection = connections.get(p);
-            IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
+            IFluidHandler destination = getFluidHandler(connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
             if (destination != null) {
-                for (int j = 0; j < itemHandler.getSlots(); j++) {
-                    ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
+                for (int j = 0; j < fluidHandler.getTanks(); j++) {
+                    FluidStack fluidInTank = fluidHandler.getFluidInTank(j);
+                    FluidStack simulatedExtract = fluidHandler.drain(new FluidStack(fluidInTank.getFluid(), Math.min(100, mbToTransfer), fluidInTank.getTag()), IFluidHandler.FluidAction.SIMULATE);
                     if (simulatedExtract.isEmpty()) {
                         continue;
                     }
                     if (canInsert(connection, simulatedExtract, getFilters(side)) == getFilterMode(side).equals(FilterMode.BLACKLIST)) {
                         continue;
                     }
-                    ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
-                    int insertedAmount = simulatedExtract.getCount() - stack.getCount();
-                    if (insertedAmount > 0) {
-                        itemsToTransfer -= insertedAmount;
-                        itemHandler.extractItem(j, insertedAmount, false);
+                    FluidStack stack = FluidUtil.tryFluidTransfer(destination, fluidHandler, simulatedExtract, true);
+                    if (stack.getAmount() > 0) {
+                        mbToTransfer -= stack.getAmount();
                         hasInserted = true;
                         break;
                     }
                 }
             }
             if (!hasInserted) {
-                inventoriesFull[p] = true;
+                connectionsFull[p] = true;
             }
             p = (p + 1) % connections.size();
         }
@@ -127,46 +123,45 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
         rrIndex[side.getIndex()] = p;
     }
 
-    protected void insertOrdered(Direction side, List<Connection> connections, IItemHandler itemHandler) {
-        int itemsToTransfer = getAmount(side);
+    protected void insertOrdered(Direction side, List<Connection> connections, IFluidHandler fluidHandler) {
+        int mbToTransfer = getAmount(side);
 
         connectionLoop:
         for (Connection connection : connections) {
-            IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
+            IFluidHandler destination = getFluidHandler(connection.getPos(), connection.getDirection());
             if (destination == null) {
                 continue;
             }
 
-            for (int i = 0; i < itemHandler.getSlots(); i++) {
-                if (itemsToTransfer <= 0) {
+            for (int i = 0; i < fluidHandler.getTanks(); i++) {
+                if (mbToTransfer <= 0) {
                     break connectionLoop;
                 }
-                ItemStack simulatedExtract = itemHandler.extractItem(i, itemsToTransfer, true);
+                FluidStack fluidInTank = fluidHandler.getFluidInTank(i);
+                FluidStack simulatedExtract = fluidHandler.drain(new FluidStack(fluidInTank.getFluid(), mbToTransfer, fluidInTank.getTag()), IFluidHandler.FluidAction.SIMULATE);
                 if (simulatedExtract.isEmpty()) {
                     continue;
                 }
                 if (canInsert(connection, simulatedExtract, getFilters(side)) == getFilterMode(side).equals(FilterMode.BLACKLIST)) {
                     continue;
                 }
-                ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
-                int insertedAmount = simulatedExtract.getCount() - stack.getCount();
-                itemsToTransfer -= insertedAmount;
-                itemHandler.extractItem(i, insertedAmount, false);
+                FluidStack stack = FluidUtil.tryFluidTransfer(destination, fluidHandler, simulatedExtract, true);
+                mbToTransfer -= stack.getAmount();
             }
         }
     }
 
-    private boolean canInsert(Connection connection, ItemStack stack, List<Filter<Item>> filters) {
-        for (Filter<Item> filter : filters.stream().filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
+    private boolean canInsert(Connection connection, FluidStack stack, List<Filter<Fluid>> filters) {
+        for (Filter<Fluid> filter : filters.stream().filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
             if (matches(filter, stack)) {
                 return false;
             }
         }
-        List<Filter<Item>> collect = filters.stream().filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
+        List<Filter<Fluid>> collect = filters.stream().filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
         if (collect.isEmpty()) {
             return true;
         }
-        for (Filter<Item> filter : collect) {
+        for (Filter<Fluid> filter : collect) {
             if (matches(filter, stack)) {
                 return true;
             }
@@ -174,14 +169,14 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
         return false;
     }
 
-    private boolean matches(Filter<Item> filter, ItemStack stack) {
+    private boolean matches(Filter<Fluid> filter, FluidStack stack) {
         CompoundNBT metadata = filter.getMetadata();
         if (metadata == null) {
-            return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+            return filter.getTag() == null || stack.getFluid().isIn(filter.getTag());
         }
         if (filter.isExactMetadata()) {
             if (deepExactCompare(metadata, stack.getTag())) {
-                return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+                return filter.getTag() == null || stack.getFluid().isIn(filter.getTag());
             } else {
                 return false;
             }
@@ -193,7 +188,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
             if (!deepFuzzyCompare(metadata, stackNBT)) {
                 return false;
             }
-            return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+            return filter.getTag() == null || stack.getFluid().isIn(filter.getTag());
         }
     }
 
@@ -207,47 +202,29 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
     }
 
     @Nullable
-    private IItemHandler getItemHandler(BlockPos pos, Direction direction) {
+    private IFluidHandler getFluidHandler(BlockPos pos, Direction direction) {
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity == null) {
             return null;
         }
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).orElse(null);
-    }
-
-    public int getSpeed(Direction direction) {
-        Upgrade upgrade = getUpgrade(direction);
-        if (upgrade == null) {
-            return 20;
-        }
-        switch (upgrade) {
-            case BASIC:
-                return 15;
-            case IMPROVED:
-                return 10;
-            case ADVANCED:
-                return 5;
-            case ULTIMATE:
-            default:
-                return 1;
-        }
+        return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction).orElse(null);
     }
 
     public int getAmount(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
-            return 4;
+            return 50;
         }
         switch (upgrade) {
             case BASIC:
-                return 8;
+                return 100;
             case IMPROVED:
-                return 16;
+                return 500;
             case ADVANCED:
-                return 32;
+                return 2000;
             case ULTIMATE:
             default:
-                return 64;
+                return 10000;
         }
     }
 

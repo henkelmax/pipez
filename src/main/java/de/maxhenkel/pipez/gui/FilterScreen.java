@@ -3,13 +3,11 @@ package de.maxhenkel.pipez.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.TagUtils;
-import de.maxhenkel.pipez.DirectionalPosition;
-import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.ItemFilter;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
@@ -17,12 +15,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.*;
+import net.minecraftforge.fluids.FluidUtil;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -118,21 +116,18 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         nbt.setResponder(this::onNbtTextChanged);
         addButton(nbt);
 
+        nbtButton.active = filter.getMetadata() != null;
+
         itemHoverArea = new HoverArea(8, 18, 16, 16, () -> {
             List<ITextComponent> tooltip = new ArrayList<>();
-            ITag.INamedTag<?> tag = filter.getTag();
-            if (tag != null) {
-                Object o = FilterList.get(tag);
-                if (o instanceof Item) {
-                    ItemStack stack = new ItemStack((Item) o);
-                    if (filter.getMetadata() != null) {
-                        stack.setTag(filter.getMetadata());
-                    }
-                    tooltip = getTooltipFromItem(stack);
-                    if (!(tag instanceof SingleElementTag)) {
-                        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(tag.getName().toString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.GRAY));
-                    }
+
+            AbstractStack<?> stack = FilterList.getStack(filter);
+            if (stack != null) {
+                tooltip = stack.getTooltip(this);
+                if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
+                    tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(filter.getTag().getName().toString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.GRAY));
                 }
+
             }
             return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
         });
@@ -202,8 +197,16 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             return;
         }
 
-        if (getContainer().getPipe().createFilter() instanceof ItemFilter) {
+        if (filter instanceof ItemFilter) {
             ITag.INamedTag tag = TagUtils.getItem(text, true);
+            filter.setTag(tag);
+            if (filter.getTag() == null) {
+                item.setTextColor(TextFormatting.DARK_RED.getColor());
+            } else {
+                item.setTextColor(TextFormatting.WHITE.getColor());
+            }
+        } else if (filter instanceof FluidFilter) {
+            ITag.INamedTag tag = TagUtils.getFluid(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
                 item.setTextColor(TextFormatting.DARK_RED.getColor());
@@ -234,11 +237,23 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         if (stack == null || stack.isEmpty()) {
             return;
         }
-        item.setText(stack.getItem().getRegistryName().toString());
-        if (stack.hasTag()) {
-            nbt.setText(stack.getTag().toString());
-        } else {
-            nbt.setText("");
+
+        if (filter instanceof ItemFilter) {
+            item.setText(stack.getItem().getRegistryName().toString());
+            if (stack.hasTag()) {
+                nbt.setText(stack.getTag().toString());
+            } else {
+                nbt.setText("");
+            }
+        } else if (filter instanceof FluidFilter) {
+            FluidUtil.getFluidContained(stack).ifPresent(s -> {
+                item.setText(s.getFluid().getRegistryName().toString());
+                if (s.hasTag()) {
+                    nbt.setText(s.getTag().toString());
+                } else {
+                    nbt.setText("");
+                }
+            });
         }
     }
 
@@ -266,15 +281,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
 
-        if (filter.getTag() != null) {
-            Object o = FilterList.get(filter.getTag());
-            if (o instanceof Item) {
-                ItemStack stack = new ItemStack((Item) o);
-                if (filter.getMetadata() != null) {
-                    stack.setTag(filter.getMetadata());
-                }
-                minecraft.getItemRenderer().renderItemAndEffectIntoGUI(minecraft.player, stack, guiLeft + 8, guiTop + 18);
-            }
+        AbstractStack<?> stack = FilterList.getStack(filter);
+        if (stack != null) {
+            matrixStack.push();
+            matrixStack.translate(guiLeft + 8, guiTop + 18, 0D);
+            stack.render(matrixStack);
+            matrixStack.pop();
         }
 
         matrixStack.push();

@@ -1,6 +1,7 @@
 {
   "itemGroup.pipez": "Pipez",
   "block.pipez.item_pipe": "Item Pipe",
+  "block.pipez.fluid_pipe": "Fluid Pipe",
   "item.pipez.basic_upgrade": "Basic Pipe Upgrade",
   "item.pipez.improved_upgrade": "Improved Pipe Upgrade",
   "item.pipez.advanced_upgrade": "Advanced Pipe Upgrade",

@@ -1,8 +1,8 @@
 {
 	"parent": "block/block",
 	"textures": {
-		"0": "pipez:block/pipe",
-		"particle": "pipez:block/pipe"
+		"0": "pipez:block/fluid_pipe",
+		"particle": "pipez:block/fluid_pipe"
 	},
 	"elements": [
 		{

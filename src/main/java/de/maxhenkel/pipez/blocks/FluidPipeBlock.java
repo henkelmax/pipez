@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.blocks.tileentity.ItemPipeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.FluidPipeTileEntity;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.block.BlockState;
@@ -15,18 +15,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
-public class ItemPipeBlock extends PipeBlock {
+public class FluidPipeBlock extends PipeBlock {
 
-    protected ItemPipeBlock() {
-        setRegistryName(new ResourceLocation(Main.MODID, "item_pipe"));
+    protected FluidPipeBlock() {
+        setRegistryName(new ResourceLocation(Main.MODID, "fluid_pipe"));
     }
 
     @Override
     public boolean canConnectTo(IWorldReader world, BlockPos pos, Direction facing) {
         TileEntity te = world.getTileEntity(pos.offset(facing));
-        return (te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).isPresent());
+        return (te != null && te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()).isPresent());
     }
 
     @Override
@@ -37,17 +37,17 @@ public class ItemPipeBlock extends PipeBlock {
 
     @Override
     TileEntity createTileEntity() {
-        return new ItemPipeTileEntity();
+        return new FluidPipeTileEntity();
     }
 
     @Override
     public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity instanceof ItemPipeTileEntity && isExtracting(worldIn, pos, direction)) {
+        if (tileEntity instanceof FluidPipeTileEntity && isExtracting(worldIn, pos, direction)) {
             if (worldIn.isRemote) {
                 return ActionResultType.SUCCESS;
             }
-            ItemPipeTileEntity pipe = (ItemPipeTileEntity) tileEntity;
+            FluidPipeTileEntity pipe = (FluidPipeTileEntity) tileEntity;
             PipeContainerProvider.openGui(player, pipe, direction, (i, playerInventory, playerEntity) -> new ExtractContainer(i, playerInventory, pipe, direction));
             return ActionResultType.SUCCESS;
         }
