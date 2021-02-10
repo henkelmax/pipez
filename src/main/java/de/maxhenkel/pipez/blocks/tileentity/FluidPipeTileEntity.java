@@ -89,7 +89,8 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
         if (connections.isEmpty()) {
             return;
         }
-        int mbToTransfer = getAmount(side);
+        int completeAmount = getAmount(side);
+        int mbToTransfer = completeAmount;
         boolean[] connectionsFull = new boolean[connections.size()];
         int p = rrIndex[side.getIndex()] % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
@@ -99,7 +100,7 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
             if (destination != null) {
                 for (int j = 0; j < fluidHandler.getTanks(); j++) {
                     FluidStack fluidInTank = fluidHandler.getFluidInTank(j);
-                    FluidStack simulatedExtract = fluidHandler.drain(new FluidStack(fluidInTank.getFluid(), Math.min(100, mbToTransfer), fluidInTank.getTag()), IFluidHandler.FluidAction.SIMULATE);
+                    FluidStack simulatedExtract = fluidHandler.drain(new FluidStack(fluidInTank.getFluid(), Math.min(Math.max(completeAmount / connections.size(), 1), mbToTransfer), fluidInTank.getTag()), IFluidHandler.FluidAction.SIMULATE);
                     if (simulatedExtract.isEmpty()) {
                         continue;
                     }
@@ -223,8 +224,10 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
             case ADVANCED:
                 return 2000;
             case ULTIMATE:
-            default:
                 return 10000;
+            case INFINITY:
+            default:
+                return Integer.MAX_VALUE;
         }
     }
 

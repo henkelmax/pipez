@@ -2,7 +2,7 @@ package de.maxhenkel.pipez;
 
 public enum Upgrade {
 
-    BASIC("basic"), IMPROVED("improved"), ADVANCED("advanced"), ULTIMATE("ultimate");
+    BASIC("basic"), IMPROVED("improved"), ADVANCED("advanced"), ULTIMATE("ultimate"), INFINITY("infinity");
 
     private final String name;
 

@@ -26,7 +26,8 @@ public class UpgradeTagProvider extends TagsProvider<Item> {
                 .addItemEntry(ModItems.BASIC_UPGRADE)
                 .addItemEntry(ModItems.IMPROVED_UPGRADE)
                 .addItemEntry(ModItems.ADVANCED_UPGRADE)
-                .addItemEntry(ModItems.ULTIMATE_UPGRADE);
+                .addItemEntry(ModItems.ULTIMATE_UPGRADE)
+                .addItemEntry(ModItems.INFINITY_UPGRADE);
     }
 
     @Override

@@ -10,6 +10,7 @@ public class ModItems {
     public static final UpgradeItem IMPROVED_UPGRADE = new UpgradeItem(Upgrade.IMPROVED);
     public static final UpgradeItem ADVANCED_UPGRADE = new UpgradeItem(Upgrade.ADVANCED);
     public static final UpgradeItem ULTIMATE_UPGRADE = new UpgradeItem(Upgrade.ULTIMATE);
+    public static final UpgradeItem INFINITY_UPGRADE = new UpgradeItem(Upgrade.INFINITY);
     public static final WrenchItem WRENCH = new WrenchItem();
     public static final FilterDestinationToolItem FILTER_DESTINATION_TOOL = new FilterDestinationToolItem();
 
@@ -19,6 +20,7 @@ public class ModItems {
                 IMPROVED_UPGRADE,
                 ADVANCED_UPGRADE,
                 ULTIMATE_UPGRADE,
+                INFINITY_UPGRADE,
                 WRENCH,
                 FILTER_DESTINATION_TOOL
         );

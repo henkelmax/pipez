@@ -6,6 +6,7 @@
   "item.pipez.improved_upgrade": "Improved Pipe Upgrade",
   "item.pipez.advanced_upgrade": "Advanced Pipe Upgrade",
   "item.pipez.ultimate_upgrade": "Ultimate Pipe Upgrade",
+  "item.pipez.infinity_upgrade": "Infinity Pipe Upgrade",
   "item.pipez.wrench": "Pipe Wrench",
   "item.pipez.filter_destination_tool": "Filter Destination Tool",
   "tooltip.pipez.wrench": "Click on a pipe to configure",

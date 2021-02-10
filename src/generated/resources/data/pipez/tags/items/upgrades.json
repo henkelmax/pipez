@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "pipez:basic_upgrade",
+    "pipez:improved_upgrade",
+    "pipez:advanced_upgrade",
+    "pipez:ultimate_upgrade",
+    "pipez:infinity_upgrade"
+  ]
+}

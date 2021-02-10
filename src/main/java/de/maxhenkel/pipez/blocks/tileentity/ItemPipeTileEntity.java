@@ -228,6 +228,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
             case ADVANCED:
                 return 5;
             case ULTIMATE:
+            case INFINITY:
             default:
                 return 1;
         }
@@ -246,8 +247,10 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
             case ADVANCED:
                 return 32;
             case ULTIMATE:
-            default:
                 return 64;
+            case INFINITY:
+            default:
+                return Integer.MAX_VALUE;
         }
     }
 
