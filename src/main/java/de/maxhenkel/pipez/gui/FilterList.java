@@ -81,7 +81,7 @@ public class FilterList extends WidgetBase {
                     if (filter.isInvert()) {
                         tooltip.set(0, new TranslationTextComponent("tooltip.pipez.filter.not").mergeStyle(TextFormatting.DARK_RED).appendString(" ").append(tooltip.get(0)));
                     }
-                    if (filter.getTag() != null) {
+                    if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                         tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(filter.getTag().getName().toString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.GRAY));
                     }
                     screen.renderToolTip(matrixStack, tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.fontRenderer);
