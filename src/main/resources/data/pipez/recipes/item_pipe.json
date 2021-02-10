@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "DRD",
+    "III"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:dropper"
+    },
+    "I": {
+      "tag": "forge:ingots/iron"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    }
+  },
+  "result": {
+    "item": "pipez:item_pipe",
+    "count": 16
+  }
+}

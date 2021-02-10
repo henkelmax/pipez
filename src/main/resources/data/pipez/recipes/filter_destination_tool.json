@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "RGR",
+    "IBI"
+  ],
+  "key": {
+    "I": {
+      "tag": "forge:ingots/iron"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    },
+    "G": {
+      "tag": "forge:glass_panes"
+    },
+    "B": {
+      "tag": "minecraft:buttons"
+    }
+  },
+  "result": {
+    "item": "pipez:filter_destination_tool",
+    "count": 1
+  }
+}

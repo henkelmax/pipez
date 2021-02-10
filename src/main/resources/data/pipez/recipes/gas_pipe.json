@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "ARA",
+    "III"
+  ],
+  "key": {
+    "A": {
+      "item": "mekanism:alloy_infused"
+    },
+    "I": {
+      "tag": "forge:ingots/iron"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    }
+  },
+  "result": {
+    "item": "pipez:gas_pipe",
+    "count": 16
+  }
+}

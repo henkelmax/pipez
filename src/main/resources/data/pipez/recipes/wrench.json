@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " F ",
+    " SF",
+    "S  "
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:flint"
+    },
+    "S": {
+      "tag": "forge:rods"
+    }
+  },
+  "result": {
+    "item": "pipez:wrench",
+    "count": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DRD",
+    "RUR",
+    "DRD"
+  ],
+  "key": {
+    "D": {
+      "tag": "forge:gems/diamond"
+    },
+    "R": {
+      "tag": "forge:storage_blocks/redstone"
+    },
+    "U": {
+      "item": "pipez:improved_upgrade"
+    }
+  },
+  "result": {
+    "item": "pipez:advanced_upgrade",
+    "count": 1
+  }
+}
