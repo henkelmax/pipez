@@ -14,17 +14,19 @@ import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class WrenchTagProvider extends TagsProvider<Item> {
+public class UpgradeTagProvider extends TagsProvider<Item> {
 
-    public WrenchTagProvider(DataGenerator generatorIn, @Nullable ExistingFileHelper existingFileHelper) {
+    public UpgradeTagProvider(DataGenerator generatorIn, @Nullable ExistingFileHelper existingFileHelper) {
         super(generatorIn, Registry.ITEM, Main.MODID, existingFileHelper);
     }
 
     @Override
     protected void registerTags() {
-        getOrCreateBuilder(ModItemTags.WRENCHES_TAG).addTag(ModItemTags.WRENCH_TAG);
-        getOrCreateBuilder(ModItemTags.WRENCH_TAG).addItemEntry(ModItems.WRENCH);
-        getOrCreateBuilder(ModItemTags.TOOLS_TAG).addTag(ModItemTags.WRENCH_TAG);
+        getOrCreateBuilder(ModItemTags.UPGRADES_TAG)
+                .addItemEntry(ModItems.BASIC_UPGRADE)
+                .addItemEntry(ModItems.IMPROVED_UPGRADE)
+                .addItemEntry(ModItems.ADVANCED_UPGRADE)
+                .addItemEntry(ModItems.ULTIMATE_UPGRADE);
     }
 
     @Override
@@ -34,6 +36,6 @@ public class WrenchTagProvider extends TagsProvider<Item> {
 
     @Override
     public String getName() {
-        return "PipezWrenchesTags";
+        return "PipezUpgradeTags";
     }
 }

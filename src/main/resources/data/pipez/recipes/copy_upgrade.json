@@ -1,0 +1,6 @@
+{
+  "type": "pipez:copy_nbt",
+  "item": {
+    "tag": "pipez:upgrades"
+  }
+}

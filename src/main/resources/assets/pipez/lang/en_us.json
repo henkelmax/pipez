@@ -37,6 +37,8 @@
   "tooltip.pipez.filter.destination_location": "At X=%s, Y=%s, Z=%s",
   "tooltip.pipez.filter.destination_distance": "%s block(s) away",
   "tooltip.pipez.filter.destination_side": "Facing %s",
+  "tooltip.pipez.upgrade.filters.item": "%s Item Filter(s)",
+  "tooltip.pipez.upgrade.filters.fluid": "%s Fluid Filter(s)",
   "message.pipez.filter.tag": "Tag: %s",
   "message.pipez.filter.item": "Item: %s",
   "message.pipez.filter.nbt": "NBT: %s",
