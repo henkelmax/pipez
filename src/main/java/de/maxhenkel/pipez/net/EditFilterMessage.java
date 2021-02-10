@@ -19,7 +19,7 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
 
     }
 
-    public EditFilterMessage(Filter<?> filter) {
+    public EditFilterMessage(Filter filter) {
         this.filter = filter.serializeNBT();
     }
 

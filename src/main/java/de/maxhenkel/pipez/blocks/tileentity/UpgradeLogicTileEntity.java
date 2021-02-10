@@ -3,7 +3,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 
-public abstract class UpgradeLogicTileEntity extends UpgradeTileEntity {
+public abstract class UpgradeLogicTileEntity<T> extends UpgradeTileEntity<T> {
 
     public UpgradeLogicTileEntity(TileEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);

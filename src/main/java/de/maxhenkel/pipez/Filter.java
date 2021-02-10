@@ -69,4 +69,14 @@ public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
     public UUID getId() {
         return id;
     }
+
+    @Override
+    public CompoundNBT serializeNBT() {
+        return new CompoundNBT();
+    }
+
+    @Override
+    public void deserializeNBT(CompoundNBT nbt) {
+
+    }
 }

@@ -1,9 +1,14 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.ItemFilter;
 import de.maxhenkel.pipez.Upgrade;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -12,13 +17,10 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class ItemPipeTileEntity extends UpgradeLogicTileEntity {
+public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
 
     public ItemPipeTileEntity() {
         super(ModTileEntities.ITEM_PIPE);
@@ -30,7 +32,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity {
     }
 
     @Override
-    public Filter<?> createFilter() {
+    public Filter<Item> createFilter() {
         return new ItemFilter();
     }
 
@@ -103,6 +105,12 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity {
             if (destination != null) {
                 for (int j = 0; j < itemHandler.getSlots(); j++) {
                     ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
+                    if (simulatedExtract.isEmpty()) {
+                        continue;
+                    }
+                    if (canInsert(connection, simulatedExtract, getFilters(side)) == getFilterMode(side).equals(FilterMode.BLACKLIST)) {
+                        continue;
+                    }
                     ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
                     int insertedAmount = simulatedExtract.getCount() - stack.getCount();
                     if (insertedAmount > 0) {
@@ -122,15 +130,6 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity {
         rrIndex[side.getIndex()] = p;
     }
 
-    private boolean hasNotInserted(boolean[] inventoriesFull) {
-        for (int i = 0; i < inventoriesFull.length; i++) {
-            if (!inventoriesFull[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected void insertOrdered(Direction side, List<Connection> connections, IItemHandler itemHandler) {
         int itemsToTransfer = getAmount(side);
 
@@ -146,13 +145,148 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity {
                     break connectionLoop;
                 }
                 ItemStack simulatedExtract = itemHandler.extractItem(i, itemsToTransfer, true);
-
+                if (simulatedExtract.isEmpty()) {
+                    continue;
+                }
+                if (canInsert(connection, simulatedExtract, getFilters(side)) == getFilterMode(side).equals(FilterMode.BLACKLIST)) {
+                    continue;
+                }
                 ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
                 int insertedAmount = simulatedExtract.getCount() - stack.getCount();
                 itemsToTransfer -= insertedAmount;
                 itemHandler.extractItem(i, insertedAmount, false);
             }
         }
+    }
+
+    private boolean canInsert(Connection connection, ItemStack stack, List<Filter<Item>> filters) {
+        for (Filter<Item> filter : filters.stream().filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
+            if (matches(filter, stack)) {
+                return false;
+            }
+        }
+        List<Filter<Item>> collect = filters.stream().filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
+        if (collect.isEmpty()) {
+            return true;
+        }
+        for (Filter<Item> filter : collect) {
+            if (matches(filter, stack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean matchesConnection(Connection connection, Filter<Item> filter) {
+        if (filter.getDestination() == null) {
+            return true;
+        }
+        return filter.getDestination().equals(new DirectionalPosition(connection.getPos(), connection.getDirection()));
+    }
+
+    private boolean matches(Filter<Item> filter, ItemStack stack) {
+        CompoundNBT metadata = filter.getMetadata();
+        if (metadata == null) {
+            return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+        }
+        if (filter.isExactMetadata()) {
+            if (deepExactCompare(metadata, stack.getTag())) {
+                return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+            } else {
+                return false;
+            }
+        } else {
+            CompoundNBT stackNBT = stack.getTag();
+            if (stackNBT == null) {
+                return metadata.size() <= 0;
+            }
+            if (!deepFuzzyCompare(metadata, stackNBT)) {
+                return false;
+            }
+            return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+        }
+    }
+
+    private boolean deepExactCompare(INBT meta, INBT item) {
+        if (meta instanceof CompoundNBT) {
+            if (!(item instanceof CompoundNBT)) {
+                return false;
+            }
+            CompoundNBT c = (CompoundNBT) meta;
+            CompoundNBT i = (CompoundNBT) item;
+            Set<String> allKeys = new HashSet<>();
+            allKeys.addAll(c.keySet());
+            allKeys.addAll(i.keySet());
+            for (String key : allKeys) {
+                if (c.contains(key)) {
+                    if (i.contains(key)) {
+                        INBT nbt = c.get(key);
+                        if (!deepExactCompare(nbt, i.get(key))) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        } else if (meta instanceof ListNBT) {
+            ListNBT l = (ListNBT) meta;
+            if (!(item instanceof ListNBT)) {
+                return false;
+            }
+            ListNBT il = (ListNBT) item;
+            if (!l.stream().allMatch(inbt -> il.stream().anyMatch(inbt1 -> deepExactCompare(inbt, inbt1)))) {
+                return false;
+            }
+            if (!il.stream().allMatch(inbt -> l.stream().anyMatch(inbt1 -> deepExactCompare(inbt, inbt1)))) {
+                return false;
+            }
+            return true;
+        } else {
+            return meta != null && meta.equals(item);
+        }
+    }
+
+    private boolean deepFuzzyCompare(INBT meta, INBT item) {
+        if (meta instanceof CompoundNBT) {
+            if (!(item instanceof CompoundNBT)) {
+                return false;
+            }
+            CompoundNBT c = (CompoundNBT) meta;
+            CompoundNBT i = (CompoundNBT) item;
+            for (String key : c.keySet()) {
+                INBT nbt = c.get(key);
+                if (i.contains(key, nbt.getId())) {
+                    if (!deepFuzzyCompare(nbt, i.get(key))) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        } else if (meta instanceof ListNBT) {
+            ListNBT l = (ListNBT) meta;
+            if (!(item instanceof ListNBT)) {
+                return false;
+            }
+            ListNBT il = (ListNBT) item;
+            return l.stream().allMatch(inbt -> il.stream().anyMatch(inbt1 -> deepFuzzyCompare(inbt, inbt1)));
+        } else {
+            return meta != null && meta.equals(item);
+        }
+    }
+
+    private boolean hasNotInserted(boolean[] inventoriesFull) {
+        for (boolean b : inventoriesFull) {
+            if (!b) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Connection> getSortedConnections(Direction side) {

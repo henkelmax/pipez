@@ -23,13 +23,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class UpgradeTileEntity extends PipeTileEntity {
+public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
 
     protected NonNullList<ItemStack> upgradeInventory;
     protected CachedValue<Distribution>[] distributions;
     protected CachedValue<RedstoneMode>[] redstoneModes;
     protected CachedValue<FilterMode>[] filterModes;
-    protected CachedValue<List<Filter<?>>>[] filters;
+    protected CachedValue<List<Filter<T>>>[] filters;
 
     public UpgradeTileEntity(TileEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);
@@ -89,7 +89,7 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         markDirty();
     }
 
-    private List<Filter<?>> deserializeFilters(ItemStack stack) {
+    private List<Filter<T>> deserializeFilters(ItemStack stack) {
         if (stack.isEmpty()) {
             return Collections.emptyList();
         }
@@ -101,16 +101,16 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
             return Collections.emptyList();
         }
         ListNBT list = compound.getList(getFilterKey(), Constants.NBT.TAG_COMPOUND);
-        List<Filter<?>> filters = new ArrayList<>();
+        List<Filter<T>> filters = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            Filter<?> filter = createFilter();
+            Filter<T> filter = createFilter();
             filter.deserializeNBT(list.getCompound(i));
             filters.add(filter);
         }
         return filters;
     }
 
-    private void serializeFilters(ItemStack stack, List<Filter<?>> filters) {
+    private void serializeFilters(ItemStack stack, List<Filter<T>> filters) {
         if (stack.isEmpty()) {
             return;
         }
@@ -123,15 +123,15 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         markDirty();
     }
 
-    public abstract Filter<?> createFilter();
+    public abstract Filter<T> createFilter();
 
     public abstract String getFilterKey();
 
-    public List<Filter<?>> getFilters(Direction side) {
+    public List<Filter<T>> getFilters(Direction side) {
         return filters[side.getIndex()].get();
     }
 
-    public void setFilters(Direction side, List<Filter<?>> f) {
+    public void setFilters(Direction side, List<Filter<T>> f) {
         serializeFilters(upgradeInventory.get(side.getIndex()), f);
         filters[side.getIndex()].invalidate();
     }

@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
+import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
@@ -72,12 +73,12 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         });
         editFilterButton = new Button(guiLeft + 80, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.edit"), button -> {
             if (filterList.getSelected() >= 0) {
-                Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.getFilters(side).get(filterList.getSelected())));
+                Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage((Filter) pipe.getFilters(side).get(filterList.getSelected())));
             }
         });
         removeFilterButton = new Button(guiLeft + 129, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {
-                Main.SIMPLE_CHANNEL.sendToServer(new RemoveFilterMessage(pipe.getFilters(side).get(filterList.getSelected()).getId()));
+                Main.SIMPLE_CHANNEL.sendToServer(new RemoveFilterMessage(((Filter) pipe.getFilters(side).get(filterList.getSelected())).getId()));
             }
         });
 
