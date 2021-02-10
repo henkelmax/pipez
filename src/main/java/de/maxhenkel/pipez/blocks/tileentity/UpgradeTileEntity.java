@@ -91,6 +91,9 @@ public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
     }
 
     private List<Filter<T>> deserializeFilters(ItemStack stack) {
+        if (!hasFilter()) {
+            return new ArrayList<>();
+        }
         if (stack.isEmpty()) {
             return new ArrayList<>();
         }
@@ -112,6 +115,9 @@ public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
     }
 
     private void serializeFilters(ItemStack stack, List<Filter<T>> filters) {
+        if (!hasFilter()) {
+            return;
+        }
         if (stack.isEmpty()) {
             return;
         }
@@ -127,6 +133,10 @@ public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
     public abstract Filter<T> createFilter();
 
     public abstract String getFilterKey();
+
+    public boolean hasFilter() {
+        return true;
+    }
 
     public List<Filter<T>> getFilters(Direction side) {
         return filters[side.getIndex()].get();

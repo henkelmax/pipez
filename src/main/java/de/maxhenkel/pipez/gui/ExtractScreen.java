@@ -63,7 +63,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         sortButton = new CycleIconButton(guiLeft + 7, guiTop + 31, distributionIcons, distributionIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleDistributionMessage());
         });
-        Supplier<Integer> filterModeIndex = () -> pipe.getFilterMode(getContainer().getSide()).ordinal();
+        Supplier<Integer> filterModeIndex = () -> pipe.hasFilter() ? pipe.getFilterMode(getContainer().getSide()).ordinal() : 0;
         List<CycleIconButton.Icon> filterModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 32), new CycleIconButton.Icon(BACKGROUND, 192, 32));
         filterButton = new CycleIconButton(guiLeft + 7, guiTop + 55, filterModeIcons, filterModeIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleFilterModeMessage());
@@ -152,8 +152,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         } else {
             redstoneButton.active = true;
             sortButton.active = true;
-            filterButton.active = true;
-            addFilterButton.active = true;
+            filterButton.active = container.getPipe().hasFilter();
+            addFilterButton.active = container.getPipe().hasFilter();
             editFilterButton.active = filterList.getSelected() >= 0;
             removeFilterButton.active = filterList.getSelected() >= 0;
         }
