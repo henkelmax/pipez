@@ -323,6 +323,8 @@ public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
         }
     }
 
+    public abstract int getRate(Direction direction);
+
     public enum Distribution implements ICyclable<Distribution> {
         NEAREST("nearest"), FURTHEST("furthest"), ROUND_ROBIN("round_robin"), RANDOM("random");
 

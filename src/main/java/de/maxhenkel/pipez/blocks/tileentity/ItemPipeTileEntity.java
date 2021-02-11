@@ -93,7 +93,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
         if (connections.isEmpty()) {
             return;
         }
-        int itemsToTransfer = getAmount(side);
+        int itemsToTransfer = getRate(side);
         boolean[] inventoriesFull = new boolean[connections.size()];
         int p = rrIndex[side.getIndex()] % connections.size();
         while (itemsToTransfer > 0 && hasNotInserted(inventoriesFull)) {
@@ -129,7 +129,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
     }
 
     protected void insertOrdered(Direction side, List<Connection> connections, IItemHandler itemHandler) {
-        int itemsToTransfer = getAmount(side);
+        int itemsToTransfer = getRate(side);
 
         connectionLoop:
         for (Connection connection : connections) {
@@ -236,7 +236,8 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
         }
     }
 
-    public int getAmount(Direction direction) {
+    @Override
+    public int getRate(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
             return Main.SERVER_CONFIG.itemPipeAmount.get();

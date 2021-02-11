@@ -91,7 +91,7 @@ public class EnergyPipeTileEntity extends UpgradeLogicTileEntity<Void> {
         if (connections.isEmpty()) {
             return;
         }
-        int completeAmount = getAmount(side);
+        int completeAmount = getRate(side);
         int energyToTransfer = completeAmount;
         boolean[] connectionsFull = new boolean[connections.size()];
         int p = rrIndex[side.getIndex()] % connections.size();
@@ -119,7 +119,7 @@ public class EnergyPipeTileEntity extends UpgradeLogicTileEntity<Void> {
     }
 
     protected void insertOrdered(Direction side, List<Connection> connections, IEnergyStorage energyStorage) {
-        int energyToTransfer = getAmount(side);
+        int energyToTransfer = getRate(side);
 
         for (Connection connection : connections) {
             if (energyToTransfer <= 0) {
@@ -156,7 +156,8 @@ public class EnergyPipeTileEntity extends UpgradeLogicTileEntity<Void> {
         return tileEntity.getCapability(CapabilityEnergy.ENERGY, direction).orElse(null);
     }
 
-    public int getAmount(Direction direction) {
+    @Override
+    public int getRate(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
             return Main.SERVER_CONFIG.energyPipeAmount.get();

@@ -397,7 +397,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             new Pair<>(SHAPE_EXTRACT_DOWN, Direction.DOWN)
     );
 
-    private Pair<Direction, VoxelShape> getSelection(BlockState state, IBlockReader blockReader, BlockPos pos, PlayerEntity player) {
+    public Pair<Direction, VoxelShape> getSelection(BlockState state, IBlockReader blockReader, BlockPos pos, PlayerEntity player) {
         Vector3d start = player.getEyePosition(1F);
         Vector3d end = start.add(player.getLookVec().normalize().scale(getBlockReachDistance(player)));
 

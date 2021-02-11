@@ -1,1 +1,1 @@
-- Pipes can only be configured by sneak clicked with a wrench
+- Added TheOneProbe integration

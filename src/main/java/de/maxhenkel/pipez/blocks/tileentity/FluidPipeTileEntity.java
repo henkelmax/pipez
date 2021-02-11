@@ -90,7 +90,7 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
         if (connections.isEmpty()) {
             return;
         }
-        int completeAmount = getAmount(side);
+        int completeAmount = getRate(side);
         int mbToTransfer = completeAmount;
         boolean[] connectionsFull = new boolean[connections.size()];
         int p = rrIndex[side.getIndex()] % connections.size();
@@ -126,7 +126,7 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
     }
 
     protected void insertOrdered(Direction side, List<Connection> connections, IFluidHandler fluidHandler) {
-        int mbToTransfer = getAmount(side);
+        int mbToTransfer = getRate(side);
 
         connectionLoop:
         for (Connection connection : connections) {
@@ -212,7 +212,8 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
         return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction).orElse(null);
     }
 
-    public int getAmount(Direction direction) {
+    @Override
+    public int getRate(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
             return Main.SERVER_CONFIG.fluidPipeAmount.get();

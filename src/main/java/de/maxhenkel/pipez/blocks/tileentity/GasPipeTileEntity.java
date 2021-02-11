@@ -89,7 +89,7 @@ public class GasPipeTileEntity extends UpgradeLogicTileEntity<Gas> {
         if (connections.isEmpty()) {
             return;
         }
-        long completeAmount = getAmount(side);
+        long completeAmount = getRate(side);
         long mbToTransfer = completeAmount;
         boolean[] connectionsFull = new boolean[connections.size()];
         int p = rrIndex[side.getIndex()] % connections.size();
@@ -125,7 +125,7 @@ public class GasPipeTileEntity extends UpgradeLogicTileEntity<Gas> {
     }
 
     protected void insertOrdered(Direction side, List<Connection> connections, IGasHandler gasHandler) {
-        long mbToTransfer = getAmount(side);
+        long mbToTransfer = getRate(side);
 
         connectionLoop:
         for (Connection connection : connections) {
@@ -198,20 +198,21 @@ public class GasPipeTileEntity extends UpgradeLogicTileEntity<Gas> {
         return tileEntity.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, direction).orElse(null);
     }
 
-    public long getAmount(Direction direction) {
+    @Override
+    public int getRate(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.gasPipeAmount.get().longValue();
+            return Main.SERVER_CONFIG.gasPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.gasPipeAmountBasic.get().longValue();
+                return Main.SERVER_CONFIG.gasPipeAmountBasic.get();
             case IMPROVED:
-                return Main.SERVER_CONFIG.gasPipeAmountImproved.get().longValue();
+                return Main.SERVER_CONFIG.gasPipeAmountImproved.get();
             case ADVANCED:
-                return Main.SERVER_CONFIG.gasPipeAmountAdvanced.get().longValue();
+                return Main.SERVER_CONFIG.gasPipeAmountAdvanced.get();
             case ULTIMATE:
-                return Main.SERVER_CONFIG.gasPipeAmountUltimate.get().longValue();
+                return Main.SERVER_CONFIG.gasPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;
