@@ -3,6 +3,7 @@ package de.maxhenkel.pipez.gui;
 import de.maxhenkel.corelib.inventory.ContainerBase;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.Direction;
 
@@ -42,4 +43,10 @@ public class FilterContainer extends ContainerBase {
     public int getInvOffset() {
         return 56;
     }
+
+    @Override
+    public boolean canInteractWith(PlayerEntity player) {
+        return !pipe.isRemoved();
+    }
+
 }

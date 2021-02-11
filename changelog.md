@@ -1,0 +1,1 @@
+- Fixed GUI not closing when block is removed
