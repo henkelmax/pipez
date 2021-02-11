@@ -26,7 +26,7 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
 
     @Override
     public boolean canInsert(TileEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()).isPresent();
+        return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction).isPresent();
     }
 
     @Override

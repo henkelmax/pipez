@@ -26,7 +26,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
 
     @Override
     public boolean canInsert(TileEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent();
+        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent();
     }
 
     @Override

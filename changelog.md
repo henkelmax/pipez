@@ -1,1 +1,1 @@
-- Fixed pipes can be pushed by pistons
+- Fixed pipes looking for connections on the wrong side

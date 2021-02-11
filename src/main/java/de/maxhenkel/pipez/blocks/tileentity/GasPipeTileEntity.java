@@ -25,7 +25,7 @@ public class GasPipeTileEntity extends UpgradeLogicTileEntity<Gas> {
 
     @Override
     public boolean canInsert(TileEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, direction.getOpposite()).isPresent();
+        return tileEntity.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, direction).isPresent();
     }
 
     @Override

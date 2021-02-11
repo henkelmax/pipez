@@ -21,7 +21,7 @@ public class EnergyPipeTileEntity extends UpgradeLogicTileEntity<Void> {
 
     @Override
     public boolean canInsert(TileEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(CapabilityEnergy.ENERGY, direction.getOpposite()).isPresent();
+        return tileEntity.getCapability(CapabilityEnergy.ENERGY, direction).isPresent();
     }
 
     @Override
