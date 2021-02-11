@@ -1,1 +1,1 @@
-- Fixed GUI not closing when block is removed
+- Fixed pipes can be pushed by pistons

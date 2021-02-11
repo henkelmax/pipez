@@ -10,6 +10,7 @@ import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.block.material.PushReaction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -68,6 +69,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     @Override
     public Item toItem() {
         return new BlockItem(this, new Item.Properties().group(ModItemGroups.TAB_PIPEZ)).setRegistryName(getRegistryName());
+    }
+
+    @Override
+    public PushReaction getPushReaction(BlockState state) {
+        return PushReaction.BLOCK;
     }
 
     @Override
