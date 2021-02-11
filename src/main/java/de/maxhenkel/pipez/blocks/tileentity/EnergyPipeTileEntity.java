@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.corelib.energy.EnergyUtils;
 import de.maxhenkel.pipez.Filter;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -158,17 +159,17 @@ public class EnergyPipeTileEntity extends UpgradeLogicTileEntity<Void> {
     public int getAmount(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
-            return 256;
+            return Main.SERVER_CONFIG.energyPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return 1024;
+                return Main.SERVER_CONFIG.energyPipeAmountBasic.get();
             case IMPROVED:
-                return 8192;
+                return Main.SERVER_CONFIG.energyPipeAmountImproved.get();
             case ADVANCED:
-                return 32768;
+                return Main.SERVER_CONFIG.energyPipeAmountAdvanced.get();
             case ULTIMATE:
-                return 131072;
+                return Main.SERVER_CONFIG.energyPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;

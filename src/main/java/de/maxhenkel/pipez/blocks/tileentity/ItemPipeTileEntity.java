@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.ItemFilter;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -218,16 +219,17 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
     public int getSpeed(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
-            return 20;
+            return Main.SERVER_CONFIG.itemPipeSpeed.get();
         }
         switch (upgrade) {
             case BASIC:
-                return 15;
+                return Main.SERVER_CONFIG.itemPipeSpeedBasic.get();
             case IMPROVED:
-                return 10;
+                return Main.SERVER_CONFIG.itemPipeSpeedImproved.get();
             case ADVANCED:
-                return 5;
+                return Main.SERVER_CONFIG.itemPipeSpeedAdvanced.get();
             case ULTIMATE:
+                return Main.SERVER_CONFIG.itemPipeSpeedUltimate.get();
             case INFINITY:
             default:
                 return 1;
@@ -237,17 +239,17 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
     public int getAmount(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
-            return 4;
+            return Main.SERVER_CONFIG.itemPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return 8;
+                return Main.SERVER_CONFIG.itemPipeAmountBasic.get();
             case IMPROVED:
-                return 16;
+                return Main.SERVER_CONFIG.itemPipeAmountImproved.get();
             case ADVANCED:
-                return 32;
+                return Main.SERVER_CONFIG.itemPipeAmountAdvanced.get();
             case ULTIMATE:
-                return 64;
+                return Main.SERVER_CONFIG.itemPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;

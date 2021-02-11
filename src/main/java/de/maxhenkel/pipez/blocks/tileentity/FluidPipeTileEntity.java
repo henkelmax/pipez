@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.FluidFilter;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.CompoundNBT;
@@ -214,17 +215,17 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
     public int getAmount(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
-            return 50;
+            return Main.SERVER_CONFIG.fluidPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return 100;
+                return Main.SERVER_CONFIG.fluidPipeAmountBasic.get();
             case IMPROVED:
-                return 500;
+                return Main.SERVER_CONFIG.fluidPipeAmountImproved.get();
             case ADVANCED:
-                return 2000;
+                return Main.SERVER_CONFIG.fluidPipeAmountAdvanced.get();
             case ULTIMATE:
-                return 10000;
+                return Main.SERVER_CONFIG.fluidPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;

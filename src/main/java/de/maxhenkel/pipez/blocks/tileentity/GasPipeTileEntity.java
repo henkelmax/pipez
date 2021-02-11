@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.GasFilter;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import mekanism.api.Action;
@@ -200,17 +201,17 @@ public class GasPipeTileEntity extends UpgradeLogicTileEntity<Gas> {
     public long getAmount(Direction direction) {
         Upgrade upgrade = getUpgrade(direction);
         if (upgrade == null) {
-            return 200L;
+            return Main.SERVER_CONFIG.gasPipeAmount.get().longValue();
         }
         switch (upgrade) {
             case BASIC:
-                return 400L;
+                return Main.SERVER_CONFIG.gasPipeAmountBasic.get().longValue();
             case IMPROVED:
-                return 2000L;
+                return Main.SERVER_CONFIG.gasPipeAmountImproved.get().longValue();
             case ADVANCED:
-                return 8000L;
+                return Main.SERVER_CONFIG.gasPipeAmountAdvanced.get().longValue();
             case ULTIMATE:
-                return 40000L;
+                return Main.SERVER_CONFIG.gasPipeAmountUltimate.get().longValue();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;
