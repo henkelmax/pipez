@@ -79,43 +79,48 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         Direction side = getSelection(state, worldIn, pos, player).getKey();
-        if (WrenchItem.isWrench(player.getHeldItem(handIn))) {
-            if (side != null) {
-                if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
-                    boolean extracting = isExtracting(worldIn, pos, side);
-                    if (extracting) {
-                        setExtracting(worldIn, pos, side, false);
-                        setDisconnected(worldIn, pos, side, true);
-                    } else {
-                        setExtracting(worldIn, pos, side, true);
-                        setDisconnected(worldIn, pos, side, false);
-                    }
-                } else {
-                    setDisconnected(worldIn, pos, side, true);
-                }
-            } else {
-                // Core
-                side = hit.getFace();
-                if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
-                    setExtracting(worldIn, pos, side, false);
-                    if (isAbleToConnect(worldIn, pos, side)) {
-                        setDisconnected(worldIn, pos, side, false);
-                    }
-                } else {
-                    setDisconnected(worldIn, pos, side, false);
-                    setDisconnected(worldIn, pos.offset(side), side.getOpposite(), false);
-                }
-            }
-
-            PipeTileEntity.markPipesDirty(worldIn, pos);
-            return ActionResultType.SUCCESS;
+        if (side != null) {
+            return onPipeSideActivated(state, worldIn, pos, player, handIn, hit, side);
         } else {
-            if (side != null) {
-                return onPipeSideActivated(state, worldIn, pos, player, handIn, hit, side);
+            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+        }
+    }
+
+    public ActionResultType onWrenchClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (!player.isSneaking()) {
+            return ActionResultType.PASS;
+        }
+
+        Direction side = getSelection(state, worldIn, pos, player).getKey();
+        if (side != null) {
+            if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
+                boolean extracting = isExtracting(worldIn, pos, side);
+                if (extracting) {
+                    setExtracting(worldIn, pos, side, false);
+                    setDisconnected(worldIn, pos, side, true);
+                } else {
+                    setExtracting(worldIn, pos, side, true);
+                    setDisconnected(worldIn, pos, side, false);
+                }
             } else {
-                return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+                setDisconnected(worldIn, pos, side, true);
+            }
+        } else {
+            // Core
+            side = hit.getFace();
+            if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
+                setExtracting(worldIn, pos, side, false);
+                if (isAbleToConnect(worldIn, pos, side)) {
+                    setDisconnected(worldIn, pos, side, false);
+                }
+            } else {
+                setDisconnected(worldIn, pos, side, false);
+                setDisconnected(worldIn, pos.offset(side), side.getOpposite(), false);
             }
         }
+
+        PipeTileEntity.markPipesDirty(worldIn, pos);
+        return ActionResultType.SUCCESS;
     }
 
     public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {

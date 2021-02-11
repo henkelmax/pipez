@@ -52,11 +52,11 @@ This mod adds simple and highly configurable pipes that are designed to create a
 ## Configuring Pipes
 
 **Pipes don't transfer anything if they are not set to extract.**
-You can click onto the end of a connected pipe with a wrench to set it to extract.
+You can sneak-click onto the end of a connected pipe with a wrench to set it to extract.
 
 Click the extracting part of the pipe to change modes, add filters or add upgrades.
 
-Pipes can be disconnected/reconnected by clicking with a wrench.
+Pipes can be disconnected/reconnected by sneak-clicking with a wrench.
 
 By default pipes are relatively slow. The speed can only be increased by adding an upgrade.
 Higher tiers of upgrades mean a higher transfer rate.

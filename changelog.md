@@ -1,1 +1,1 @@
-- Fixed pipes looking for connections on the wrong side
+- Pipes can only be configured by sneak clicked with a wrench
