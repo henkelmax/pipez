@@ -110,3 +110,16 @@ To set the location to a filter, put it into the destination slot of the filter 
 This will also display the destination block in the filter list.
 
 ![](https://i.imgur.com/N5T9HWR.png)
+
+
+## Performance Comparison
+
+Comparison between Pipez' item pipes and Mekanism's logistical transporters with about 4200 pipes.
+
+![](https://i.imgur.com/t6iJe4H.png)
+
+
+Comparison between Pipez' item pipes and Mekanism's logistical transporters with about 7200 pipes.
+Since Mekanism calculates its pipe connections with a recoursive algorithm it just crashes, due to a stack overflow.
+
+![](https://i.imgur.com/QTzFnqz.png)
