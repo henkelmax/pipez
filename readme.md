@@ -72,6 +72,9 @@ Certain features of pipes can only be used by adding a high enough upgrade:
 - Advanced Upgrade
   - Filter modes
   - Filters
+  
+Every configuration you change and every filter you add is stored in the upgrade.
+You can copy the data to other upgrades by crafting them together.
 
 ### Filters
 
@@ -96,7 +99,7 @@ This causes only items that match that tag exactly to be accepted by the filter.
 Filters can be inverted by pressing the button with the paper on it.
 This causes the filter to apply for the exact opposite of the provided data (except the destination).
 
-You can also set the filter to only apply for a certain a destination.
+You can also set the filter to only apply for a certain destination.
 For this you need a filter destination tool.
 Just click the block your pipe inserts into with it so store the location and face of the block.
 Note that this doesn't work if you clicked a side of the block that the cable isn't connected to.
