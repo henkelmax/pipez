@@ -1,1 +1,1 @@
-- Added HWYLA integration
+- Added sneak-clicking upgrades in pipes

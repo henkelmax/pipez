@@ -3,11 +3,11 @@ package de.maxhenkel.pipez.events;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
-import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -18,22 +18,19 @@ public class BlockEvents {
     @SubscribeEvent
     public void onBlockClick(PlayerInteractEvent.RightClickBlock event) {
         onDestinationToolClick(event);
-        onWrenchPipeClick(event);
+        onPipeClick(event);
     }
 
-    private void onWrenchPipeClick(PlayerInteractEvent.RightClickBlock event) {
-        ItemStack heldItem = event.getPlayer().getHeldItem(event.getHand());
-        if (!WrenchItem.isWrench(heldItem)) {
-            return;
-        }
+    private void onPipeClick(PlayerInteractEvent.RightClickBlock event) {
         BlockState state = event.getWorld().getBlockState(event.getPos());
         if (!(state.getBlock() instanceof PipeBlock)) {
             return;
         }
 
         PipeBlock pipe = (PipeBlock) state.getBlock();
-        ActionResultType result = pipe.onWrenchClicked(state, event.getWorld(), event.getPos(), event.getPlayer(), event.getHand(), event.getHitVec());
 
+        Direction side = pipe.getSelection(state, event.getWorld(), event.getPos(), event.getPlayer()).getKey();
+        ActionResultType result = pipe.onPipeSideForceActivated(state, event.getWorld(), event.getPos(), event.getPlayer(), event.getHand(), event.getHitVec(), side);
         if (result.isSuccessOrConsume()) {
             event.setUseItem(Event.Result.ALLOW);
             event.setCancellationResult(result);

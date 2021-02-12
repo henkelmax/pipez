@@ -6,6 +6,8 @@ import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.helpers.Triple;
 import de.maxhenkel.pipez.ModItemGroups;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.items.UpgradeItem;
 import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -14,9 +16,11 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -86,12 +90,10 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         }
     }
 
-    public ActionResultType onWrenchClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public ActionResultType onWrenchClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction side) {
         if (!player.isSneaking()) {
             return ActionResultType.PASS;
         }
-
-        Direction side = getSelection(state, worldIn, pos, player).getKey();
         if (side != null) {
             if (worldIn.getBlockState(pos.offset(side)).getBlock() != this) {
                 boolean extracting = isExtracting(worldIn, pos, side);
@@ -125,6 +127,32 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
 
     public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+    }
+
+    public ActionResultType onPipeSideForceActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit, @Nullable Direction side) {
+        ItemStack heldItem = player.getHeldItem(hand);
+        if (WrenchItem.isWrench(heldItem)) {
+            return onWrenchClicked(state, world, pos, player, hand, hit, side);
+        } else if (heldItem.getItem() instanceof UpgradeItem && player.isSneaking()) {
+            TileEntity te = world.getTileEntity(pos);
+            if (!(te instanceof UpgradeTileEntity)) {
+                return ActionResultType.PASS;
+            }
+            UpgradeTileEntity<?> upgradeTe = (UpgradeTileEntity<?>) te;
+            IInventory upgradeInventory = upgradeTe.getUpgradeInventory();
+            ItemStack oldUpgrade = upgradeInventory.getStackInSlot(side.getIndex());
+            upgradeInventory.setInventorySlotContents(side.getIndex(), heldItem.split(1));
+            if (heldItem.isEmpty()) {
+                player.setHeldItem(hand, oldUpgrade);
+            } else {
+                if (!player.inventory.addItemStackToInventory(oldUpgrade)) {
+                    player.dropItem(oldUpgrade, true);
+                }
+            }
+            return ActionResultType.func_233537_a_(world.isRemote);
+        }
+
+        return ActionResultType.PASS;
     }
 
     public BooleanProperty getProperty(Direction side) {
