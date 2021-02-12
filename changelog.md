@@ -1,1 +1,1 @@
-- Added TheOneProbe integration
+- Added HWYLA integration
