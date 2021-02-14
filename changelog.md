@@ -1,1 +1,1 @@
-- Added sneak-clicking upgrades in pipes
+- Fixed gas pipes not extracting gas

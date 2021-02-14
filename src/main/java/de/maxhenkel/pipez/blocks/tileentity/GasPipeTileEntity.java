@@ -155,7 +155,7 @@ public class GasPipeTileEntity extends UpgradeLogicTileEntity<Gas> {
     private GasStack transfer(IGasHandler source, IGasHandler destination, GasStack transfer) {
         GasStack extracted = source.extractChemical(transfer, Action.SIMULATE);
         GasStack gasStack = destination.insertChemical(extracted, Action.EXECUTE);
-        return source.extractChemical(gasStack, Action.EXECUTE);
+        return source.extractChemical(new GasStack(extracted.getType(), extracted.getAmount() - gasStack.getAmount()), Action.EXECUTE);
     }
 
     private boolean canInsert(Connection connection, GasStack stack, List<Filter<Gas>> filters) {
