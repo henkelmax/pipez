@@ -141,7 +141,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             UpgradeTileEntity<?> upgradeTe = (UpgradeTileEntity<?>) te;
             IInventory upgradeInventory = upgradeTe.getUpgradeInventory();
             ItemStack oldUpgrade = upgradeInventory.getStackInSlot(side.getIndex());
-            upgradeInventory.setInventorySlotContents(side.getIndex(), heldItem.split(1));
+            if (player.abilities.isCreativeMode) {
+                upgradeInventory.setInventorySlotContents(side.getIndex(), heldItem.copy().split(1));
+            } else {
+                upgradeInventory.setInventorySlotContents(side.getIndex(), heldItem.split(1));
+            }
             if (heldItem.isEmpty()) {
                 player.setHeldItem(hand, oldUpgrade);
             } else {
