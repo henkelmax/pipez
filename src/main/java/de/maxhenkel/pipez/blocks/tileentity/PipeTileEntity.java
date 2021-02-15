@@ -28,6 +28,11 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
     protected boolean[] extractingSides;
     protected boolean[] disconnectedSides;
 
+    /**
+     * Invalidating the cache five ticks after load, because Mekanism is broken!
+     */
+    private int invalidateCountdown;
+
     public PipeTileEntity(TileEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);
         extractingSides = new boolean[Direction.values().length];
@@ -170,6 +175,9 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
         if (tileEntity == null) {
             return false;
         }
+        if (tileEntity instanceof PipeTileEntity) {
+            return false;
+        }
         return canInsert(tileEntity, direction.getOpposite());
     }
 
@@ -177,7 +185,12 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
 
     @Override
     public void tick() {
-
+        if (invalidateCountdown > 0) {
+            invalidateCountdown--;
+            if (invalidateCountdown <= 0) {
+                connectionCache = null;
+            }
+        }
     }
 
     public boolean isExtracting(Direction side) {
@@ -239,6 +252,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
                 disconnectedSides[i] = b.getByte() != 0;
             }
         }
+        invalidateCountdown = 5;
     }
 
     @Override

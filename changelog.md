@@ -1,1 +1,1 @@
-- Fixed gas pipes not extracting gas
+- Fixed gas pipes not working with mekanism multiblocks
