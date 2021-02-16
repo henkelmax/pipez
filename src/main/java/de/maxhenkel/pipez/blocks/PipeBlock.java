@@ -195,9 +195,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
 
     public void setHasData(World world, BlockPos pos, boolean hasData) {
         BlockState blockState = world.getBlockState(pos);
-        //if (blockState.get(HAS_DATA) != hasData) {
         world.setBlockState(pos, blockState.with(HAS_DATA, hasData));
-        //}
     }
 
     public void setExtracting(World world, BlockPos pos, Direction side, boolean extracting) {
@@ -214,6 +212,10 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             pipe.setExtracting(side, extracting);
             if (!pipe.hasReasonToStay()) {
                 setHasData(world, pos, false);
+            } else {
+                BlockState blockState = world.getBlockState(pos);
+                world.setBlockState(pos, blockState.with(getProperty(side), false));
+                world.setBlockState(pos, blockState.with(getProperty(side), true));
             }
         }
     }

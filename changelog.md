@@ -1,2 +1,1 @@
-- Fixed gas pipes not working with mekanism multiblocks
-- Fixed upgrade consumed in creative
+- Fixed pipes not synchronizing to clients correctly
