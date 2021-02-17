@@ -40,15 +40,30 @@ public class TileInfoProvider implements IProbeInfoProvider {
             UpgradeTileEntity<?> upgradeTileEntity = (UpgradeTileEntity<?>) te;
 
             ItemStack upgrade = upgradeTileEntity.getUpgradeInventory().getStackInSlot(selectedSide.getIndex());
-            if (!upgrade.isEmpty()) {
-                if (upgradeTileEntity instanceof ItemPipeTileEntity) {
-                    ItemPipeTileEntity itemPipe = (ItemPipeTileEntity) upgradeTileEntity;
-                    info.horizontal().item(upgrade).vertical().itemLabel(upgrade).text(new TranslationTextComponent("tooltip.pipez.item_rate", itemPipe.getRate(selectedSide), itemPipe.getSpeed(selectedSide)));
+
+            if (upgradeTileEntity instanceof ItemPipeTileEntity) {
+                ItemPipeTileEntity itemPipe = (ItemPipeTileEntity) upgradeTileEntity;
+                if (upgrade.isEmpty()) {
+                    info.text(new TranslationTextComponent("tooltip.pipez.no_upgrade"))
+                            .text(new TranslationTextComponent("tooltip.pipez.item_rate", itemPipe.getRate(selectedSide), itemPipe.getSpeed(selectedSide)));
                 } else {
-                    info.horizontal().item(upgrade).vertical().itemLabel(upgrade).text(new TranslationTextComponent("tooltip.pipez.rate", upgradeTileEntity.getRate(selectedSide)));
+                    info.horizontal()
+                            .item(upgrade)
+                            .vertical()
+                            .itemLabel(upgrade)
+                            .text(new TranslationTextComponent("tooltip.pipez.item_rate", itemPipe.getRate(selectedSide), itemPipe.getSpeed(selectedSide)));
                 }
             } else {
-                info.text(new TranslationTextComponent("tooltip.pipez.no_upgrade"));
+                if (upgrade.isEmpty()) {
+                    info.text(new TranslationTextComponent("tooltip.pipez.no_upgrade"))
+                            .text(new TranslationTextComponent("tooltip.pipez.rate", upgradeTileEntity.getRate(selectedSide)));
+                } else {
+                    info.horizontal()
+                            .item(upgrade)
+                            .vertical()
+                            .itemLabel(upgrade)
+                            .text(new TranslationTextComponent("tooltip.pipez.rate", upgradeTileEntity.getRate(selectedSide)));
+                }
             }
         }
     }

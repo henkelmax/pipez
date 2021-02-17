@@ -18,7 +18,7 @@ import java.util.List;
 public class FilterDestinationToolItem extends Item {
 
     public FilterDestinationToolItem() {
-        super(new Properties().group(ModItemGroups.TAB_PIPEZ));
+        super(new Properties().group(ModItemGroups.TAB_PIPEZ).maxStackSize(1));
         setRegistryName(new ResourceLocation(Main.MODID, "filter_destination_tool"));
     }
 

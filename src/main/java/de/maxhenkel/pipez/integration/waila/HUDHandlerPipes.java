@@ -49,16 +49,17 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
             UpgradeTileEntity<?> upgradeTileEntity = (UpgradeTileEntity<?>) te;
 
             ItemStack upgrade = upgradeTileEntity.getUpgradeInventory().getStackInSlot(selectedSide.getIndex());
-            if (!upgrade.isEmpty()) {
-                compound.putString("Upgrade", ITextComponent.Serializer.toJson(upgrade.getDisplayName()));
-                if (upgradeTileEntity instanceof ItemPipeTileEntity) {
-                    ItemPipeTileEntity itemPipe = (ItemPipeTileEntity) upgradeTileEntity;
-                    compound.putString("Tooltip", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.item_rate", itemPipe.getRate(selectedSide), itemPipe.getSpeed(selectedSide))));
-                } else {
-                    compound.putString("Tooltip", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.rate", upgradeTileEntity.getRate(selectedSide))));
-                }
+            if (upgrade.isEmpty()) {
+                compound.putString("Upgrade", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.no_upgrade")));
             } else {
-                compound.putString("Tooltip", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.no_upgrade")));
+                compound.putString("Upgrade", ITextComponent.Serializer.toJson(upgrade.getDisplayName()));
+            }
+
+            if (upgradeTileEntity instanceof ItemPipeTileEntity) {
+                ItemPipeTileEntity itemPipe = (ItemPipeTileEntity) upgradeTileEntity;
+                compound.putString("Tooltip", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.item_rate", itemPipe.getRate(selectedSide), itemPipe.getSpeed(selectedSide))));
+            } else {
+                compound.putString("Tooltip", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.rate", upgradeTileEntity.getRate(selectedSide))));
             }
         }
     }

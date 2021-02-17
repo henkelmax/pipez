@@ -1,1 +1,2 @@
-- Fixed pipes not synchronizing to clients correctly
+- Fixed maximum stack size of wrench and filter destination tool
+- Fixed pipe tooltip
