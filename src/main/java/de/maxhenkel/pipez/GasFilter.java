@@ -55,6 +55,8 @@ public class GasFilter extends Filter<Gas> {
         if (compound.contains("Destination", Constants.NBT.TAG_COMPOUND)) {
             destination = new DirectionalPosition();
             destination.deserializeNBT(compound.getCompound("Destination"));
+        } else {
+            destination = null;
         }
 
         if (compound.contains("Invert", Constants.NBT.TAG_BYTE)) {

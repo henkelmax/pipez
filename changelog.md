@@ -1,2 +1,1 @@
-- Fixed maximum stack size of wrench and filter destination tool
-- Fixed pipe tooltip
+- Fixed filter destinations can't be removed
