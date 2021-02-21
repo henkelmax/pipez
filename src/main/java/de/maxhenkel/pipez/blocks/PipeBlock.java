@@ -133,7 +133,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         ItemStack heldItem = player.getHeldItem(hand);
         if (WrenchItem.isWrench(heldItem)) {
             return onWrenchClicked(state, world, pos, player, hand, hit, side);
-        } else if (heldItem.getItem() instanceof UpgradeItem && player.isSneaking()) {
+        } else if (heldItem.getItem() instanceof UpgradeItem && player.isSneaking() && side != null) {
             TileEntity te = world.getTileEntity(pos);
             if (!(te instanceof UpgradeTileEntity)) {
                 return ActionResultType.PASS;

@@ -1,1 +1,1 @@
-- Fixed filter destinations can't be removed
+- Fixed null pointer exception
