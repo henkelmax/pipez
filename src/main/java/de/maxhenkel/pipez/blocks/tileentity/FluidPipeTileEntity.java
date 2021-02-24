@@ -98,10 +98,10 @@ public class FluidPipeTileEntity extends UpgradeLogicTileEntity<Fluid> {
             Connection connection = connections.get(p);
             IFluidHandler destination = getFluidHandler(connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
-            if (destination != null) {
+            if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < fluidHandler.getTanks(); j++) {
                     FluidStack fluidInTank = fluidHandler.getFluidInTank(j);
-                    FluidStack simulatedExtract = fluidHandler.drain(new FluidStack(fluidInTank.getFluid(), Math.min(Math.max(completeAmount / connections.size(), 1), mbToTransfer), fluidInTank.getTag()), IFluidHandler.FluidAction.SIMULATE);
+                    FluidStack simulatedExtract = fluidHandler.drain(new FluidStack(fluidInTank.getFluid(), Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer), fluidInTank.getTag()), IFluidHandler.FluidAction.SIMULATE);
                     if (simulatedExtract.isEmpty()) {
                         continue;
                     }

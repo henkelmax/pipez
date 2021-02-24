@@ -99,8 +99,8 @@ public class EnergyPipeTileEntity extends UpgradeLogicTileEntity<Void> {
             Connection connection = connections.get(p);
             IEnergyStorage destination = getEnergyStorage(connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
-            if (destination != null && destination.canReceive()) {
-                int simulatedExtract = energyStorage.extractEnergy(Math.min(Math.max(completeAmount / connections.size(), 1), energyToTransfer), true);
+            if (destination != null && destination.canReceive() && !connectionsFull[p]) {
+                int simulatedExtract = energyStorage.extractEnergy(Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), energyToTransfer), true);
                 if (simulatedExtract > 0) {
                     int transferred = EnergyUtils.pushEnergy(energyStorage, destination, simulatedExtract);
                     if (transferred > 0) {

@@ -97,10 +97,10 @@ public class GasPipeTileEntity extends UpgradeLogicTileEntity<Gas> {
             Connection connection = connections.get(p);
             IGasHandler destination = getGasHandler(connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
-            if (destination != null) {
+            if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < gasHandler.getTanks(); j++) {
                     GasStack gasInTank = gasHandler.getChemicalInTank(j);
-                    GasStack simulatedExtract = gasHandler.extractChemical(new GasStack(gasInTank.getType(), Math.min(Math.max(completeAmount / connections.size(), 1), mbToTransfer)), Action.SIMULATE);
+                    GasStack simulatedExtract = gasHandler.extractChemical(new GasStack(gasInTank.getType(), Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer)), Action.SIMULATE);
                     if (simulatedExtract.isEmpty()) {
                         continue;
                     }

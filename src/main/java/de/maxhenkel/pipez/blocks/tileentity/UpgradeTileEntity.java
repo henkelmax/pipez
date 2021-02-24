@@ -323,6 +323,16 @@ public abstract class UpgradeTileEntity<T> extends PipeTileEntity {
         }
     }
 
+    public static int getConnectionsNotFullCount(boolean[] connections) {
+        int count = 0;
+        for (boolean connection : connections) {
+            if (!connection) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public abstract int getRate(Direction direction);
 
     public enum Distribution implements ICyclable<Distribution> {

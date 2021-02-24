@@ -100,7 +100,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
             Connection connection = connections.get(p);
             IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
-            if (destination != null) {
+            if (destination != null && !inventoriesFull[p]) {
                 for (int j = 0; j < itemHandler.getSlots(); j++) {
                     ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
                     if (simulatedExtract.isEmpty()) {
