@@ -43,6 +43,13 @@ public class DirectionalPosition implements INBTSerializable<CompoundNBT> {
     }
 
     @Override
+    public int hashCode() {
+        int result = pos.hashCode();
+        result = 31 * result + direction.hashCode();
+        return result;
+    }
+
+    @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT compound = new CompoundNBT();
         CompoundNBT p = new CompoundNBT();

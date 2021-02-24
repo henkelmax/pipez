@@ -1,1 +1,1 @@
-- Improved round robin performance
+- Fixed pipe distribution issues
