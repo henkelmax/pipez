@@ -100,7 +100,7 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
             Connection connection = connections.get(p);
             IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
-            if (destination != null && !inventoriesFull[p]) {
+            if (destination != null && !inventoriesFull[p] && !isFull(destination)) {
                 for (int j = 0; j < itemHandler.getSlots(); j++) {
                     ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
                     if (simulatedExtract.isEmpty()) {
@@ -137,7 +137,9 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
             if (destination == null) {
                 continue;
             }
-
+            if (isFull(destination)) {
+                continue;
+            }
             for (int i = 0; i < itemHandler.getSlots(); i++) {
                 if (itemsToTransfer <= 0) {
                     break connectionLoop;
@@ -155,6 +157,16 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
                 itemHandler.extractItem(i, insertedAmount, false);
             }
         }
+    }
+
+    private boolean isFull(IItemHandler itemHandler) {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+            if (stackInSlot.getCount() < Math.min(stackInSlot.getMaxStackSize(), itemHandler.getSlotLimit(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean canInsert(Connection connection, ItemStack stack, List<Filter<Item>> filters) {

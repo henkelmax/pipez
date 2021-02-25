@@ -1,1 +1,1 @@
-- Fixed pipe distribution issues
+- Improved item pipe performance
