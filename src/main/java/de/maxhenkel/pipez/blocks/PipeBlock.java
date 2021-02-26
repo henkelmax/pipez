@@ -214,8 +214,10 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
                 setHasData(world, pos, false);
             } else {
                 BlockState blockState = world.getBlockState(pos);
-                world.setBlockState(pos, blockState.with(getProperty(side), false));
-                world.setBlockState(pos, blockState.with(getProperty(side), true));
+                BooleanProperty sideProperty = getProperty(side);
+                boolean connected = blockState.get(sideProperty);
+                world.setBlockState(pos, blockState.with(sideProperty, !connected));
+                world.setBlockState(pos, blockState.with(sideProperty, connected));
             }
         }
     }

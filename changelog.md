@@ -1,1 +1,3 @@
-- Fixed extraction pipe z fighting
+- Fixed pipes connecting to the wrong sides
+- Fixed HWYLA tooltip
+- Fixed The One Probe tooltip

@@ -39,6 +39,10 @@ public class TileInfoProvider implements IProbeInfoProvider {
 
             UpgradeTileEntity<?> upgradeTileEntity = (UpgradeTileEntity<?>) te;
 
+            if (!upgradeTileEntity.isExtracting(selectedSide)) {
+                return;
+            }
+
             ItemStack upgrade = upgradeTileEntity.getUpgradeInventory().getStackInSlot(selectedSide.getIndex());
 
             if (upgradeTileEntity instanceof ItemPipeTileEntity) {

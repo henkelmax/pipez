@@ -48,6 +48,10 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
 
             UpgradeTileEntity<?> upgradeTileEntity = (UpgradeTileEntity<?>) te;
 
+            if (!upgradeTileEntity.isExtracting(selectedSide)) {
+                return;
+            }
+
             ItemStack upgrade = upgradeTileEntity.getUpgradeInventory().getStackInSlot(selectedSide.getIndex());
             if (upgrade.isEmpty()) {
                 compound.putString("Upgrade", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.no_upgrade")));
