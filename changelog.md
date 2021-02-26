@@ -1,1 +1,1 @@
-- Improved item pipe performance
+- Optimized pipe connection logic

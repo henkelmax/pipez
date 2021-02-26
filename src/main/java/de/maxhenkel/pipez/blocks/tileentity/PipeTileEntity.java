@@ -54,7 +54,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
 
     public static void markPipesDirty(World world, BlockPos pos) {
         List<BlockPos> travelPositions = new ArrayList<>();
-        List<BlockPos> queue = new ArrayList<>();
+        LinkedList<BlockPos> queue = new LinkedList<>();
         Block block = world.getBlockState(pos).getBlock();
         if (!(block instanceof PipeBlock)) {
             return;
@@ -78,12 +78,11 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
         travelPositions.add(pos);
         addToDirtyList(world, pos, pipeBlock, travelPositions, queue);
         while (queue.size() > 0) {
-            BlockPos blockPos = queue.get(0);
+            BlockPos blockPos = queue.removeFirst();
             block = world.getBlockState(blockPos).getBlock();
             if (block instanceof PipeBlock) {
                 addToDirtyList(world, blockPos, (PipeBlock) block, travelPositions, queue);
             }
-            queue.remove(0);
         }
         for (BlockPos p : travelPositions) {
             TileEntity te = world.getTileEntity(p);
@@ -95,7 +94,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
         }
     }
 
-    private static void addToDirtyList(World world, BlockPos pos, PipeBlock pipeBlock, List<BlockPos> travelPositions, List<BlockPos> queue) {
+    private static void addToDirtyList(World world, BlockPos pos, PipeBlock pipeBlock, List<BlockPos> travelPositions, LinkedList<BlockPos> queue) {
         for (Direction direction : Direction.values()) {
             if (pipeBlock.isConnected(world, pos, direction)) {
                 BlockPos p = pos.offset(direction);
