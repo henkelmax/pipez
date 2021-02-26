@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.ItemFilter;
 import de.maxhenkel.pipez.Main;
@@ -15,6 +16,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -131,8 +133,11 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
     protected void insertOrdered(Direction side, List<Connection> connections, IItemHandler itemHandler) {
         int itemsToTransfer = getRate(side);
 
+        ArrayList<ItemStack> nonFittingItems = new ArrayList<>();
+
         connectionLoop:
         for (Connection connection : connections) {
+            nonFittingItems.clear();
             IItemHandler destination = getItemHandler(connection.getPos(), connection.getDirection());
             if (destination == null) {
                 continue;
@@ -148,11 +153,17 @@ public class ItemPipeTileEntity extends UpgradeLogicTileEntity<Item> {
                 if (simulatedExtract.isEmpty()) {
                     continue;
                 }
+                if (nonFittingItems.stream().anyMatch(stack -> ItemUtils.isStackable(stack, simulatedExtract))) {
+                    continue;
+                }
                 if (canInsert(connection, simulatedExtract, getFilters(side)) == getFilterMode(side).equals(FilterMode.BLACKLIST)) {
                     continue;
                 }
                 ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
                 int insertedAmount = simulatedExtract.getCount() - stack.getCount();
+                if (insertedAmount <= 0) {
+                    nonFittingItems.add(simulatedExtract);
+                }
                 itemsToTransfer -= insertedAmount;
                 itemHandler.extractItem(i, insertedAmount, false);
             }
