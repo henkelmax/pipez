@@ -1,2 +1,1 @@
-- Optimized pipe connection logic
-- Optimized item pipes
+- Added upgrade clearing recipe
