@@ -53,6 +53,7 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
 
     private void renderExtractor(Direction direction, MatrixStack matrixStack, IVertexBuilder b, List<BakedQuad> quads, int combinedLight, int combinedOverlay) {
         matrixStack.push();
+        matrixStack.translate(direction.getXOffset() * 0.001D, direction.getYOffset() * 0.001D, direction.getZOffset() * 0.001D);
         matrixStack.translate(0.5D, 0.5D, 0.5D);
         matrixStack.rotate(getRotation(direction));
         matrixStack.translate(-0.5D, -0.5D, -0.5D);
