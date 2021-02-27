@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IEF",
+    "MRM",
+    "IEF"
+  ],
+  "key": {
+    "I": {
+      "item": "pipez:item_pipe"
+    },
+    "E": {
+      "item": "pipez:energy_pipe"
+    },
+    "F": {
+      "item": "pipez:fluid_pipe"
+    },
+    "R": {
+      "tag": "forge:storage_blocks/redstone"
+    },
+    "M": {
+      "tag": "forge:ingots/iron"
+    }
+  },
+  "result": {
+    "item": "pipez:universal_pipe",
+    "count": 6
+  }
+}

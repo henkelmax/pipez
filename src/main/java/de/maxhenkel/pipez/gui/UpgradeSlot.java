@@ -20,6 +20,12 @@ public class UpgradeSlot extends Slot {
     }
 
     @Override
+    public void onSlotChanged() {
+        super.onSlotChanged();
+        UpgradeItem.upgradeData(getStack()); //TODO Remove after MC update
+    }
+
+    @Override
     public boolean isItemValid(ItemStack stack) {
         return stack.getItem() instanceof UpgradeItem;
     }

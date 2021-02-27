@@ -20,14 +20,15 @@ public class PipeContainerFactory<T extends Container, U extends UpgradeTileEnti
     public T create(int windowId, PlayerInventory inv, PacketBuffer data) {
         TileEntity te = inv.player.world.getTileEntity(data.readBlockPos());
         Direction direction = data.readEnumValue(Direction.class);
+        int index = data.readInt();
         try {
-            return containerCreator.create(windowId, inv, (U) te, direction);
+            return containerCreator.create(windowId, inv, (U) te, direction, index);
         } catch (ClassCastException e) {
             return null;
         }
     }
 
     public interface ContainerCreator<T extends Container, U extends TileEntity> {
-        T create(int windowId, PlayerInventory inv, U tileEntity, Direction side);
+        T create(int windowId, PlayerInventory inv, U tileEntity, Direction side, int index);
     }
 }

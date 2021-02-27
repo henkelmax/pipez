@@ -7,16 +7,16 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UpgradeItem extends Item {
@@ -37,25 +37,98 @@ public class UpgradeItem extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        int itemFilters = getFilterCount(stack, "ItemFilters");
-        if (itemFilters > 0) {
-            tooltip.add(new TranslationTextComponent("tooltip.pipez.upgrade.filters.item", new StringTextComponent(String.valueOf(itemFilters)).mergeStyle(TextFormatting.WHITE)).mergeStyle(TextFormatting.YELLOW));
-        }
-        int fluidFilters = getFilterCount(stack, "FluidFilters");
-        if (fluidFilters > 0) {
-            tooltip.add(new TranslationTextComponent("tooltip.pipez.upgrade.filters.fluid", new StringTextComponent(String.valueOf(fluidFilters)).mergeStyle(TextFormatting.WHITE)).mergeStyle(TextFormatting.BLUE));
+        CompoundNBT tag = stack.getTag();
+        if (tag != null) {
+            List<IFormattableTextComponent> list = new ArrayList<>();
+            if (tag.contains("Item", Constants.NBT.TAG_COMPOUND)) {
+                list.add(new TranslationTextComponent("tooltip.pipez.upgrade.configured.item"));
+            }
+            if (tag.contains("Energy", Constants.NBT.TAG_COMPOUND)) {
+                list.add(new TranslationTextComponent("tooltip.pipez.upgrade.configured.energy"));
+            }
+            if (tag.contains("Fluid", Constants.NBT.TAG_COMPOUND)) {
+                list.add(new TranslationTextComponent("tooltip.pipez.upgrade.configured.fluid"));
+            }
+            if (tag.contains("Gas", Constants.NBT.TAG_COMPOUND)) {
+                list.add(new TranslationTextComponent("tooltip.pipez.upgrade.configured.gas"));
+            }
+
+            if (!list.isEmpty()) {
+                IFormattableTextComponent types = list.stream().reduce((text1, text2) -> text1.appendString(", ").append(text2)).get();
+                tooltip.add(new TranslationTextComponent("tooltip.pipez.upgrade.configured", types.mergeStyle(TextFormatting.WHITE)).mergeStyle(TextFormatting.YELLOW));
+            }
         }
     }
 
-    private int getFilterCount(ItemStack stack, String key) {
+    public static ItemStack upgradeData(ItemStack stack) {
+        if (!(stack.getItem() instanceof UpgradeItem)) {
+            return stack;
+        }
+
         if (!stack.hasTag()) {
-            return 0;
+            return stack;
         }
-        CompoundNBT tag = stack.getTag();
-        if (!tag.contains(key, Constants.NBT.TAG_LIST)) {
-            return 0;
+
+        boolean isOld = false;
+
+        CompoundNBT oldTag = stack.getTag();
+        CompoundNBT newTag = new CompoundNBT();
+
+        CompoundNBT item = new CompoundNBT();
+        newTag.put("Item", item);
+
+        CompoundNBT energy = new CompoundNBT();
+        newTag.put("Energy", energy);
+
+        CompoundNBT fluid = new CompoundNBT();
+        newTag.put("Fluid", fluid);
+
+        CompoundNBT gas = new CompoundNBT();
+        newTag.put("Gas", gas);
+
+        if (oldTag.contains("RedstoneMode", Constants.NBT.TAG_BYTE)) {
+            item.putByte("RedstoneMode", oldTag.getByte("RedstoneMode"));
+            energy.putByte("RedstoneMode", oldTag.getByte("RedstoneMode"));
+            fluid.putByte("RedstoneMode", oldTag.getByte("RedstoneMode"));
+            gas.putByte("RedstoneMode", oldTag.getByte("RedstoneMode"));
+            isOld = true;
         }
-        ListNBT filters = tag.getList(key, Constants.NBT.TAG_COMPOUND);
-        return filters.size();
+
+        if (oldTag.contains("Distribution", Constants.NBT.TAG_BYTE)) {
+            item.putByte("Distribution", oldTag.getByte("Distribution"));
+            energy.putByte("Distribution", oldTag.getByte("Distribution"));
+            fluid.putByte("Distribution", oldTag.getByte("Distribution"));
+            gas.putByte("Distribution", oldTag.getByte("Distribution"));
+            isOld = true;
+        }
+
+        if (oldTag.contains("FilterMode", Constants.NBT.TAG_BYTE)) {
+            item.putByte("FilterMode", oldTag.getByte("FilterMode"));
+            energy.putByte("FilterMode", oldTag.getByte("FilterMode"));
+            fluid.putByte("FilterMode", oldTag.getByte("FilterMode"));
+            gas.putByte("FilterMode", oldTag.getByte("FilterMode"));
+            isOld = true;
+        }
+
+        if (oldTag.contains("ItemFilters", Constants.NBT.TAG_LIST)) {
+            item.put("Filters", oldTag.getList("ItemFilters", Constants.NBT.TAG_COMPOUND));
+            isOld = true;
+        }
+
+        if (oldTag.contains("FluidFilters", Constants.NBT.TAG_LIST)) {
+            fluid.put("Filters", oldTag.getList("FluidFilters", Constants.NBT.TAG_COMPOUND));
+            isOld = true;
+        }
+
+        if (oldTag.contains("GasFilters", Constants.NBT.TAG_LIST)) {
+            gas.put("Filters", oldTag.getList("GasFilters", Constants.NBT.TAG_COMPOUND));
+            isOld = true;
+        }
+
+        if (isOld) {
+            stack.setTag(newTag);
+        }
+        return stack;
     }
+
 }

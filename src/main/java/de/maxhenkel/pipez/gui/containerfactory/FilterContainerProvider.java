@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.gui.containerfactory;
 
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -15,9 +15,9 @@ import net.minecraftforge.fml.network.NetworkHooks;
 public class FilterContainerProvider implements INamedContainerProvider {
 
     private ContainerCreator container;
-    private UpgradeTileEntity pipe;
+    private PipeLogicTileEntity pipe;
 
-    public FilterContainerProvider(ContainerCreator container, UpgradeTileEntity pipe) {
+    public FilterContainerProvider(ContainerCreator container, PipeLogicTileEntity pipe) {
         this.container = container;
         this.pipe = pipe;
     }
@@ -27,11 +27,12 @@ public class FilterContainerProvider implements INamedContainerProvider {
         return new TranslationTextComponent(pipe.getBlockState().getBlock().getTranslationKey());
     }
 
-    public static void openGui(PlayerEntity player, UpgradeTileEntity tileEntity, Direction direction, Filter<?> filter, ContainerCreator containerCreator) {
+    public static void openGui(PlayerEntity player, PipeLogicTileEntity tileEntity, Direction direction, Filter<?> filter, int index, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayerEntity) {
             NetworkHooks.openGui((ServerPlayerEntity) player, new FilterContainerProvider(containerCreator, tileEntity), packetBuffer -> {
                 packetBuffer.writeBlockPos(tileEntity.getPos());
                 packetBuffer.writeEnumValue(direction);
+                packetBuffer.writeInt(index);
                 packetBuffer.writeCompoundTag(filter.serializeNBT());
             });
         }

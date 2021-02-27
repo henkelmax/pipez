@@ -11,8 +11,14 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class OpenExtractMessage implements Message<OpenExtractMessage> {
 
+    private int index;
+
     public OpenExtractMessage() {
 
+    }
+
+    public OpenExtractMessage(int index) {
+        this.index = index;
     }
 
     @Override
@@ -25,17 +31,18 @@ public class OpenExtractMessage implements Message<OpenExtractMessage> {
         Container container = context.getSender().openContainer;
         if (container instanceof FilterContainer) {
             FilterContainer filterContainer = (FilterContainer) container;
-            PipeContainerProvider.openGui(context.getSender(), filterContainer.getPipe(), filterContainer.getSide(), (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, filterContainer.getPipe(), filterContainer.getSide()));
+            PipeContainerProvider.openGui(context.getSender(), filterContainer.getPipe(), filterContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, filterContainer.getPipe(), filterContainer.getSide(), index));
         }
     }
 
     @Override
     public OpenExtractMessage fromBytes(PacketBuffer packetBuffer) {
+        index = packetBuffer.readInt();
         return this;
     }
 
     @Override
     public void toBytes(PacketBuffer packetBuffer) {
-
+        packetBuffer.writeInt(index);
     }
 }

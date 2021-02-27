@@ -48,7 +48,7 @@ public class GasPipeBlock extends PipeBlock {
                 return ActionResultType.SUCCESS;
             }
             GasPipeTileEntity pipe = (GasPipeTileEntity) tileEntity;
-            PipeContainerProvider.openGui(player, pipe, direction, (i, playerInventory, playerEntity) -> new ExtractContainer(i, playerInventory, pipe, direction));
+            PipeContainerProvider.openGui(player, pipe, direction, -1, (i, playerInventory, playerEntity) -> new ExtractContainer(i, playerInventory, pipe, direction, -1));
             return ActionResultType.SUCCESS;
         }
         return super.onPipeSideActivated(state, worldIn, pos, player, handIn, hit, direction);

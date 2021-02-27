@@ -16,7 +16,6 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
@@ -138,13 +137,12 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             if (!(te instanceof UpgradeTileEntity)) {
                 return ActionResultType.PASS;
             }
-            UpgradeTileEntity<?> upgradeTe = (UpgradeTileEntity<?>) te;
-            IInventory upgradeInventory = upgradeTe.getUpgradeInventory();
-            ItemStack oldUpgrade = upgradeInventory.getStackInSlot(side.getIndex());
+            UpgradeTileEntity upgradeTe = (UpgradeTileEntity) te;
+            ItemStack oldUpgrade;
             if (player.abilities.isCreativeMode) {
-                upgradeInventory.setInventorySlotContents(side.getIndex(), heldItem.copy().split(1));
+                oldUpgrade = upgradeTe.setUpgradeItem(side, heldItem.copy().split(1));
             } else {
-                upgradeInventory.setInventorySlotContents(side.getIndex(), heldItem.split(1));
+                oldUpgrade = upgradeTe.setUpgradeItem(side, heldItem.split(1));
             }
             if (heldItem.isEmpty()) {
                 player.setHeldItem(hand, oldUpgrade);

@@ -2,28 +2,34 @@ package de.maxhenkel.pipez.gui;
 
 import de.maxhenkel.corelib.inventory.ContainerBase;
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.Direction;
 
 public class FilterContainer extends ContainerBase {
 
-    private UpgradeTileEntity pipe;
+    private PipeLogicTileEntity pipe;
     private Direction side;
+    private int index;
     private Filter<?> filter;
 
-    public FilterContainer(int id, IInventory playerInventory, UpgradeTileEntity pipe, Direction side, Filter<?> filter) {
+    public FilterContainer(int id, IInventory playerInventory, PipeLogicTileEntity pipe, Direction side, int index, Filter<?> filter) {
         super(Containers.FILTER, id, playerInventory, null);
         this.pipe = pipe;
         this.side = side;
+        this.index = index;
         this.filter = filter;
 
         addPlayerInventorySlots();
     }
 
-    public UpgradeTileEntity getPipe() {
+    public PipeLogicTileEntity getPipe() {
         return pipe;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public Filter<?> getFilter() {

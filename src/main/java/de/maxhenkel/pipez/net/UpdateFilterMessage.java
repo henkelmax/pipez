@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.net;
 
 import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.Filter;
+import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.FilterContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
+
     private CompoundNBT filter;
 
     public UpdateFilterMessage() {
@@ -35,9 +37,10 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
         Container container = context.getSender().openContainer;
         if (container instanceof FilterContainer) {
             FilterContainer filterContainer = (FilterContainer) container;
-            Filter<?> f = filterContainer.getPipe().createFilter();
+            PipeType<?> pipeType = filterContainer.getPipe().getPipeTypes()[filterContainer.getIndex()];
+            Filter<?> f = pipeType.createFilter();
             f.deserializeNBT(filter);
-            List<Filter<?>> filters = filterContainer.getPipe().getFilters(filterContainer.getSide());
+            List<Filter<?>> filters = filterContainer.getPipe().getFilters(filterContainer.getSide(), pipeType);
 
             Optional<Filter<?>> editFilter = filters.stream().filter(f1 -> f.getId().equals(f1.getId())).findFirst();
             if (editFilter.isPresent()) {
@@ -45,9 +48,9 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
             } else {
                 filters.add(f);
             }
-            filterContainer.getPipe().setFilters(filterContainer.getSide(), filters);
+            filterContainer.getPipe().setFilters(filterContainer.getSide(), pipeType, filters);
 
-            PipeContainerProvider.openGui(context.getSender(), filterContainer.getPipe(), filterContainer.getSide(), (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, filterContainer.getPipe(), filterContainer.getSide()));
+            PipeContainerProvider.openGui(context.getSender(), filterContainer.getPipe(), filterContainer.getSide(), filterContainer.getIndex(), (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, filterContainer.getPipe(), filterContainer.getSide(), filterContainer.getIndex()));
         }
     }
 

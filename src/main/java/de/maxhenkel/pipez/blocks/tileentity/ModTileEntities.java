@@ -2,10 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.ModBlocks;
-import de.maxhenkel.pipez.blocks.tileentity.render.EnergyPipeRenderer;
-import de.maxhenkel.pipez.blocks.tileentity.render.FluidPipeRenderer;
-import de.maxhenkel.pipez.blocks.tileentity.render.GasPipeRenderer;
-import de.maxhenkel.pipez.blocks.tileentity.render.ItemPipeRenderer;
+import de.maxhenkel.pipez.blocks.tileentity.render.*;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -19,6 +16,7 @@ public class ModTileEntities {
     public static TileEntityType<ItemPipeTileEntity> ITEM_PIPE;
     public static TileEntityType<FluidPipeTileEntity> FLUID_PIPE;
     public static TileEntityType<EnergyPipeTileEntity> ENERGY_PIPE;
+    public static TileEntityType<UniversalPipeTileEntity> UNIVERSAL_PIPE;
     public static TileEntityType<GasPipeTileEntity> GAS_PIPE;
 
     public static void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> event) {
@@ -34,6 +32,10 @@ public class ModTileEntities {
         ENERGY_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "energy_pipe"));
         event.getRegistry().register(ENERGY_PIPE);
 
+        UNIVERSAL_PIPE = TileEntityType.Builder.create(UniversalPipeTileEntity::new, ModBlocks.UNIVERSAL_PIPE).build(null);
+        UNIVERSAL_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "universal_pipe"));
+        event.getRegistry().register(UNIVERSAL_PIPE);
+
         if (ModList.get().isLoaded("mekanism")) {
             GAS_PIPE = TileEntityType.Builder.create(GasPipeTileEntity::new, ModBlocks.GAS_PIPE).build(null);
             GAS_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "gas_pipe"));
@@ -46,6 +48,7 @@ public class ModTileEntities {
         ClientRegistry.bindTileEntityRenderer(ITEM_PIPE, ItemPipeRenderer::new);
         ClientRegistry.bindTileEntityRenderer(FLUID_PIPE, FluidPipeRenderer::new);
         ClientRegistry.bindTileEntityRenderer(ENERGY_PIPE, EnergyPipeRenderer::new);
+        ClientRegistry.bindTileEntityRenderer(UNIVERSAL_PIPE, UniversalPipeRenderer::new);
         if (ModList.get().isLoaded("mekanism")) {
             ClientRegistry.bindTileEntityRenderer(GAS_PIPE, GasPipeRenderer::new);
         }

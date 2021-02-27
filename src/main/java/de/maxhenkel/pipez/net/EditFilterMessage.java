@@ -14,13 +14,15 @@ import net.minecraftforge.fml.network.NetworkEvent;
 public class EditFilterMessage implements Message<EditFilterMessage> {
 
     private CompoundNBT filter;
+    private int index;
 
     public EditFilterMessage() {
 
     }
 
-    public EditFilterMessage(Filter filter) {
+    public EditFilterMessage(Filter filter, int index) {
         this.filter = filter.serializeNBT();
+        this.index = index;
     }
 
     @Override
@@ -33,20 +35,22 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
         Container container = context.getSender().openContainer;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
-            Filter<?> f = extractContainer.getPipe().createFilter();
+            Filter<?> f = extractContainer.getPipe().getPipeTypes()[index].createFilter();
             f.deserializeNBT(filter);
-            FilterContainerProvider.openGui(context.getSender(), extractContainer.getPipe(), extractContainer.getSide(), f, (id, playerInventory, playerEntity) -> new FilterContainer(id, playerInventory, extractContainer.getPipe(), extractContainer.getSide(), f));
+            FilterContainerProvider.openGui(context.getSender(), extractContainer.getPipe(), extractContainer.getSide(), f, index, (id, playerInventory, playerEntity) -> new FilterContainer(id, playerInventory, extractContainer.getPipe(), extractContainer.getSide(), index, f));
         }
     }
 
     @Override
     public EditFilterMessage fromBytes(PacketBuffer packetBuffer) {
         filter = packetBuffer.readCompoundTag();
+        index = packetBuffer.readInt();
         return this;
     }
 
     @Override
     public void toBytes(PacketBuffer packetBuffer) {
         packetBuffer.writeCompoundTag(filter);
+        packetBuffer.writeInt(index);
     }
 }

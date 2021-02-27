@@ -1,7 +1,8 @@
 package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.blocks.tileentity.FluidPipeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.UniversalPipeTileEntity;
+import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.block.BlockState;
@@ -15,18 +16,25 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.items.CapabilityItemHandler;
 
-public class FluidPipeBlock extends PipeBlock {
+public class UniversalPipeBlock extends PipeBlock {
 
-    protected FluidPipeBlock() {
-        setRegistryName(new ResourceLocation(Main.MODID, "fluid_pipe"));
+    protected UniversalPipeBlock() {
+        setRegistryName(new ResourceLocation(Main.MODID, "universal_pipe"));
     }
 
     @Override
     public boolean canConnectTo(IWorldReader world, BlockPos pos, Direction facing) {
         TileEntity te = world.getTileEntity(pos.offset(facing));
-        return (te != null && te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()).isPresent());
+        return te != null && (
+                te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
+                        || te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
+                        || te.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).isPresent()
+                        || te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
+        );
     }
 
     @Override
@@ -37,17 +45,17 @@ public class FluidPipeBlock extends PipeBlock {
 
     @Override
     TileEntity createTileEntity() {
-        return new FluidPipeTileEntity();
+        return new UniversalPipeTileEntity();
     }
 
     @Override
     public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity instanceof FluidPipeTileEntity && isExtracting(worldIn, pos, direction)) {
+        if (tileEntity instanceof UniversalPipeTileEntity && isExtracting(worldIn, pos, direction)) {
             if (worldIn.isRemote) {
                 return ActionResultType.SUCCESS;
             }
-            FluidPipeTileEntity pipe = (FluidPipeTileEntity) tileEntity;
+            UniversalPipeTileEntity pipe = (UniversalPipeTileEntity) tileEntity;
             PipeContainerProvider.openGui(player, pipe, direction, -1, (i, playerInventory, playerEntity) -> new ExtractContainer(i, playerInventory, pipe, direction, -1));
             return ActionResultType.SUCCESS;
         }

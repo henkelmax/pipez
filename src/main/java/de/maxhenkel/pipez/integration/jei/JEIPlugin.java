@@ -1,10 +1,9 @@
 package de.maxhenkel.pipez.integration.jei;
 
 import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.gui.ExtractScreen;
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import net.minecraft.util.ResourceLocation;
 
 @mezz.jei.api.JeiPlugin
@@ -16,18 +15,7 @@ public class JEIPlugin implements IModPlugin {
     }
 
     @Override
-    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        registration.addGuiContainerHandler(ExtractScreen.class, new ExtractScreenHandler());
     }
-
-    @Override
-    public void registerCategories(IRecipeCategoryRegistration registration) {
-
-    }
-
-    @Override
-    public void registerRecipes(IRecipeRegistration registration) {
-
-    }
-
 }

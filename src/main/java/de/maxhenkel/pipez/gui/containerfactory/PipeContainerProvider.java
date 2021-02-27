@@ -26,11 +26,12 @@ public class PipeContainerProvider implements INamedContainerProvider {
         return new TranslationTextComponent(tileEntity.getBlockState().getBlock().getTranslationKey());
     }
 
-    public static void openGui(PlayerEntity player, UpgradeTileEntity tileEntity, Direction direction, ContainerCreator containerCreator) {
+    public static void openGui(PlayerEntity player, UpgradeTileEntity tileEntity, Direction direction, int index, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayerEntity) {
             NetworkHooks.openGui((ServerPlayerEntity) player, new PipeContainerProvider(containerCreator, tileEntity), packetBuffer -> {
                 packetBuffer.writeBlockPos(tileEntity.getPos());
                 packetBuffer.writeEnumValue(direction);
+                packetBuffer.writeInt(index);
             });
         }
     }

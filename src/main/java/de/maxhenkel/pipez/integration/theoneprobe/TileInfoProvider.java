@@ -2,8 +2,8 @@ package de.maxhenkel.pipez.integration.theoneprobe;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.PipeBlock;
-import de.maxhenkel.pipez.blocks.tileentity.ItemPipeTileEntity;
-import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
@@ -33,40 +33,30 @@ public class TileInfoProvider implements IProbeInfoProvider {
             if (selectedSide == null) {
                 return;
             }
-            if (!(te instanceof UpgradeTileEntity)) {
+            if (!(te instanceof PipeLogicTileEntity)) {
                 return;
             }
 
-            UpgradeTileEntity<?> upgradeTileEntity = (UpgradeTileEntity<?>) te;
+            PipeLogicTileEntity pipeTile = (PipeLogicTileEntity) te;
 
-            if (!upgradeTileEntity.isExtracting(selectedSide)) {
+            if (!pipeTile.isExtracting(selectedSide)) {
                 return;
             }
 
-            ItemStack upgrade = upgradeTileEntity.getUpgradeInventory().getStackInSlot(selectedSide.getIndex());
+            ItemStack upgrade = pipeTile.getUpgradeItem(selectedSide);
 
-            if (upgradeTileEntity instanceof ItemPipeTileEntity) {
-                ItemPipeTileEntity itemPipe = (ItemPipeTileEntity) upgradeTileEntity;
-                if (upgrade.isEmpty()) {
-                    info.text(new TranslationTextComponent("tooltip.pipez.no_upgrade"))
-                            .text(new TranslationTextComponent("tooltip.pipez.item_rate", itemPipe.getRate(selectedSide), itemPipe.getSpeed(selectedSide)));
-                } else {
-                    info.horizontal()
-                            .item(upgrade)
-                            .vertical()
-                            .itemLabel(upgrade)
-                            .text(new TranslationTextComponent("tooltip.pipez.item_rate", itemPipe.getRate(selectedSide), itemPipe.getSpeed(selectedSide)));
-                }
+            IProbeInfo i;
+            if (upgrade.isEmpty()) {
+                i = info.text(new TranslationTextComponent("tooltip.pipez.no_upgrade"));
             } else {
-                if (upgrade.isEmpty()) {
-                    info.text(new TranslationTextComponent("tooltip.pipez.no_upgrade"))
-                            .text(new TranslationTextComponent("tooltip.pipez.rate", upgradeTileEntity.getRate(selectedSide)));
-                } else {
-                    info.horizontal()
-                            .item(upgrade)
-                            .vertical()
-                            .itemLabel(upgrade)
-                            .text(new TranslationTextComponent("tooltip.pipez.rate", upgradeTileEntity.getRate(selectedSide)));
+                i = info.horizontal()
+                        .item(upgrade)
+                        .vertical()
+                        .itemLabel(upgrade);
+            }
+            for (PipeType<?> type : pipeTile.getPipeTypes()) {
+                if (pipeTile.isEnabled(selectedSide, type)) {
+                    i = i.text(type.getTransferText(pipeTile.getUpgrade(selectedSide)));
                 }
             }
         }

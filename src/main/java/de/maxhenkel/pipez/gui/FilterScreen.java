@@ -81,7 +81,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         addButton(invertButton);
 
         cancelButton = new Button(guiLeft + 25, guiTop + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.cancel"), button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage());
+            Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage(getContainer().getIndex()));
         });
         addButton(cancelButton);
 
