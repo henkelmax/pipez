@@ -1,1 +1,1 @@
-- Added universal pipes
+- Fixed redstone mode icons
