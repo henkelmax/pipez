@@ -12,7 +12,7 @@
 
 This mod adds simple and highly configurable pipes that are designed to create as little lag as possible.
 
-![](https://i.imgur.com/VyX11vt.png)
+![](https://i.imgur.com/F3Ja4m4.png)
 
 ## Pipe Types
 
@@ -20,6 +20,7 @@ This mod adds simple and highly configurable pipes that are designed to create a
 - Fluid Pipes
 - Energy Pipes
 - Gas Pipes ([Mekanism](https://www.curseforge.com/minecraft/mc-mods/mekanism))
+- Universal Pipe (All 4 Pipes in one!)
 
 ## Features
 
@@ -111,6 +112,10 @@ This will also display the destination block in the filter list.
 
 ![](https://i.imgur.com/N5T9HWR.png)
 
+The **Universal Pipe** has every feature of all other pipes combined.
+You can choose which pipe type you want to configure with the tabs on the left of the GUI.
+
+![](https://i.imgur.com/0IXNja8.png)
 
 ## Performance Comparison
 
