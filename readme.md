@@ -20,7 +20,7 @@ This mod adds simple and highly configurable pipes that are designed to create a
 - Fluid Pipes
 - Energy Pipes
 - Gas Pipes ([Mekanism](https://www.curseforge.com/minecraft/mc-mods/mekanism))
-- Universal Pipe (All 4 Pipes in one!)
+- Universal Pipes (All 4 Pipes in one!)
 
 ## Features
 
