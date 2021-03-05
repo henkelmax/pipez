@@ -27,12 +27,15 @@ public class ClearNbtRecipe extends SpecialRecipe {
     public ItemStack getIngredient(CraftingInventory inv) {
         ItemStack found = null;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (ingredient.test(inv.getStackInSlot(i))) {
+            ItemStack stackInSlot = inv.getStackInSlot(i);
+            if (ingredient.test(stackInSlot)) {
                 if (found != null) {
                     return null;
                 } else {
-                    found = inv.getStackInSlot(i);
+                    found = stackInSlot;
                 }
+            } else if (!stackInSlot.isEmpty()) {
+                return null;
             }
         }
         return found;

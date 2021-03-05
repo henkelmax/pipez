@@ -1,1 +1,1 @@
-- Fixed redstone mode icons
+- Fixed clear upgrade NBT recipe
