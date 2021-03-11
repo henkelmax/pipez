@@ -1,1 +1,1 @@
-- Updated to official mappings
+- Added dummy capability handlers to pipes

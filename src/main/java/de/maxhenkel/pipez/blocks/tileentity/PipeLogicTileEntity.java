@@ -1,9 +1,23 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
+import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
+import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
+import de.maxhenkel.pipez.utils.DummyEnergyStorage;
+import de.maxhenkel.pipez.utils.DummyFluidHandler;
+import de.maxhenkel.pipez.utils.DummyItemHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.items.CapabilityItemHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
@@ -14,6 +28,39 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         super(tileEntityTypeIn);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (remove) {
+            return super.getCapability(cap, side);
+        }
+
+        if (cap == CapabilityEnergy.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
+            if (side == null || isExtracting(side)) {
+                return LazyOptional.of(() -> DummyEnergyStorage.INSTANCE).cast();
+            }
+        } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && hasType(FluidPipeType.INSTANCE)) {
+            if (side == null || isExtracting(side)) {
+                return LazyOptional.of(() -> DummyFluidHandler.INSTANCE).cast();
+            }
+        } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && hasType(ItemPipeType.INSTANCE)) {
+            if (side == null || isExtracting(side)) {
+                return LazyOptional.of(() -> DummyItemHandler.INSTANCE).cast();
+            }
+        }
+
+        return super.getCapability(cap, side);
+    }
+
+    public boolean hasType(PipeType<?> type) {
+        for (PipeType<?> t : types) {
+            if (t == type) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getRoundRobinIndex(Direction direction, PipeType<?> pipeType) {

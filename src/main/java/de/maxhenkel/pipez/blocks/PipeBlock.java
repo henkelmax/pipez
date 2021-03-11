@@ -210,14 +210,13 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             pipe.setExtracting(side, extracting);
             if (!pipe.hasReasonToStay()) {
                 setHasData(world, pos, false);
-            } else {
-                BlockState blockState = world.getBlockState(pos);
-                BooleanProperty sideProperty = getProperty(side);
-                boolean connected = blockState.getValue(sideProperty);
-                world.setBlockAndUpdate(pos, blockState.setValue(sideProperty, !connected));
-                world.setBlockAndUpdate(pos, blockState.setValue(sideProperty, connected));
             }
         }
+        BlockState blockState = world.getBlockState(pos);
+        BooleanProperty sideProperty = getProperty(side);
+        boolean connected = blockState.getValue(sideProperty);
+        world.setBlockAndUpdate(pos, blockState.setValue(sideProperty, !connected));
+        world.setBlockAndUpdate(pos, blockState.setValue(sideProperty, connected));
     }
 
     public void setDisconnected(World world, BlockPos pos, Direction side, boolean disconnected) {
