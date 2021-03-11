@@ -55,10 +55,10 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
 
     public FilterScreen(FilterContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(BACKGROUND, container, playerInventory, title);
-        xSize = 176;
-        ySize = 222;
+        imageWidth = 176;
+        imageHeight = 222;
 
-        filter = getContainer().getFilter();
+        filter = getMenu().getFilter();
     }
 
     @Override
@@ -67,54 +67,54 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         hoverAreas.clear();
         buttons.clear();
         children.clear();
-        minecraft.keyboardListener.enableRepeatEvents(true);
+        minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
         List<CycleIconButton.Icon> nbtIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 16), new CycleIconButton.Icon(BACKGROUND, 192, 16));
-        nbtButton = new CycleIconButton(guiLeft + 125, guiTop + 81, nbtIcons, () -> filter.isExactMetadata() ? 1 : 0, button -> {
+        nbtButton = new CycleIconButton(leftPos + 125, topPos + 81, nbtIcons, () -> filter.isExactMetadata() ? 1 : 0, button -> {
             filter.setExactMetadata(!filter.isExactMetadata());
         });
         addButton(nbtButton);
         List<CycleIconButton.Icon> invertIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 32), new CycleIconButton.Icon(BACKGROUND, 192, 32));
-        invertButton = new CycleIconButton(guiLeft + 149, guiTop + 81, invertIcons, () -> filter.isInvert() ? 1 : 0, button -> {
+        invertButton = new CycleIconButton(leftPos + 149, topPos + 81, invertIcons, () -> filter.isInvert() ? 1 : 0, button -> {
             filter.setInvert(!filter.isInvert());
         });
         addButton(invertButton);
 
-        cancelButton = new Button(guiLeft + 25, guiTop + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.cancel"), button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage(getContainer().getIndex()));
+        cancelButton = new Button(leftPos + 25, topPos + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.cancel"), button -> {
+            Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage(getMenu().getIndex()));
         });
         addButton(cancelButton);
 
-        submitButton = new Button(guiLeft + 91, guiTop + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.submit"), button -> {
+        submitButton = new Button(leftPos + 91, topPos + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.submit"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter));
         });
         addButton(submitButton);
 
-        item = new TextFieldWidget(font, guiLeft + 30, guiTop + 18, 138, 16, StringTextComponent.EMPTY);
+        item = new TextFieldWidget(font, leftPos + 30, topPos + 18, 138, 16, StringTextComponent.EMPTY);
         item.setTextColor(TextFormatting.WHITE.getColor());
-        item.setEnableBackgroundDrawing(true);
-        item.setMaxStringLength(1024);
+        item.setBordered(true);
+        item.setMaxLength(1024);
         if (filter.getTag() != null) {
             if (filter.getTag() instanceof SingleElementTag) {
-                item.setText(filter.getTag().getName().toString());
+                item.setValue(filter.getTag().getName().toString());
             } else {
-                item.setText("#" + filter.getTag().getName().toString());
+                item.setValue("#" + filter.getTag().getName().toString());
             }
         }
         item.setResponder(this::onItemTextChanged);
-        item.setValidator(s -> {
+        item.setFilter(s -> {
             if (s.startsWith("#")) {
                 s = s.substring(1);
             }
-            return ResourceLocation.isResouceNameValid(s);
+            return ResourceLocation.isValidResourceLocation(s);
         });
         addButton(item);
 
-        nbt = new TextFieldWidget(font, guiLeft + 8, guiTop + 50, 160, 16, StringTextComponent.EMPTY);
+        nbt = new TextFieldWidget(font, leftPos + 8, topPos + 50, 160, 16, StringTextComponent.EMPTY);
         nbt.setTextColor(TextFormatting.WHITE.getColor());
-        nbt.setEnableBackgroundDrawing(true);
-        nbt.setMaxStringLength(1024);
-        nbt.setText(filter.getMetadata() != null ? filter.getMetadata().toString() : "");
+        nbt.setBordered(true);
+        nbt.setMaxLength(1024);
+        nbt.setValue(filter.getMetadata() != null ? filter.getMetadata().toString() : "");
         nbt.setResponder(this::onNbtTextChanged);
         nbt.visible = hasNBT();
 
@@ -129,16 +129,16 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             if (stack != null) {
                 tooltip = stack.getTooltip(this);
                 if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
-                    tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(filter.getTag().getName().toString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.GRAY));
+                    tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(filter.getTag().getName().toString()).withStyle(TextFormatting.BLUE)).withStyle(TextFormatting.GRAY));
                 }
             }
-            return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
+            return tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(itemHoverArea);
         itemTextHoverArea = new HoverArea(29, 17, 140, 18, () -> {
             List<ITextComponent> tooltip = new ArrayList<>();
             tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.item_tag.description"));
-            return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
+            return tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(itemTextHoverArea);
         nbtTextHoverArea = new HoverArea(7, 49, 162, 18, () -> {
@@ -148,7 +148,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.nbt_string.no_nbt"));
             }
-            return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
+            return tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(nbtTextHoverArea);
         exactNBTHoverArea = new HoverArea(126, 82, 20, 20, () -> {
@@ -158,7 +158,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.nbt.not_exact"));
             }
-            return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
+            return tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(exactNBTHoverArea);
         invertHoverArea = new HoverArea(150, 82, 20, 20, () -> {
@@ -168,16 +168,16 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.not_inverted"));
             }
-            return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
+            return tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(invertHoverArea);
         destinationHoverArea = new HoverArea(8, 83, 16, 16, () -> {
             List<ITextComponent> tooltip = new ArrayList<>();
             tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination.description"));
             if (filter.getDestination() != null) {
-                tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination.click_to_remove").mergeStyle(TextFormatting.GRAY));
+                tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination.click_to_remove").withStyle(TextFormatting.GRAY));
             }
-            return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
+            return tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(destinationHoverArea);
 
@@ -185,9 +185,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             List<ITextComponent> tooltip = new ArrayList<>();
             if (filter.getDestination() != null) {
                 DirectionalPosition dst = filter.getDestination();
-                tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslationTextComponent("message.pipez.direction." + dst.getDirection().getName2()).mergeStyle(TextFormatting.DARK_GREEN)));
+                tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslationTextComponent("message.pipez.direction." + dst.getDirection().getName()).withStyle(TextFormatting.DARK_GREEN)));
             }
-            return tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList());
+            return tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(destinationTextHoverArea);
     }
@@ -244,7 +244,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
         nbtButton.active = true;
         try {
-            filter.setMetadata(JsonToNBT.getTagFromJson(text));
+            filter.setMetadata(JsonToNBT.parseTag(text));
             nbt.setTextColor(TextFormatting.WHITE.getColor());
         } catch (CommandSyntaxException e) {
             nbt.setTextColor(TextFormatting.DARK_RED.getColor());
@@ -258,26 +258,26 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (filter instanceof ItemFilter) {
-            item.setText(stack.getItem().getRegistryName().toString());
+            item.setValue(stack.getItem().getRegistryName().toString());
             if (stack.hasTag()) {
-                nbt.setText(stack.getTag().toString());
+                nbt.setValue(stack.getTag().toString());
             } else {
-                nbt.setText("");
+                nbt.setValue("");
             }
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
-                item.setText(s.getFluid().getRegistryName().toString());
+                item.setValue(s.getFluid().getRegistryName().toString());
                 if (s.hasTag()) {
-                    nbt.setText(s.getTag().toString());
+                    nbt.setValue(s.getTag().toString());
                 } else {
-                    nbt.setText("");
+                    nbt.setValue("");
                 }
             });
         } else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
-                item.setText(gas.getType().getRegistryName().toString());
-                nbt.setText("");
+                item.setValue(gas.getType().getRegistryName().toString());
+                nbt.setValue("");
             }
         }
     }
@@ -292,46 +292,46 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
-        font.func_243248_b(matrixStack, new TranslationTextComponent("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR);
-        font.func_243248_b(matrixStack, new TranslationTextComponent("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR);
-        font.func_243248_b(matrixStack, new TranslationTextComponent("message.pipez.filter.destination"), 8, 71, FONT_COLOR);
-        font.func_243248_b(matrixStack, playerInventory.getDisplayName(), 8, (float) (ySize - 96 + 3), FONT_COLOR);
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+        super.renderLabels(matrixStack, mouseX, mouseY);
+        font.draw(matrixStack, new TranslationTextComponent("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR);
+        font.draw(matrixStack, new TranslationTextComponent("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR);
+        font.draw(matrixStack, new TranslationTextComponent("message.pipez.filter.destination"), 8, 71, FONT_COLOR);
+        font.draw(matrixStack, inventory.getDisplayName(), 8, (float) (imageHeight - 96 + 3), FONT_COLOR);
 
         drawHoverAreas(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+        super.renderBg(matrixStack, partialTicks, mouseX, mouseY);
 
         AbstractStack<?> stack = FilterList.getStack(filter);
         if (stack != null) {
-            stack.render(matrixStack, guiLeft + 8, guiTop + 18);
+            stack.render(matrixStack, leftPos + 8, topPos + 18);
         }
 
-        matrixStack.push();
-        matrixStack.translate(guiLeft + 31, guiTop + 89, 0D);
+        matrixStack.pushPose();
+        matrixStack.translate(leftPos + 31, topPos + 89, 0D);
         matrixStack.scale(0.5F, 0.5F, 1F);
         if (filter.getDestination() != null) {
             DirectionalPosition dst = filter.getDestination();
-            font.func_243248_b(matrixStack, new TranslationTextComponent("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new StringTextComponent(String.valueOf(dst.getDirection().name().charAt(0))).mergeStyle(TextFormatting.DARK_GREEN)), 0, 0, 0xFFFFFF);
+            font.draw(matrixStack, new TranslationTextComponent("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new StringTextComponent(String.valueOf(dst.getDirection().name().charAt(0))).withStyle(TextFormatting.DARK_GREEN)), 0, 0, 0xFFFFFF);
         } else {
-            font.func_243248_b(matrixStack, new TranslationTextComponent("message.pipez.filter_destination_tool.destination.any"), 0, 0, 0xFFFFFF);
+            font.draw(matrixStack, new TranslationTextComponent("message.pipez.filter_destination_tool.destination.any"), 0, 0, 0xFFFFFF);
         }
-        matrixStack.pop();
+        matrixStack.popPose();
 
-        if (itemHoverArea.isHovered(guiLeft, guiTop, mouseX, mouseY)) {
-            drawHoverSlot(matrixStack, guiLeft + 8, guiTop + 18);
+        if (itemHoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
+            drawHoverSlot(matrixStack, leftPos + 8, topPos + 18);
         }
-        if (destinationHoverArea.isHovered(guiLeft, guiTop, mouseX, mouseY)) {
-            drawHoverSlot(matrixStack, guiLeft + 8, guiTop + 83);
+        if (destinationHoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
+            drawHoverSlot(matrixStack, leftPos + 8, topPos + 83);
         }
     }
 
     private IFormattableTextComponent number(int num) {
-        return new StringTextComponent(String.valueOf(num)).mergeStyle(TextFormatting.DARK_GREEN);
+        return new StringTextComponent(String.valueOf(num)).withStyle(TextFormatting.DARK_GREEN);
     }
 
     private void drawHoverSlot(MatrixStack matrixStack, int posX, int posY) {
@@ -345,17 +345,17 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     @Override
     public void onClose() {
         super.onClose();
-        minecraft.keyboardListener.enableRepeatEvents(false);
+        minecraft.keyboardHandler.setSendRepeatsToGui(false);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (itemHoverArea.isHovered(guiLeft, guiTop, (int) mouseX, (int) mouseY)) {
-            onInsertStack(minecraft.player.inventory.getItemStack());
+        if (itemHoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
+            onInsertStack(minecraft.player.inventory.getCarried());
             return true;
         }
-        if (destinationHoverArea.isHovered(guiLeft, guiTop, (int) mouseX, (int) mouseY)) {
-            onInsertDestination(minecraft.player.inventory.getItemStack());
+        if (destinationHoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
+            onInsertDestination(minecraft.player.inventory.getCarried());
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -364,23 +364,23 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     @Override
     public boolean keyPressed(int key, int scanCode, int modifiers) {
         if (key == GLFW.GLFW_KEY_ESCAPE) {
-            minecraft.player.closeScreen();
+            minecraft.player.closeContainer();
             return true;
         }
 
         return item.keyPressed(key, scanCode, modifiers) ||
-                item.canWrite() ||
+                item.canConsumeInput() ||
                 nbt.keyPressed(key, scanCode, modifiers) ||
-                nbt.canWrite() || super.keyPressed(key, scanCode, modifiers);
+                nbt.canConsumeInput() || super.keyPressed(key, scanCode, modifiers);
     }
 
     @Override
     public void resize(Minecraft mc, int x, int y) {
-        String itemTxt = item.getText();
-        String nbtTxt = nbt.getText();
+        String itemTxt = item.getValue();
+        String nbtTxt = nbt.getValue();
         init(mc, x, y);
-        item.setText(itemTxt);
-        nbt.setText(nbtTxt);
+        item.setValue(itemTxt);
+        nbt.setValue(nbtTxt);
     }
 
 }

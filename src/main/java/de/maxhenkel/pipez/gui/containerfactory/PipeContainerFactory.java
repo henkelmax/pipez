@@ -18,8 +18,8 @@ public class PipeContainerFactory<T extends Container, U extends UpgradeTileEnti
 
     @Override
     public T create(int windowId, PlayerInventory inv, PacketBuffer data) {
-        TileEntity te = inv.player.world.getTileEntity(data.readBlockPos());
-        Direction direction = data.readEnumValue(Direction.class);
+        TileEntity te = inv.player.level.getBlockEntity(data.readBlockPos());
+        Direction direction = data.readEnum(Direction.class);
         int index = data.readInt();
         try {
             return containerCreator.create(windowId, inv, (U) te, direction, index);

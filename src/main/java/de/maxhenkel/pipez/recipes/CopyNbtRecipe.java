@@ -30,8 +30,8 @@ public class CopyNbtRecipe extends SpecialRecipe {
         ItemStack source = null;
         List<ItemStack> toCopy = new ArrayList<>();
 
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack stack = inv.getStackInSlot(i);
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) {
                 continue;
             } else if (ingredient.test(stack)) {
@@ -64,7 +64,7 @@ public class CopyNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inv) {
+    public ItemStack assemble(CraftingInventory inv) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
         if (result.getKey() == null) {
             return ItemStack.EMPTY;
@@ -95,8 +95,8 @@ public class CopyNbtRecipe extends SpecialRecipe {
             return super.getRemainingItems(inv);
         } else if (result.getValue().size() == 1) {
             NonNullList<ItemStack> res = super.getRemainingItems(inv);
-            for (int i = 0; i < inv.getSizeInventory(); i++) {
-                if (inv.getStackInSlot(i).equals(result.getKey())) {
+            for (int i = 0; i < inv.getContainerSize(); i++) {
+                if (inv.getItem(i).equals(result.getKey())) {
                     ItemStack r = result.getKey().copy();
                     r.setCount(1);
                     res.set(i, r);
@@ -115,12 +115,12 @@ public class CopyNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return width >= 2 && height >= 2;
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return ItemStack.EMPTY;
     }
 
@@ -128,18 +128,18 @@ public class CopyNbtRecipe extends SpecialRecipe {
         public static final ResourceLocation NAME = new ResourceLocation(Main.MODID, "copy_nbt");
 
         @Override
-        public CopyNbtRecipe read(ResourceLocation recipeId, JsonObject json) {
-            return new CopyNbtRecipe(recipeId, Ingredient.deserialize(json.get("item")));
+        public CopyNbtRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            return new CopyNbtRecipe(recipeId, Ingredient.fromJson(json.get("item")));
         }
 
         @Override
-        public CopyNbtRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            return new CopyNbtRecipe(recipeId, Ingredient.read(buffer));
+        public CopyNbtRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+            return new CopyNbtRecipe(recipeId, Ingredient.fromNetwork(buffer));
         }
 
         @Override
-        public void write(PacketBuffer buffer, CopyNbtRecipe recipe) {
-            recipe.ingredient.write(buffer);
+        public void toNetwork(PacketBuffer buffer, CopyNbtRecipe recipe) {
+            recipe.ingredient.toNetwork(buffer);
         }
     }
 }

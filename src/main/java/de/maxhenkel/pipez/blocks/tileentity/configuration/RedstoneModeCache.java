@@ -27,7 +27,7 @@ public class RedstoneModeCache extends CachedPipeConfiguration<UpgradeTileEntity
     public UpgradeTileEntity.RedstoneMode deserialize(PipeType pipeType, INBT inbt) {
         if (inbt instanceof ByteNBT) {
             ByteNBT byteNBT = (ByteNBT) inbt;
-            return UpgradeTileEntity.RedstoneMode.values()[byteNBT.getByte()];
+            return UpgradeTileEntity.RedstoneMode.values()[byteNBT.getAsByte()];
         }
         return null;
     }

@@ -28,7 +28,7 @@ public class DistributionCache extends CachedPipeConfiguration<UpgradeTileEntity
     public UpgradeTileEntity.Distribution deserialize(PipeType pipeType, INBT inbt) {
         if (inbt instanceof ByteNBT) {
             ByteNBT byteNBT = (ByteNBT) inbt;
-            return UpgradeTileEntity.Distribution.values()[byteNBT.getByte()];
+            return UpgradeTileEntity.Distribution.values()[byteNBT.getAsByte()];
         }
         return null;
     }

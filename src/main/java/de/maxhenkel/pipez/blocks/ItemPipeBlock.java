@@ -25,13 +25,13 @@ public class ItemPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(IWorldReader world, BlockPos pos, Direction facing) {
-        TileEntity te = world.getTileEntity(pos.offset(facing));
+        TileEntity te = world.getBlockEntity(pos.relative(facing));
         return (te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).isPresent());
     }
 
     @Override
     public boolean isPipe(IWorldReader world, BlockPos pos, Direction facing) {
-        BlockState state = world.getBlockState(pos.offset(facing));
+        BlockState state = world.getBlockState(pos.relative(facing));
         return state.getBlock().equals(this);
     }
 
@@ -42,9 +42,9 @@ public class ItemPipeBlock extends PipeBlock {
 
     @Override
     public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        TileEntity tileEntity = worldIn.getBlockEntity(pos);
         if (tileEntity instanceof ItemPipeTileEntity && isExtracting(worldIn, pos, direction)) {
-            if (worldIn.isRemote) {
+            if (worldIn.isClientSide) {
                 return ActionResultType.SUCCESS;
             }
             ItemPipeTileEntity pipe = (ItemPipeTileEntity) tileEntity;

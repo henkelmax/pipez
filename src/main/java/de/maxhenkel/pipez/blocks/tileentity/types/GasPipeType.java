@@ -67,7 +67,7 @@ public class GasPipeType extends PipeType<Gas> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IGasHandler gasHandler = getGasHandler(tileEntity, tileEntity.getPos().offset(side), side.getOpposite());
+            IGasHandler gasHandler = getGasHandler(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (gasHandler == null) {
                 continue;
             }
@@ -188,7 +188,7 @@ public class GasPipeType extends PipeType<Gas> {
 
     @Nullable
     private IGasHandler getGasHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getWorld().getTileEntity(pos);
+        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

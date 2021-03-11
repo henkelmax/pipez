@@ -82,34 +82,34 @@ public class FilterList extends WidgetBase {
                 if (stack != null && !stack.isEmpty()) {
                     List<ITextComponent> tooltip = stack.getTooltip(screen);
                     if (filter.isInvert()) {
-                        tooltip.set(0, new TranslationTextComponent("tooltip.pipez.filter.not").mergeStyle(TextFormatting.DARK_RED).appendString(" ").append(tooltip.get(0)));
+                        tooltip.set(0, new TranslationTextComponent("tooltip.pipez.filter.not").withStyle(TextFormatting.DARK_RED).append(" ").append(tooltip.get(0)));
                     }
                     if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
-                        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(filter.getTag().getName().toString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.GRAY));
+                        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.accepts_tag", new StringTextComponent(filter.getTag().getName().toString()).withStyle(TextFormatting.BLUE)).withStyle(TextFormatting.GRAY));
                     }
-                    screen.renderToolTip(matrixStack, tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.fontRenderer);
+                    screen.renderToolTip(matrixStack, tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
                 }
             } else if (blockHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 if (filter.getDestination() != null) {
                     List<ITextComponent> tooltip = new ArrayList<>();
                     Pair<BlockState, ItemStack> destPair = getBlockAt(filter.getDestination());
                     if (destPair.getKey() == null) {
-                        tooltip.add(TextComponentUtils.wrapWithSquareBrackets(new TranslationTextComponent("tooltip.pipez.filter.unknown_block")).mergeStyle(TextFormatting.DARK_RED));
+                        tooltip.add(TextComponentUtils.wrapInSquareBrackets(new TranslationTextComponent("tooltip.pipez.filter.unknown_block")).withStyle(TextFormatting.DARK_RED));
                     } else {
-                        tooltip.add(destPair.getKey().getBlock().getTranslatedName().mergeStyle(TextFormatting.BLUE));
+                        tooltip.add(destPair.getKey().getBlock().getName().withStyle(TextFormatting.BLUE));
                     }
                     BlockPos pos = filter.getDestination().getPos();
                     tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
-                    tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination_distance", number(pos.manhattanDistance(getContainer().getPipe().getPos()))));
-                    tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination_side", new TranslationTextComponent("message.pipez.direction." + filter.getDestination().getDirection().getName2()).mergeStyle(TextFormatting.DARK_GREEN)));
-                    screen.renderToolTip(matrixStack, tooltip.stream().map(ITextComponent::func_241878_f).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.fontRenderer);
+                    tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
+                    tooltip.add(new TranslationTextComponent("tooltip.pipez.filter.destination_side", new TranslationTextComponent("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(TextFormatting.DARK_GREEN)));
+                    screen.renderToolTip(matrixStack, tooltip.stream().map(ITextComponent::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
                 }
             }
         }
     }
 
     private IFormattableTextComponent number(int num) {
-        return new StringTextComponent(String.valueOf(num)).mergeStyle(TextFormatting.DARK_GREEN);
+        return new StringTextComponent(String.valueOf(num)).withStyle(TextFormatting.DARK_GREEN);
     }
 
     @Nullable
@@ -146,7 +146,7 @@ public class FilterList extends WidgetBase {
 
         List<Filter<?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
-            mc.getTextureManager().bindTexture(BACKGROUND);
+            mc.getTextureManager().bind(BACKGROUND);
             int pos = i - getOffset();
             int startY = guiTop + pos * columnHeight;
             Filter<?> filter = f.get(i);
@@ -161,15 +161,15 @@ public class FilterList extends WidgetBase {
                 stack.render(matrixStack, guiLeft + 3, startY + 3);
                 if (filter.getTag() != null) {
                     if (filter.getTag() instanceof SingleElementTag) {
-                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.item", new TranslationTextComponent(stack.getDisplayName().getString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.WHITE));
+                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.item", new TranslationTextComponent(stack.getDisplayName().getString()).withStyle(TextFormatting.BLUE)).withStyle(TextFormatting.WHITE));
                     } else {
-                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.tag", new StringTextComponent(filter.getTag().getName().toString()).mergeStyle(TextFormatting.BLUE)).mergeStyle(TextFormatting.WHITE));
+                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.tag", new StringTextComponent(filter.getTag().getName().toString()).withStyle(TextFormatting.BLUE)).withStyle(TextFormatting.WHITE));
                     }
                     if (filter.getMetadata() != null && filter.getMetadata().size() > 0) {
-                        IFormattableTextComponent tags = new TranslationTextComponent("message.pipez.filter.nbt.tag" + (filter.getMetadata().size() != 1 ? "s" : ""), filter.getMetadata().size()).mergeStyle(TextFormatting.DARK_PURPLE);
-                        IFormattableTextComponent nbtStr = new TranslationTextComponent("message.pipez.filter.nbt", tags).mergeStyle(TextFormatting.WHITE);
+                        IFormattableTextComponent tags = new TranslationTextComponent("message.pipez.filter.nbt.tag" + (filter.getMetadata().size() != 1 ? "s" : ""), filter.getMetadata().size()).withStyle(TextFormatting.DARK_PURPLE);
+                        IFormattableTextComponent nbtStr = new TranslationTextComponent("message.pipez.filter.nbt", tags).withStyle(TextFormatting.WHITE);
                         if (filter.isExactMetadata()) {
-                            nbtStr.appendString(" ").append(new TranslationTextComponent("message.pipez.filter.nbt.exact"));
+                            nbtStr.append(" ").append(new TranslationTextComponent("message.pipez.filter.nbt.exact"));
                         }
                         drawStringSmall(matrixStack, guiLeft + 22, startY + 10, nbtStr);
                     }
@@ -177,17 +177,17 @@ public class FilterList extends WidgetBase {
             }
 
             if (filter.isInvert()) {
-                drawStringSmall(matrixStack, guiLeft + 22, startY + 15, new TranslationTextComponent("message.pipez.filter.inverted").mergeStyle(TextFormatting.DARK_RED));
+                drawStringSmall(matrixStack, guiLeft + 22, startY + 15, new TranslationTextComponent("message.pipez.filter.inverted").withStyle(TextFormatting.DARK_RED));
             }
 
             if (filter.getDestination() != null) {
                 Pair<BlockState, ItemStack> dstPair = getBlockAt(filter.getDestination());
-                mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3);
-                mc.getItemRenderer().renderItemOverlayIntoGUI(mc.fontRenderer, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
+                mc.getItemRenderer().renderAndDecorateItem(mc.player, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3);
+                mc.getItemRenderer().renderGuiItemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
             }
         }
 
-        mc.getTextureManager().bindTexture(BACKGROUND);
+        mc.getTextureManager().bind(BACKGROUND);
 
         if (f.size() > columnCount) {
             float h = 66 - 17;
@@ -203,9 +203,9 @@ public class FilterList extends WidgetBase {
         return filterPosCache.get(destination, () -> {
             ItemStack stack = new ItemStack(Items.WHITE_CONCRETE);
             BlockState state = null;
-            if (mc.world.isAreaLoaded(destination.getPos(), 1)) {
-                state = mc.world.getBlockState(destination.getPos());
-                ItemStack pickBlock = state.getBlock().getPickBlock(state, new BlockRayTraceResult(new Vector3d(destination.getPos().getX() + 0.5D, destination.getPos().getY() + 0.5D, destination.getPos().getZ() + 0.5D), destination.getDirection(), destination.getPos(), true), mc.world, destination.getPos(), mc.player);
+            if (mc.level.isAreaLoaded(destination.getPos(), 1)) {
+                state = mc.level.getBlockState(destination.getPos());
+                ItemStack pickBlock = state.getBlock().getPickBlock(state, new BlockRayTraceResult(new Vector3d(destination.getPos().getX() + 0.5D, destination.getPos().getY() + 0.5D, destination.getPos().getZ() + 0.5D), destination.getDirection(), destination.getPos(), true), mc.level, destination.getPos(), mc.player);
                 if (pickBlock != null && !pickBlock.isEmpty()) {
                     stack = pickBlock;
                 }
@@ -238,16 +238,16 @@ public class FilterList extends WidgetBase {
     }
 
     private void drawStringSmall(MatrixStack matrixStack, int x, int y, ITextComponent text) {
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(x, y, 0);
         matrixStack.scale(0.5F, 0.5F, 1F);
-        mc.fontRenderer.func_243248_b(matrixStack, text, 0, 0, 0);
-        matrixStack.pop();
+        mc.font.draw(matrixStack, text, 0, 0, 0);
+        matrixStack.popPose();
     }
 
     public static <T> T get(ITag.INamedTag<T> tag) {
-        long time = Minecraft.getInstance().world.getGameTime();
-        List<T> allElements = tag.getAllElements();
+        long time = Minecraft.getInstance().level.getGameTime();
+        List<T> allElements = tag.getValues();
         return allElements.get((int) (time / 20L % allElements.size()));
     }
 

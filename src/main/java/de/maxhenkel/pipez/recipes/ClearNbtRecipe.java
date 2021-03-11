@@ -26,8 +26,8 @@ public class ClearNbtRecipe extends SpecialRecipe {
     @Nullable
     public ItemStack getIngredient(CraftingInventory inv) {
         ItemStack found = null;
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack stackInSlot = inv.getStackInSlot(i);
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stackInSlot = inv.getItem(i);
             if (ingredient.test(stackInSlot)) {
                 if (found != null) {
                     return null;
@@ -47,7 +47,7 @@ public class ClearNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inv) {
+    public ItemStack assemble(CraftingInventory inv) {
         ItemStack ingredient = getIngredient(inv);
         if (ingredient == null) {
             return ItemStack.EMPTY;
@@ -65,12 +65,12 @@ public class ClearNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return ItemStack.EMPTY;
     }
 
@@ -78,18 +78,18 @@ public class ClearNbtRecipe extends SpecialRecipe {
         public static final ResourceLocation NAME = new ResourceLocation(Main.MODID, "clear_nbt");
 
         @Override
-        public ClearNbtRecipe read(ResourceLocation recipeId, JsonObject json) {
-            return new ClearNbtRecipe(recipeId, Ingredient.deserialize(json.get("item")));
+        public ClearNbtRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            return new ClearNbtRecipe(recipeId, Ingredient.fromJson(json.get("item")));
         }
 
         @Override
-        public ClearNbtRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            return new ClearNbtRecipe(recipeId, Ingredient.read(buffer));
+        public ClearNbtRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+            return new ClearNbtRecipe(recipeId, Ingredient.fromNetwork(buffer));
         }
 
         @Override
-        public void write(PacketBuffer buffer, ClearNbtRecipe recipe) {
-            recipe.ingredient.write(buffer);
+        public void toNetwork(PacketBuffer buffer, ClearNbtRecipe recipe) {
+            recipe.ingredient.toNetwork(buffer);
         }
     }
 }

@@ -17,11 +17,11 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     }
 
     public int getRoundRobinIndex(Direction direction, PipeType<?> pipeType) {
-        return rrIndex[direction.getIndex()][getIndex(pipeType)];
+        return rrIndex[direction.get3DDataValue()][getIndex(pipeType)];
     }
 
     public void setRoundRobinIndex(Direction direction, PipeType<?> pipeType, int value) {
-        rrIndex[direction.getIndex()][getIndex(pipeType)] = value;
+        rrIndex[direction.get3DDataValue()][getIndex(pipeType)] = value;
     }
 
     public boolean isEnabled(Direction side, PipeType<?> pipeType) {
@@ -52,7 +52,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     }
 
     public boolean isRedstonePowered() {
-        return world.isBlockPowered(pos);
+        return level.hasNeighborSignal(worldPosition);
     }
 
     public PipeType<?>[] getPipeTypes() {
@@ -73,7 +73,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     public void tick() {
         super.tick();
 
-        if (world.isRemote) {
+        if (level.isClientSide) {
             return;
         }
 

@@ -68,7 +68,7 @@ public class FluidPipeType extends PipeType<Fluid> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IFluidHandler fluidHandler = getFluidHandler(tileEntity, tileEntity.getPos().offset(side), side.getOpposite());
+            IFluidHandler fluidHandler = getFluidHandler(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (fluidHandler == null) {
                 continue;
             }
@@ -171,11 +171,11 @@ public class FluidPipeType extends PipeType<Fluid> {
     private boolean matches(Filter<Fluid> filter, FluidStack stack) {
         CompoundNBT metadata = filter.getMetadata();
         if (metadata == null) {
-            return filter.getTag() == null || stack.getFluid().isIn(filter.getTag());
+            return filter.getTag() == null || stack.getFluid().is(filter.getTag());
         }
         if (filter.isExactMetadata()) {
             if (deepExactCompare(metadata, stack.getTag())) {
-                return filter.getTag() == null || stack.getFluid().isIn(filter.getTag());
+                return filter.getTag() == null || stack.getFluid().is(filter.getTag());
             } else {
                 return false;
             }
@@ -187,7 +187,7 @@ public class FluidPipeType extends PipeType<Fluid> {
             if (!deepFuzzyCompare(metadata, stackNBT)) {
                 return false;
             }
-            return filter.getTag() == null || stack.getFluid().isIn(filter.getTag());
+            return filter.getTag() == null || stack.getFluid().is(filter.getTag());
         }
     }
 
@@ -202,7 +202,7 @@ public class FluidPipeType extends PipeType<Fluid> {
 
     @Nullable
     private IFluidHandler getFluidHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getWorld().getTileEntity(pos);
+        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

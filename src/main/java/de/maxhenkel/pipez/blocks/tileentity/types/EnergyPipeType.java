@@ -69,7 +69,7 @@ public class EnergyPipeType extends PipeType<Void> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IEnergyStorage energyStorage = getEnergyStorage(tileEntity, tileEntity.getPos().offset(side), side.getOpposite());
+            IEnergyStorage energyStorage = getEnergyStorage(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (energyStorage == null || !energyStorage.canExtract()) {
                 continue;
             }
@@ -146,7 +146,7 @@ public class EnergyPipeType extends PipeType<Void> {
 
     @Nullable
     private IEnergyStorage getEnergyStorage(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getWorld().getTileEntity(pos);
+        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

@@ -23,14 +23,14 @@ public class PipeContainerProvider implements INamedContainerProvider {
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(tileEntity.getBlockState().getBlock().getTranslationKey());
+        return new TranslationTextComponent(tileEntity.getBlockState().getBlock().getDescriptionId());
     }
 
     public static void openGui(PlayerEntity player, UpgradeTileEntity tileEntity, Direction direction, int index, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayerEntity) {
             NetworkHooks.openGui((ServerPlayerEntity) player, new PipeContainerProvider(containerCreator, tileEntity), packetBuffer -> {
-                packetBuffer.writeBlockPos(tileEntity.getPos());
-                packetBuffer.writeEnumValue(direction);
+                packetBuffer.writeBlockPos(tileEntity.getBlockPos());
+                packetBuffer.writeEnum(direction);
                 packetBuffer.writeInt(index);
             });
         }

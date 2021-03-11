@@ -28,7 +28,7 @@ public class FilterModeCache extends CachedPipeConfiguration<UpgradeTileEntity.F
     public UpgradeTileEntity.FilterMode deserialize(PipeType pipeType, INBT inbt) {
         if (inbt instanceof ByteNBT) {
             ByteNBT byteNBT = (ByteNBT) inbt;
-            return UpgradeTileEntity.FilterMode.values()[byteNBT.getByte()];
+            return UpgradeTileEntity.FilterMode.values()[byteNBT.getAsByte()];
         }
         return null;
     }

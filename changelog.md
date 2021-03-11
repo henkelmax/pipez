@@ -1,1 +1,1 @@
-- Fixed clear upgrade NBT recipe
+- Updated to official mappings

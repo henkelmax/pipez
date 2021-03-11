@@ -55,19 +55,19 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         distributions.invalidate();
         filterModes.invalidate();
         filters.invalidate();
-        markDirty();
+        setChanged();
     }
 
     public ItemStack setUpgradeItem(Direction side, ItemStack upgrade) {
-        ItemStack old = upgradeInventory.get(side.getIndex());
+        ItemStack old = upgradeInventory.get(side.get3DDataValue());
         UpgradeItem.upgradeData(upgrade); //TODO Remove after MC update
-        upgradeInventory.set(side.getIndex(), upgrade);
+        upgradeInventory.set(side.get3DDataValue(), upgrade);
         invalidateAllCaches();
         return old;
     }
 
     public ItemStack getUpgradeItem(Direction side) {
-        return upgradeInventory.get(side.getIndex());
+        return upgradeInventory.get(side.get3DDataValue());
     }
 
     public RedstoneMode getRedstoneMode(Direction side, PipeType pipeType) {
@@ -106,17 +106,17 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     public void setExtracting(Direction side, boolean extracting) {
         super.setExtracting(side, extracting);
         if (!extracting) {
-            ItemStack stack = upgradeInventory.get(side.getIndex());
-            upgradeInventory.set(side.getIndex(), ItemStack.EMPTY);
-            InventoryHelper.dropItems(world, pos, NonNullList.from(ItemStack.EMPTY, stack));
-            markDirty();
+            ItemStack stack = upgradeInventory.get(side.get3DDataValue());
+            upgradeInventory.set(side.get3DDataValue(), ItemStack.EMPTY);
+            InventoryHelper.dropContents(level, worldPosition, NonNullList.of(ItemStack.EMPTY, stack));
+            setChanged();
         }
     }
 
     @Override
-    public void remove() {
-        InventoryHelper.dropItems(world, pos, upgradeInventory);
-        super.remove();
+    public void setRemoved() {
+        InventoryHelper.dropContents(level, worldPosition, upgradeInventory);
+        super.setRemoved();
     }
 
     public IInventory getUpgradeInventory() {
@@ -124,8 +124,8 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(BlockState state, CompoundNBT compound) {
+        super.load(state, compound);
         upgradeInventory.clear();
         ItemUtils.readInventory(compound, "Upgrades", upgradeInventory);
         for (ItemStack stack : upgradeInventory) {
@@ -135,14 +135,14 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT save(CompoundNBT compound) {
         ItemUtils.saveInventory(compound, "Upgrades", upgradeInventory);
-        return super.write(compound);
+        return super.save(compound);
     }
 
     @Nullable
     public Upgrade getUpgrade(Direction direction) {
-        ItemStack stack = upgradeInventory.get(direction.getIndex());
+        ItemStack stack = upgradeInventory.get(direction.get3DDataValue());
         if (stack.getItem() instanceof UpgradeItem) {
             return ((UpgradeItem) stack.getItem()).getTier();
         }

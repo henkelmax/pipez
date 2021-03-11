@@ -21,14 +21,14 @@ public class WrenchTagProvider extends TagsProvider<Item> {
     }
 
     @Override
-    protected void registerTags() {
-        getOrCreateBuilder(ModItemTags.WRENCHES_TAG).addTag(ModItemTags.WRENCH_TAG);
-        getOrCreateBuilder(ModItemTags.WRENCH_TAG).addItemEntry(ModItems.WRENCH);
-        getOrCreateBuilder(ModItemTags.TOOLS_TAG).addTag(ModItemTags.WRENCH_TAG);
+    protected void addTags() {
+        tag(ModItemTags.WRENCHES_TAG).addTag(ModItemTags.WRENCH_TAG);
+        tag(ModItemTags.WRENCH_TAG).add(ModItems.WRENCH);
+        tag(ModItemTags.TOOLS_TAG).addTag(ModItemTags.WRENCH_TAG);
     }
 
     @Override
-    protected Path makePath(ResourceLocation id) {
+    protected Path getPath(ResourceLocation id) {
         return generator.getOutputFolder().resolve(Paths.get("data", id.getNamespace(), "tags", "items", id.getPath() + ".json"));
     }
 

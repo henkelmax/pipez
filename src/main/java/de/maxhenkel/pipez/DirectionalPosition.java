@@ -57,7 +57,7 @@ public class DirectionalPosition implements INBTSerializable<CompoundNBT> {
         p.putInt("Y", pos.getY());
         p.putInt("Z", pos.getZ());
         compound.put("Position", p);
-        compound.putByte("Direction", (byte) direction.getIndex());
+        compound.putByte("Direction", (byte) direction.get3DDataValue());
         return compound;
     }
 
@@ -65,6 +65,6 @@ public class DirectionalPosition implements INBTSerializable<CompoundNBT> {
     public void deserializeNBT(CompoundNBT compound) {
         CompoundNBT p = compound.getCompound("Position");
         pos = new BlockPos(p.getInt("X"), p.getInt("Y"), p.getInt("Z"));
-        direction = Direction.byIndex(compound.getByte("Direction"));
+        direction = Direction.from3DDataValue(compound.getByte("Direction"));
     }
 }

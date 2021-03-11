@@ -27,7 +27,7 @@ public class CycleRedstoneModeMessage implements Message<CycleRedstoneModeMessag
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().openContainer;
+        Container container = context.getSender().containerMenu;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
             PipeType<?> pipeType = extractContainer.getPipe().getPipeTypes()[index];

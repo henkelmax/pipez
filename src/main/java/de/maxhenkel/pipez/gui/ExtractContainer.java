@@ -18,7 +18,7 @@ public class ExtractContainer extends ContainerBase {
         this.side = side;
         this.index = index;
 
-        addSlot(new UpgradeSlot(pipe.getUpgradeInventory(), side.getIndex(), 9, 81));
+        addSlot(new UpgradeSlot(pipe.getUpgradeInventory(), side.get3DDataValue(), 9, 81));
 
         addPlayerInventorySlots();
     }
@@ -51,7 +51,7 @@ public class ExtractContainer extends ContainerBase {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         return !pipe.isRemoved();
     }
 }

@@ -25,7 +25,7 @@ public class CycleIconButton extends Button {
     public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
         Icon icon = icons.get(index.get());
-        Minecraft.getInstance().getTextureManager().bindTexture(icon.texture);
+        Minecraft.getInstance().getTextureManager().bind(icon.texture);
         RenderSystem.color4f(1F, 1F, 1F, 1F);
         blit(matrixStack, x + 2, y + 2, icon.offsetX, icon.offsetY, 16, 16);
     }

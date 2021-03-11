@@ -20,25 +20,25 @@ public class UpgradeSlot extends Slot {
     }
 
     @Override
-    public void onSlotChanged() {
-        super.onSlotChanged();
-        UpgradeItem.upgradeData(getStack()); //TODO Remove after MC update
+    public void setChanged() {
+        super.setChanged();
+        UpgradeItem.upgradeData(getItem()); //TODO Remove after MC update
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return stack.getItem() instanceof UpgradeItem;
     }
 
     @Override
-    public int getSlotStackLimit() {
+    public int getMaxStackSize() {
         return 1;
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public Pair<ResourceLocation, ResourceLocation> getBackground() {
-        return Pair.of(PlayerContainer.LOCATION_BLOCKS_TEXTURE, UPGRADE_SLOT);
+    public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+        return Pair.of(PlayerContainer.BLOCK_ATLAS, UPGRADE_SLOT);
     }
 
 }

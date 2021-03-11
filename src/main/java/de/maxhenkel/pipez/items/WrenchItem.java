@@ -19,22 +19,22 @@ import java.util.List;
 public class WrenchItem extends Item {
 
     public WrenchItem() {
-        super(new Properties().group(ModItemGroups.TAB_PIPEZ).maxStackSize(1));
+        super(new Properties().tab(ModItemGroups.TAB_PIPEZ).stacksTo(1));
         setRegistryName(new ResourceLocation(Main.MODID, "wrench"));
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new TranslationTextComponent("tooltip.pipez.wrench").mergeStyle(TextFormatting.GRAY));
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(new TranslationTextComponent("tooltip.pipez.wrench").withStyle(TextFormatting.GRAY));
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
     }
 
     public static boolean isWrench(ItemStack stack) {
-        return stack.getItem().isIn(ModItemTags.WRENCH_TAG) || stack.getItem().isIn(ModItemTags.WRENCHES_TAG);
+        return stack.getItem().is(ModItemTags.WRENCH_TAG) || stack.getItem().is(ModItemTags.WRENCHES_TAG);
     }
 
     public static boolean isHoldingWrench(PlayerEntity player) {
-        for (ItemStack stack : player.getHeldEquipment()) {
+        for (ItemStack stack : player.getHandSlots()) {
             if (isWrench(stack)) {
                 return true;
             }

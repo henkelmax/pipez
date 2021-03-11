@@ -31,7 +31,7 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
     public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
         CompoundNBT compound = accessor.getServerData();
         if (compound.contains("Upgrade", Constants.NBT.TAG_STRING)) {
-            tooltip.add(ITextComponent.Serializer.getComponentFromJson(compound.getString("Upgrade")));
+            tooltip.add(ITextComponent.Serializer.fromJson(compound.getString("Upgrade")));
         }
         tooltip.addAll(getTooltips(compound));
     }
@@ -40,7 +40,7 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
     public void appendServerData(CompoundNBT compound, ServerPlayerEntity player, World world, TileEntity te) {
         if (te.getBlockState().getBlock() instanceof PipeBlock) {
             PipeBlock pipe = (PipeBlock) te.getBlockState().getBlock();
-            Direction selectedSide = pipe.getSelection(te.getBlockState(), world, te.getPos(), player).getKey();
+            Direction selectedSide = pipe.getSelection(te.getBlockState(), world, te.getBlockPos(), player).getKey();
             if (selectedSide == null) {
                 return;
             }
@@ -59,7 +59,7 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
             if (upgrade.isEmpty()) {
                 compound.putString("Upgrade", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.no_upgrade")));
             } else {
-                compound.putString("Upgrade", ITextComponent.Serializer.toJson(upgrade.getDisplayName()));
+                compound.putString("Upgrade", ITextComponent.Serializer.toJson(upgrade.getHoverName()));
             }
 
             List<ITextComponent> tooltips = new ArrayList<>();
@@ -87,7 +87,7 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
         }
         ListNBT list = compound.getList("Tooltips", Constants.NBT.TAG_STRING);
         for (int i = 0; i < list.size(); i++) {
-            tooltips.add(ITextComponent.Serializer.getComponentFromJson(list.getString(i)));
+            tooltips.add(ITextComponent.Serializer.fromJson(list.getString(i)));
         }
         return tooltips;
     }

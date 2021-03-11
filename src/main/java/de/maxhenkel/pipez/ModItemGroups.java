@@ -9,7 +9,7 @@ public class ModItemGroups {
     public static final ItemGroup TAB_PIPEZ = new ItemGroup("pipez") {
 
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(ModBlocks.ITEM_PIPE);
         }
 

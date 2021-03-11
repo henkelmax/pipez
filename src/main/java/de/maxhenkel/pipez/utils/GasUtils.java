@@ -24,7 +24,7 @@ public class GasUtils {
         ResourceLocation id;
         if (name.startsWith("#")) {
             id = new ResourceLocation(name.substring(1));
-            ITag<Gas> tag = ChemicalTags.GAS.getCollection().get(id);
+            ITag<Gas> tag = ChemicalTags.GAS.getCollection().getTag(id);
             if (tag == null) {
                 return nullIfNotExists ? null : EMPTY_GAS_TAG;
             } else {

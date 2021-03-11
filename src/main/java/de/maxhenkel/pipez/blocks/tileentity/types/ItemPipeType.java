@@ -68,7 +68,7 @@ public class ItemPipeType extends PipeType<Item> {
     @Override
     public void tick(PipeLogicTileEntity tileEntity) {
         for (Direction side : Direction.values()) {
-            if (tileEntity.getWorld().getGameTime() % getSpeed(tileEntity, side) != 0) {
+            if (tileEntity.getLevel().getGameTime() % getSpeed(tileEntity, side) != 0) {
                 continue;
             }
             if (!tileEntity.isExtracting(side)) {
@@ -77,7 +77,7 @@ public class ItemPipeType extends PipeType<Item> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IItemHandler itemHandler = getItemHandler(tileEntity, tileEntity.getPos().offset(side), side.getOpposite());
+            IItemHandler itemHandler = getItemHandler(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (itemHandler == null) {
                 continue;
             }
@@ -202,11 +202,11 @@ public class ItemPipeType extends PipeType<Item> {
     private boolean matches(Filter<Item> filter, ItemStack stack) {
         CompoundNBT metadata = filter.getMetadata();
         if (metadata == null) {
-            return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+            return filter.getTag() == null || stack.getItem().is(filter.getTag());
         }
         if (filter.isExactMetadata()) {
             if (deepExactCompare(metadata, stack.getTag())) {
-                return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+                return filter.getTag() == null || stack.getItem().is(filter.getTag());
             } else {
                 return false;
             }
@@ -218,7 +218,7 @@ public class ItemPipeType extends PipeType<Item> {
             if (!deepFuzzyCompare(metadata, stackNBT)) {
                 return false;
             }
-            return filter.getTag() == null || stack.getItem().isIn(filter.getTag());
+            return filter.getTag() == null || stack.getItem().is(filter.getTag());
         }
     }
 
@@ -233,7 +233,7 @@ public class ItemPipeType extends PipeType<Item> {
 
     @Nullable
     private IItemHandler getItemHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getWorld().getTileEntity(pos);
+        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

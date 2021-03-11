@@ -18,22 +18,22 @@ import java.util.List;
 public class FilterDestinationToolItem extends Item {
 
     public FilterDestinationToolItem() {
-        super(new Properties().group(ModItemGroups.TAB_PIPEZ).maxStackSize(1));
+        super(new Properties().tab(ModItemGroups.TAB_PIPEZ).stacksTo(1));
         setRegistryName(new ResourceLocation(Main.MODID, "filter_destination_tool"));
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool").mergeStyle(TextFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool").withStyle(TextFormatting.GRAY));
         DirectionalPosition dst = getDestination(stack);
         if (dst != null) {
-            tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslationTextComponent("message.pipez.direction." + dst.getDirection().getName2()).mergeStyle(TextFormatting.GREEN)).mergeStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslationTextComponent("message.pipez.direction." + dst.getDirection().getName()).withStyle(TextFormatting.GREEN)).withStyle(TextFormatting.GRAY));
         }
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
     }
 
     private IFormattableTextComponent number(int num) {
-        return new StringTextComponent(String.valueOf(num)).mergeStyle(TextFormatting.GREEN);
+        return new StringTextComponent(String.valueOf(num)).withStyle(TextFormatting.GREEN);
     }
 
     @Nullable

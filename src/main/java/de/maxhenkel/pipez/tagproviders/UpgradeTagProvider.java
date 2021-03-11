@@ -21,17 +21,17 @@ public class UpgradeTagProvider extends TagsProvider<Item> {
     }
 
     @Override
-    protected void registerTags() {
-        getOrCreateBuilder(ModItemTags.UPGRADES_TAG)
-                .addItemEntry(ModItems.BASIC_UPGRADE)
-                .addItemEntry(ModItems.IMPROVED_UPGRADE)
-                .addItemEntry(ModItems.ADVANCED_UPGRADE)
-                .addItemEntry(ModItems.ULTIMATE_UPGRADE)
-                .addItemEntry(ModItems.INFINITY_UPGRADE);
+    protected void addTags() {
+        tag(ModItemTags.UPGRADES_TAG)
+                .add(ModItems.BASIC_UPGRADE)
+                .add(ModItems.IMPROVED_UPGRADE)
+                .add(ModItems.ADVANCED_UPGRADE)
+                .add(ModItems.ULTIMATE_UPGRADE)
+                .add(ModItems.INFINITY_UPGRADE);
     }
 
     @Override
-    protected Path makePath(ResourceLocation id) {
+    protected Path getPath(ResourceLocation id) {
         return generator.getOutputFolder().resolve(Paths.get("data", id.getNamespace(), "tags", "items", id.getPath() + ".json"));
     }
 

@@ -28,8 +28,8 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void render(MatrixStack matrixStack, int x, int y) {
-        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlasTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE).getSprite(stack.getType().getIcon());
-        Minecraft.getInstance().getTextureManager().bindTexture(texture.getAtlasTexture().getTextureLocation());
+        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(PlayerContainer.BLOCK_ATLAS).getSprite(stack.getType().getIcon());
+        Minecraft.getInstance().getTextureManager().bind(texture.atlas().location());
         WrappedFluidStack.fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getType().getTint());
     }
 
@@ -40,10 +40,10 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
 
         tooltip.add(getDisplayName());
 
-        if (Minecraft.getInstance().gameSettings.advancedItemTooltips) {
+        if (Minecraft.getInstance().options.advancedItemTooltips) {
             ResourceLocation registryName = MekanismAPI.gasRegistry().getKey(stack.getType());
             if (registryName != null) {
-                tooltip.add((new StringTextComponent(registryName.toString())).mergeStyle(TextFormatting.DARK_GRAY));
+                tooltip.add((new StringTextComponent(registryName.toString())).withStyle(TextFormatting.DARK_GRAY));
             }
         }
 

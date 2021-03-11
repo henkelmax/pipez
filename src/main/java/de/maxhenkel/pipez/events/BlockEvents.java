@@ -31,7 +31,7 @@ public class BlockEvents {
 
         Direction side = pipe.getSelection(state, event.getWorld(), event.getPos(), event.getPlayer()).getKey();
         ActionResultType result = pipe.onPipeSideForceActivated(state, event.getWorld(), event.getPos(), event.getPlayer(), event.getHand(), event.getHitVec(), side);
-        if (result.isSuccessOrConsume()) {
+        if (result.consumesAction()) {
             event.setUseItem(Event.Result.ALLOW);
             event.setCancellationResult(result);
             event.setCanceled(true);
@@ -39,12 +39,12 @@ public class BlockEvents {
     }
 
     private void onDestinationToolClick(PlayerInteractEvent.RightClickBlock event) {
-        ItemStack heldItem = event.getPlayer().getHeldItem(event.getHand());
+        ItemStack heldItem = event.getPlayer().getItemInHand(event.getHand());
         if (!(heldItem.getItem() instanceof FilterDestinationToolItem)) {
             return;
         }
 
-        TileEntity te = event.getWorld().getTileEntity(event.getPos());
+        TileEntity te = event.getWorld().getBlockEntity(event.getPos());
 
         if (te == null) {
             return;
@@ -55,8 +55,8 @@ public class BlockEvents {
             return;
         }
 
-        FilterDestinationToolItem.setDestination(heldItem, new DirectionalPosition(event.getPos().toImmutable(), event.getFace()));
-        event.getPlayer().sendStatusMessage(new TranslationTextComponent("message.pipez.filter_destination_tool.destination.set"), true);
+        FilterDestinationToolItem.setDestination(heldItem, new DirectionalPosition(event.getPos().immutable(), event.getFace()));
+        event.getPlayer().displayClientMessage(new TranslationTextComponent("message.pipez.filter_destination_tool.destination.set"), true);
         event.setUseItem(Event.Result.ALLOW);
         event.setCancellationResult(ActionResultType.SUCCESS);
         event.setCanceled(true);

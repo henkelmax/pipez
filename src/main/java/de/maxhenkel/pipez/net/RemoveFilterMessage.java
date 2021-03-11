@@ -33,7 +33,7 @@ public class RemoveFilterMessage implements Message<RemoveFilterMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().openContainer;
+        Container container = context.getSender().containerMenu;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
             PipeType<?> pipeType = extractContainer.getPipe().getPipeTypes()[index];
@@ -45,14 +45,14 @@ public class RemoveFilterMessage implements Message<RemoveFilterMessage> {
 
     @Override
     public RemoveFilterMessage fromBytes(PacketBuffer packetBuffer) {
-        filter = packetBuffer.readUniqueId();
+        filter = packetBuffer.readUUID();
         index = packetBuffer.readInt();
         return this;
     }
 
     @Override
     public void toBytes(PacketBuffer packetBuffer) {
-        packetBuffer.writeUniqueId(filter);
+        packetBuffer.writeUUID(filter);
         packetBuffer.writeInt(index);
     }
 }

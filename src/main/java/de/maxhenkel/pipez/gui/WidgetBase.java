@@ -54,7 +54,7 @@ public abstract class WidgetBase {
     }
 
     public ExtractContainer getContainer() {
-        return screen.getContainer();
+        return screen.getMenu();
     }
 
     public void addHoverArea(ScreenBase.HoverArea hoverArea) {

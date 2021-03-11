@@ -51,7 +51,7 @@ public class FilterContainer extends ContainerBase {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         return !pipe.isRemoved();
     }
 

@@ -34,15 +34,15 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
 
         cachedModel = new CachedValue<>(() -> {
             IUnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(getModel());
-            return modelOrMissing.bakeModel(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, getModel());
+            return modelOrMissing.bake(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, getModel());
         });
     }
 
     @Override
     public void render(PipeTileEntity pipe, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
         IBakedModel iBakedModel = cachedModel.get();
-        List<BakedQuad> quads = iBakedModel.getQuads(null, null, minecraft.world.rand, EmptyModelData.INSTANCE);
-        IVertexBuilder b = buffer.getBuffer(RenderType.getSolid());
+        List<BakedQuad> quads = iBakedModel.getQuads(null, null, minecraft.level.random, EmptyModelData.INSTANCE);
+        IVertexBuilder b = buffer.getBuffer(RenderType.solid());
 
         for (Direction side : Direction.values()) {
             if (pipe.isExtracting(side)) {
@@ -52,16 +52,16 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
     }
 
     private void renderExtractor(Direction direction, MatrixStack matrixStack, IVertexBuilder b, List<BakedQuad> quads, int combinedLight, int combinedOverlay) {
-        matrixStack.push();
-        matrixStack.translate(direction.getXOffset() * 0.001D, direction.getYOffset() * 0.001D, direction.getZOffset() * 0.001D);
+        matrixStack.pushPose();
+        matrixStack.translate(direction.getStepX() * 0.001D, direction.getStepY() * 0.001D, direction.getStepZ() * 0.001D);
         matrixStack.translate(0.5D, 0.5D, 0.5D);
-        matrixStack.rotate(getRotation(direction));
+        matrixStack.mulPose(getRotation(direction));
         matrixStack.translate(-0.5D, -0.5D, -0.5D);
         for (BakedQuad quad : quads) {
-            b.addQuad(matrixStack.getLast(), quad, 1F, 1F, 1F, combinedLight, combinedOverlay);
+            b.putBulkData(matrixStack.last(), quad, 1F, 1F, 1F, combinedLight, combinedOverlay);
         }
 
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
     private Quaternion getRotation(Direction direction) {
@@ -70,20 +70,20 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
             case NORTH:
                 return q;
             case SOUTH:
-                q.multiply(Vector3f.YP.rotationDegrees(180F));
+                q.mul(Vector3f.YP.rotationDegrees(180F));
                 return q;
             case WEST:
-                q.multiply(Vector3f.YP.rotationDegrees(90F));
+                q.mul(Vector3f.YP.rotationDegrees(90F));
                 return q;
             case EAST:
-                q.multiply(Vector3f.YP.rotationDegrees(270F));
+                q.mul(Vector3f.YP.rotationDegrees(270F));
                 return q;
             case UP:
-                q.multiply(Vector3f.XP.rotationDegrees(90F));
+                q.mul(Vector3f.XP.rotationDegrees(90F));
                 return q;
             case DOWN:
             default:
-                q.multiply(Vector3f.XP.rotationDegrees(270F));
+                q.mul(Vector3f.XP.rotationDegrees(270F));
                 return q;
         }
     }

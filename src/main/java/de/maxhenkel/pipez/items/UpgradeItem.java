@@ -24,7 +24,7 @@ public class UpgradeItem extends Item {
     private final Upgrade tier;
 
     public UpgradeItem(Upgrade tier) {
-        super(new Properties().group(ModItemGroups.TAB_PIPEZ));
+        super(new Properties().tab(ModItemGroups.TAB_PIPEZ));
         this.tier = tier;
         setRegistryName(new ResourceLocation(Main.MODID, tier.getName() + "_upgrade"));
     }
@@ -34,8 +34,8 @@ public class UpgradeItem extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         CompoundNBT tag = stack.getTag();
         if (tag != null) {
@@ -54,8 +54,8 @@ public class UpgradeItem extends Item {
             }
 
             if (!list.isEmpty()) {
-                IFormattableTextComponent types = list.stream().reduce((text1, text2) -> text1.appendString(", ").append(text2)).get();
-                tooltip.add(new TranslationTextComponent("tooltip.pipez.upgrade.configured", types.mergeStyle(TextFormatting.WHITE)).mergeStyle(TextFormatting.YELLOW));
+                IFormattableTextComponent types = list.stream().reduce((text1, text2) -> text1.append(", ").append(text2)).get();
+                tooltip.add(new TranslationTextComponent("tooltip.pipez.upgrade.configured", types.withStyle(TextFormatting.WHITE)).withStyle(TextFormatting.YELLOW));
             }
         }
     }

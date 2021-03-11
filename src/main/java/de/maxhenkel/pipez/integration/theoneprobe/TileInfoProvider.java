@@ -25,7 +25,7 @@ public class TileInfoProvider implements IProbeInfoProvider {
 
     @Override
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, PlayerEntity player, World world, BlockState state, IProbeHitData hitData) {
-        TileEntity te = world.getTileEntity(hitData.getPos());
+        TileEntity te = world.getBlockEntity(hitData.getPos());
 
         if (state.getBlock() instanceof PipeBlock) {
             PipeBlock pipe = (PipeBlock) state.getBlock();

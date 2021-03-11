@@ -20,11 +20,11 @@ public class FilterContainerFactory<T extends Container, U extends PipeLogicTile
     @Override
     public T create(int windowId, PlayerInventory inv, PacketBuffer data) {
         try {
-            U pipe = (U) inv.player.world.getTileEntity(data.readBlockPos());
-            Direction direction = data.readEnumValue(Direction.class);
+            U pipe = (U) inv.player.level.getBlockEntity(data.readBlockPos());
+            Direction direction = data.readEnum(Direction.class);
             int index = data.readInt();
             Filter<?> filter = pipe.getPipeTypes()[index].createFilter();
-            filter.deserializeNBT(data.readCompoundTag());
+            filter.deserializeNBT(data.readNbt());
             return containerCreator.create(windowId, inv, pipe, direction, index, filter);
         } catch (ClassCastException e) {
             return null;

@@ -71,8 +71,8 @@ public abstract class PipeType<T> {
             CompoundNBT c = (CompoundNBT) meta;
             CompoundNBT i = (CompoundNBT) item;
             Set<String> allKeys = new HashSet<>();
-            allKeys.addAll(c.keySet());
-            allKeys.addAll(i.keySet());
+            allKeys.addAll(c.getAllKeys());
+            allKeys.addAll(i.getAllKeys());
             for (String key : allKeys) {
                 if (c.contains(key)) {
                     if (i.contains(key)) {
@@ -113,7 +113,7 @@ public abstract class PipeType<T> {
             }
             CompoundNBT c = (CompoundNBT) meta;
             CompoundNBT i = (CompoundNBT) item;
-            for (String key : c.keySet()) {
+            for (String key : c.getAllKeys()) {
                 INBT nbt = c.get(key);
                 if (i.contains(key, nbt.getId())) {
                     if (!deepFuzzyCompare(nbt, i.get(key))) {

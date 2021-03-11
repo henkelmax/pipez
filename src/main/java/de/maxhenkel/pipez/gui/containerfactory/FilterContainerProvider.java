@@ -24,16 +24,16 @@ public class FilterContainerProvider implements INamedContainerProvider {
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(pipe.getBlockState().getBlock().getTranslationKey());
+        return new TranslationTextComponent(pipe.getBlockState().getBlock().getDescriptionId());
     }
 
     public static void openGui(PlayerEntity player, PipeLogicTileEntity tileEntity, Direction direction, Filter<?> filter, int index, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayerEntity) {
             NetworkHooks.openGui((ServerPlayerEntity) player, new FilterContainerProvider(containerCreator, tileEntity), packetBuffer -> {
-                packetBuffer.writeBlockPos(tileEntity.getPos());
-                packetBuffer.writeEnumValue(direction);
+                packetBuffer.writeBlockPos(tileEntity.getBlockPos());
+                packetBuffer.writeEnum(direction);
                 packetBuffer.writeInt(index);
-                packetBuffer.writeCompoundTag(filter.serializeNBT());
+                packetBuffer.writeNbt(filter.serializeNBT());
             });
         }
     }

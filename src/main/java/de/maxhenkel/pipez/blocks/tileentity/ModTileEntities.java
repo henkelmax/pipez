@@ -20,24 +20,24 @@ public class ModTileEntities {
     public static TileEntityType<GasPipeTileEntity> GAS_PIPE;
 
     public static void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> event) {
-        ITEM_PIPE = TileEntityType.Builder.create(ItemPipeTileEntity::new, ModBlocks.ITEM_PIPE).build(null);
+        ITEM_PIPE = TileEntityType.Builder.of(ItemPipeTileEntity::new, ModBlocks.ITEM_PIPE).build(null);
         ITEM_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "item_pipe"));
         event.getRegistry().register(ITEM_PIPE);
 
-        FLUID_PIPE = TileEntityType.Builder.create(FluidPipeTileEntity::new, ModBlocks.FLUID_PIPE).build(null);
+        FLUID_PIPE = TileEntityType.Builder.of(FluidPipeTileEntity::new, ModBlocks.FLUID_PIPE).build(null);
         FLUID_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "fluid_pipe"));
         event.getRegistry().register(FLUID_PIPE);
 
-        ENERGY_PIPE = TileEntityType.Builder.create(EnergyPipeTileEntity::new, ModBlocks.ENERGY_PIPE).build(null);
+        ENERGY_PIPE = TileEntityType.Builder.of(EnergyPipeTileEntity::new, ModBlocks.ENERGY_PIPE).build(null);
         ENERGY_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "energy_pipe"));
         event.getRegistry().register(ENERGY_PIPE);
 
-        UNIVERSAL_PIPE = TileEntityType.Builder.create(UniversalPipeTileEntity::new, ModBlocks.UNIVERSAL_PIPE).build(null);
+        UNIVERSAL_PIPE = TileEntityType.Builder.of(UniversalPipeTileEntity::new, ModBlocks.UNIVERSAL_PIPE).build(null);
         UNIVERSAL_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "universal_pipe"));
         event.getRegistry().register(UNIVERSAL_PIPE);
 
         if (ModList.get().isLoaded("mekanism")) {
-            GAS_PIPE = TileEntityType.Builder.create(GasPipeTileEntity::new, ModBlocks.GAS_PIPE).build(null);
+            GAS_PIPE = TileEntityType.Builder.of(GasPipeTileEntity::new, ModBlocks.GAS_PIPE).build(null);
             GAS_PIPE.setRegistryName(new ResourceLocation(Main.MODID, "gas_pipe"));
             event.getRegistry().register(GAS_PIPE);
         }

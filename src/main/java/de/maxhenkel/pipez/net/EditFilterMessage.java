@@ -32,7 +32,7 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().openContainer;
+        Container container = context.getSender().containerMenu;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
             Filter<?> f = extractContainer.getPipe().getPipeTypes()[index].createFilter();
@@ -43,14 +43,14 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
 
     @Override
     public EditFilterMessage fromBytes(PacketBuffer packetBuffer) {
-        filter = packetBuffer.readCompoundTag();
+        filter = packetBuffer.readNbt();
         index = packetBuffer.readInt();
         return this;
     }
 
     @Override
     public void toBytes(PacketBuffer packetBuffer) {
-        packetBuffer.writeCompoundTag(filter);
+        packetBuffer.writeNbt(filter);
         packetBuffer.writeInt(index);
     }
 }

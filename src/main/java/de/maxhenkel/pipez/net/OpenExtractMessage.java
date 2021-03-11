@@ -28,7 +28,7 @@ public class OpenExtractMessage implements Message<OpenExtractMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().openContainer;
+        Container container = context.getSender().containerMenu;
         if (container instanceof FilterContainer) {
             FilterContainer filterContainer = (FilterContainer) container;
             PipeContainerProvider.openGui(context.getSender(), filterContainer.getPipe(), filterContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, filterContainer.getPipe(), filterContainer.getSide(), index));

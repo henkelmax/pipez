@@ -49,8 +49,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
     public ExtractScreen(ExtractContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(BACKGROUND, container, playerInventory, title);
-        xSize = 176;
-        ySize = 196;
+        imageWidth = 176;
+        imageHeight = 196;
 
         pipeTypes = container.getPipe().getPipeTypes();
         if (pipeTypes.length > 1) {
@@ -58,7 +58,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         }
         currentindex = container.getIndex();
         if (currentindex < 0) {
-            currentindex = getContainer().getPipe().getPreferredPipeIndex(getContainer().getSide());
+            currentindex = getMenu().getPipe().getPreferredPipeIndex(getMenu().getSide());
         }
     }
 
@@ -69,35 +69,35 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         buttons.clear();
         children.clear();
 
-        PipeLogicTileEntity pipe = getContainer().getPipe();
-        Direction side = getContainer().getSide();
+        PipeLogicTileEntity pipe = getMenu().getPipe();
+        Direction side = getMenu().getSide();
 
         filterList = new FilterList(this, 32, 8, 136, 66, () -> pipe.getFilters(side, pipeTypes[currentindex]));
 
-        Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getContainer().getSide(), pipeTypes[currentindex]).ordinal();
+        Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
         List<CycleIconButton.Icon> redstoneModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 16), new CycleIconButton.Icon(BACKGROUND, 192, 16), new CycleIconButton.Icon(BACKGROUND, 208, 16), new CycleIconButton.Icon(BACKGROUND, 224, 16));
-        redstoneButton = new CycleIconButton(guiLeft + 7, guiTop + 7, redstoneModeIcons, redstoneModeIndex, button -> {
+        redstoneButton = new CycleIconButton(leftPos + 7, topPos + 7, redstoneModeIcons, redstoneModeIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleRedstoneModeMessage(currentindex));
         });
-        Supplier<Integer> distributionIndex = () -> pipe.getDistribution(getContainer().getSide(), pipeTypes[currentindex]).ordinal();
+        Supplier<Integer> distributionIndex = () -> pipe.getDistribution(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
         List<CycleIconButton.Icon> distributionIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 0), new CycleIconButton.Icon(BACKGROUND, 192, 0), new CycleIconButton.Icon(BACKGROUND, 208, 0), new CycleIconButton.Icon(BACKGROUND, 224, 0));
-        sortButton = new CycleIconButton(guiLeft + 7, guiTop + 31, distributionIcons, distributionIndex, button -> {
+        sortButton = new CycleIconButton(leftPos + 7, topPos + 31, distributionIcons, distributionIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleDistributionMessage(currentindex));
         });
-        Supplier<Integer> filterModeIndex = () -> pipeTypes[currentindex].hasFilter() ? pipe.getFilterMode(getContainer().getSide(), pipeTypes[currentindex]).ordinal() : 0;
+        Supplier<Integer> filterModeIndex = () -> pipeTypes[currentindex].hasFilter() ? pipe.getFilterMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal() : 0;
         List<CycleIconButton.Icon> filterModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 32), new CycleIconButton.Icon(BACKGROUND, 192, 32));
-        filterButton = new CycleIconButton(guiLeft + 7, guiTop + 55, filterModeIcons, filterModeIndex, button -> {
+        filterButton = new CycleIconButton(leftPos + 7, topPos + 55, filterModeIcons, filterModeIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleFilterModeMessage(currentindex));
         });
-        addFilterButton = new Button(guiLeft + 31, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.add"), button -> {
+        addFilterButton = new Button(leftPos + 31, topPos + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.add"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
         });
-        editFilterButton = new Button(guiLeft + 80, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.edit"), button -> {
+        editFilterButton = new Button(leftPos + 80, topPos + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.edit"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
             }
         });
-        removeFilterButton = new Button(guiLeft + 129, guiTop + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.remove"), button -> {
+        removeFilterButton = new Button(leftPos + 129, topPos + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
             }
@@ -115,7 +115,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 int tabIndex = i;
                 tabs[i] = new HoverArea(-26 + 3, 5 + 25 * i, 24, 24, () -> {
                     List<IReorderingProcessor> tooltip = new ArrayList<>();
-                    tooltip.add(new TranslationTextComponent(pipeTypes[tabIndex].getTranslationKey()).func_241878_f());
+                    tooltip.add(new TranslationTextComponent(pipeTypes[tabIndex].getTranslationKey()).getVisualOrderText());
                     return tooltip;
                 });
                 hoverAreas.add(tabs[i]);
@@ -124,21 +124,21 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
         redstoneArea = new HoverArea(7, 7, 20, 20, () -> {
             if (redstoneButton.active) {
-                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.redstone_mode", new TranslationTextComponent("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).func_241878_f());
+                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.redstone_mode", new TranslationTextComponent("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
         });
         sortArea = new HoverArea(7, 31, 20, 20, () -> {
             if (sortButton.active) {
-                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.distribution", new TranslationTextComponent("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).func_241878_f());
+                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.distribution", new TranslationTextComponent("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
         });
         filterArea = new HoverArea(7, 55, 20, 20, () -> {
             if (filterButton.active) {
-                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.filter_mode", new TranslationTextComponent("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).func_241878_f());
+                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.filter_mode", new TranslationTextComponent("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
@@ -158,7 +158,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     private void checkButtons() {
-        Upgrade upgrade = getContainer().getPipe().getUpgrade(getContainer().getSide());
+        Upgrade upgrade = getMenu().getPipe().getUpgrade(getMenu().getSide());
         if (upgrade == null) {
             redstoneButton.active = false;
             sortButton.active = false;
@@ -191,9 +191,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
-        font.func_243248_b(matrixStack, playerInventory.getDisplayName(), 8F, (float) (ySize - 96 + 3), FONT_COLOR);
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+        super.renderLabels(matrixStack, mouseX, mouseY);
+        font.draw(matrixStack, inventory.getDisplayName(), 8F, (float) (imageHeight - 96 + 3), FONT_COLOR);
 
         filterList.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
 
@@ -201,34 +201,34 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+        super.renderBg(matrixStack, partialTicks, mouseX, mouseY);
         filterList.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
 
         if (hasTabs()) {
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    blit(matrixStack, guiLeft - 26 + 3, guiTop + 5 + 25 * i, 176, 48, 26, 24);
+                    blit(matrixStack, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 48, 26, 24);
                 } else {
-                    blit(matrixStack, guiLeft - 26 + 3, guiTop + 5 + 25 * i, 176, 72, 26, 24);
+                    blit(matrixStack, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 72, 26, 24);
                 }
             }
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    itemRenderer.renderItemAndEffectIntoGUI(minecraft.player, pipeTypes[i].getIcon(), guiLeft - 26 + 3 + 4, guiTop + 5 + 25 * i + 4);
+                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4);
                 } else {
-                    itemRenderer.renderItemAndEffectIntoGUI(minecraft.player, pipeTypes[i].getIcon(), guiLeft - 26 + 3 + 4 + 2, guiTop + 5 + 25 * i + 4);
+                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4);
                 }
             }
         }
     }
 
     public int getTabsX() {
-        return guiLeft - getTabsWidth();
+        return leftPos - getTabsWidth();
     }
 
     public int getTabsY() {
-        return guiTop + 5;
+        return topPos + 5;
     }
 
     public int getTabsHeight() {
@@ -255,8 +255,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         if (hasTabs()) {
             for (int i = 0; i < tabs.length; i++) {
                 HoverArea hoverArea = tabs[i];
-                if (currentindex != i && hoverArea.isHovered(guiLeft, guiTop, (int) mouseX, (int) mouseY)) {
-                    minecraft.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1F));
+                if (currentindex != i && hoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
+                    minecraft.getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
                     currentindex = i;
                     init();
                     return true;

@@ -34,7 +34,7 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().openContainer;
+        Container container = context.getSender().containerMenu;
         if (container instanceof FilterContainer) {
             FilterContainer filterContainer = (FilterContainer) container;
             PipeType<?> pipeType = filterContainer.getPipe().getPipeTypes()[filterContainer.getIndex()];
@@ -56,12 +56,12 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
     @Override
     public UpdateFilterMessage fromBytes(PacketBuffer packetBuffer) {
-        filter = packetBuffer.readCompoundTag();
+        filter = packetBuffer.readNbt();
         return this;
     }
 
     @Override
     public void toBytes(PacketBuffer packetBuffer) {
-        packetBuffer.writeCompoundTag(filter);
+        packetBuffer.writeNbt(filter);
     }
 }

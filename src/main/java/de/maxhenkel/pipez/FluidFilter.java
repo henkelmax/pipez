@@ -37,7 +37,7 @@ public class FluidFilter extends Filter<Fluid> {
         if (invert) {
             compound.putBoolean("Invert", true);
         }
-        compound.putUniqueId("ID", id);
+        compound.putUUID("ID", id);
 
         return compound;
     }
@@ -81,7 +81,7 @@ public class FluidFilter extends Filter<Fluid> {
         }
 
         if (compound.contains("ID", Constants.NBT.TAG_INT_ARRAY)) {
-            id = compound.getUniqueId("ID");
+            id = compound.getUUID("ID");
         } else {
             id = UUID.randomUUID();
         }
