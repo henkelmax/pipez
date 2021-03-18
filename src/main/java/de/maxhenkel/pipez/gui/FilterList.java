@@ -165,15 +165,17 @@ public class FilterList extends WidgetBase {
                     } else {
                         drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.tag", new StringTextComponent(filter.getTag().getName().toString()).withStyle(TextFormatting.BLUE)).withStyle(TextFormatting.WHITE));
                     }
-                    if (filter.getMetadata() != null && filter.getMetadata().size() > 0) {
-                        IFormattableTextComponent tags = new TranslationTextComponent("message.pipez.filter.nbt.tag" + (filter.getMetadata().size() != 1 ? "s" : ""), filter.getMetadata().size()).withStyle(TextFormatting.DARK_PURPLE);
-                        IFormattableTextComponent nbtStr = new TranslationTextComponent("message.pipez.filter.nbt", tags).withStyle(TextFormatting.WHITE);
-                        if (filter.isExactMetadata()) {
-                            nbtStr.append(" ").append(new TranslationTextComponent("message.pipez.filter.nbt.exact"));
-                        }
-                        drawStringSmall(matrixStack, guiLeft + 22, startY + 10, nbtStr);
-                    }
                 }
+            } else {
+                drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslationTextComponent("message.pipez.filter.any_item").withStyle(TextFormatting.WHITE));
+            }
+            if (filter.getMetadata() != null && filter.getMetadata().size() > 0) {
+                IFormattableTextComponent tags = new TranslationTextComponent("message.pipez.filter.nbt.tag" + (filter.getMetadata().size() != 1 ? "s" : ""), filter.getMetadata().size()).withStyle(TextFormatting.DARK_PURPLE);
+                IFormattableTextComponent nbtStr = new TranslationTextComponent("message.pipez.filter.nbt", tags).withStyle(TextFormatting.WHITE);
+                if (filter.isExactMetadata()) {
+                    nbtStr.append(" ").append(new TranslationTextComponent("message.pipez.filter.nbt.exact"));
+                }
+                drawStringSmall(matrixStack, guiLeft + 22, startY + 10, nbtStr);
             }
 
             if (filter.isInvert()) {

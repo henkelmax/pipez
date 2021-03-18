@@ -199,7 +199,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     @Override
     public void tick() {
         super.tick();
-        submitButton.active = filter.getTag() != null;
+        submitButton.active = filter.getTag() != null || filter.getMetadata() != null;
     }
 
     public void onItemTextChanged(String text) {
@@ -351,7 +351,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (itemHoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
-            onInsertStack(minecraft.player.inventory.getCarried());
+            if (hasShiftDown()) {
+                item.setValue("");
+                filter.setTag(null);
+            } else {
+                onInsertStack(minecraft.player.inventory.getCarried());
+            }
             return true;
         }
         if (destinationHoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
