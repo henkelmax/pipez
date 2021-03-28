@@ -4,9 +4,9 @@ import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import de.maxhenkel.pipez.utils.DummyEnergyStorage;
 import de.maxhenkel.pipez.utils.DummyFluidHandler;
 import de.maxhenkel.pipez.utils.DummyItemHandler;
+import de.maxhenkel.pipez.utils.PipeEnergyStorage;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
@@ -38,8 +38,8 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         }
 
         if (cap == CapabilityEnergy.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
-            if (side == null || isExtracting(side)) {
-                return LazyOptional.of(() -> DummyEnergyStorage.INSTANCE).cast();
+            if (side != null && isExtracting(side)) {
+                return LazyOptional.of(() -> new PipeEnergyStorage(this, side)).cast(); //TODO cache
             }
         } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && hasType(FluidPipeType.INSTANCE)) {
             if (side == null || isExtracting(side)) {

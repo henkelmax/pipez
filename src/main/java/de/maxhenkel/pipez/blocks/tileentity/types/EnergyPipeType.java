@@ -84,6 +84,25 @@ public class EnergyPipeType extends PipeType<Void> {
         }
     }
 
+    public int receive(PipeLogicTileEntity tileEntity, Direction side, int amount, boolean simulate) {
+        if (!tileEntity.isExtracting(side)) {
+            return 0;
+        }
+        if (!tileEntity.shouldWork(side, this)) {
+            return 0;
+        }
+
+        List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
+
+        int maxTransfer = Math.min(getRate(tileEntity, side), amount);
+
+        if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
+            return receiveEqually(tileEntity, side, connections, maxTransfer, simulate);
+        } else {
+            return receiveOrdered(tileEntity, side, connections, maxTransfer, simulate);
+        }
+    }
+
     protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IEnergyStorage energyStorage) {
         if (connections.isEmpty()) {
             return;
@@ -115,6 +134,39 @@ public class EnergyPipeType extends PipeType<Void> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
+    protected int receiveEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, int maxReceive, boolean simulate) {
+        if (connections.isEmpty() || maxReceive <= 0) {
+            return 0;
+        }
+        int actuallyTransferred = 0;
+        int energyToTransfer = maxReceive;
+        boolean[] connectionsFull = new boolean[connections.size()];
+        int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
+        while (energyToTransfer > 0 && hasNotInserted(connectionsFull)) {
+            PipeTileEntity.Connection connection = connections.get(p);
+            IEnergyStorage destination = getEnergyStorage(tileEntity, connection.getPos(), connection.getDirection());
+            boolean hasInserted = false;
+            if (destination != null && destination.canReceive() && !connectionsFull[p]) {
+                int maxTransfer = Math.min(Math.max(maxReceive / getConnectionsNotFullCount(connectionsFull), 1), energyToTransfer);
+                int extracted = destination.receiveEnergy(Math.min(maxTransfer, maxReceive), simulate);
+                if (extracted > 0) {
+                    energyToTransfer -= extracted;
+                    actuallyTransferred += extracted;
+                    hasInserted = true;
+                }
+            }
+            if (!hasInserted) {
+                connectionsFull[p] = true;
+            }
+            p = (p + 1) % connections.size();
+        }
+
+        if (!simulate) {
+            tileEntity.setRoundRobinIndex(side, this, p);
+        }
+        return actuallyTransferred;
+    }
+
     protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IEnergyStorage energyStorage) {
         int energyToTransfer = getRate(tileEntity, side);
 
@@ -133,6 +185,26 @@ public class EnergyPipeType extends PipeType<Void> {
                 energyToTransfer -= extract;
             }
         }
+    }
+
+    protected int receiveOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, int maxReceive, boolean simulate) {
+        int actuallyTransferred = 0;
+        int energyToTransfer = maxReceive;
+
+        for (PipeTileEntity.Connection connection : connections) {
+            if (energyToTransfer <= 0) {
+                break;
+            }
+            IEnergyStorage destination = getEnergyStorage(tileEntity, connection.getPos(), connection.getDirection());
+            if (destination == null || !destination.canReceive()) {
+                continue;
+            }
+
+            int extracted = destination.receiveEnergy(Math.min(energyToTransfer, maxReceive), simulate);
+            energyToTransfer -= extracted;
+            actuallyTransferred += extracted;
+        }
+        return actuallyTransferred;
     }
 
     private boolean hasNotInserted(boolean[] inventoriesFull) {

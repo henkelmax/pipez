@@ -1,1 +1,1 @@
-- Added dummy capability handlers to pipes
+- Fixed compatibility with many mods
