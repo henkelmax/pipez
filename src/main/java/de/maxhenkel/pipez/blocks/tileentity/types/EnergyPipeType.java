@@ -62,25 +62,27 @@ public class EnergyPipeType extends PipeType<Void> {
 
     @Override
     public void tick(PipeLogicTileEntity tileEntity) {
-        for (Direction side : Direction.values()) {
-            if (!tileEntity.isExtracting(side)) {
-                continue;
-            }
-            if (!tileEntity.shouldWork(side, this)) {
-                continue;
-            }
-            IEnergyStorage energyStorage = getEnergyStorage(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
-            if (energyStorage == null || !energyStorage.canExtract()) {
-                continue;
-            }
 
-            List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
+    }
 
-            if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
-                insertEqually(tileEntity, side, connections, energyStorage);
-            } else {
-                insertOrdered(tileEntity, side, connections, energyStorage);
-            }
+    public void pullEnergy(PipeLogicTileEntity tileEntity, Direction side) {
+        if (!tileEntity.isExtracting(side)) {
+            return;
+        }
+        if (!tileEntity.shouldWork(side, this)) {
+            return;
+        }
+        IEnergyStorage energyStorage = getEnergyStorage(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
+        if (energyStorage == null || !energyStorage.canExtract()) {
+            return;
+        }
+
+        List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
+
+        if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
+            insertEqually(tileEntity, side, connections, energyStorage);
+        } else {
+            insertOrdered(tileEntity, side, connections, energyStorage);
         }
     }
 

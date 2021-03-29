@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.corelib.CachedMap;
 import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
@@ -23,11 +24,13 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     protected PipeType<?>[] types;
     protected final int[][] rrIndex;
+    protected CachedMap<Direction, PipeEnergyStorage> energyCache;
 
     public PipeLogicTileEntity(TileEntityType<?> tileEntityTypeIn, PipeType<?>[] types) {
         super(tileEntityTypeIn);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
+        energyCache = new CachedMap<>();
     }
 
     @Nonnull
@@ -39,7 +42,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
         if (cap == CapabilityEnergy.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
             if (side != null && isExtracting(side)) {
-                return LazyOptional.of(() -> new PipeEnergyStorage(this, side)).cast(); //TODO cache
+                return LazyOptional.of(() -> energyCache.get(side, () -> new PipeEnergyStorage(this, side))).cast();
             }
         } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && hasType(FluidPipeType.INSTANCE)) {
             if (side == null || isExtracting(side)) {
@@ -126,6 +129,16 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
         for (PipeType<?> type : getPipeTypes()) {
             type.tick(this);
+        }
+
+        if (hasType(EnergyPipeType.INSTANCE)) {
+            for (Direction side : Direction.values()) {
+                if (isExtracting(side)) {
+                    PipeEnergyStorage energyStorage = energyCache.get(side, () -> new PipeEnergyStorage(this, side));
+                    energyStorage.tick();
+                }
+            }
+
         }
     }
 

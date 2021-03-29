@@ -2,32 +2,29 @@ package de.maxhenkel.pipez.utils;
 
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 public class PipeEnergyStorage implements IEnergyStorage {
 
     protected PipeLogicTileEntity pipe;
     protected Direction side;
+    protected long lastReceived;
 
     public PipeEnergyStorage(PipeLogicTileEntity pipe, Direction side) {
         this.pipe = pipe;
         this.side = side;
     }
 
+    public void tick() {
+        if (pipe.getLevel().getGameTime() - lastReceived > 1) {
+            EnergyPipeType.INSTANCE.pullEnergy(pipe, side);
+        }
+    }
+
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        TileEntity te = pipe.getLevel().getBlockEntity(pipe.getBlockPos().relative(side));
-        if (te == null) {
-            return EnergyPipeType.INSTANCE.receive(pipe, side, maxReceive, simulate);
-        }
-        LazyOptional<IEnergyStorage> capability = te.getCapability(CapabilityEnergy.ENERGY, side.getOpposite());
-        if (capability.isPresent() && capability.orElse(null).canExtract()) {
-            return 0;
-        }
+        lastReceived = pipe.getLevel().getGameTime();
         return EnergyPipeType.INSTANCE.receive(pipe, side, maxReceive, simulate);
     }
 
@@ -43,7 +40,7 @@ public class PipeEnergyStorage implements IEnergyStorage {
 
     @Override
     public int getMaxEnergyStored() {
-        return 0;
+        return Integer.MAX_VALUE;
     }
 
     @Override

@@ -1,1 +1,2 @@
-- Fixed compatibility with many mods
+- Improved energy pipe performance
+- Fixed some possible bugs
