@@ -1,2 +1,1 @@
-- Improved energy pipe performance
-- Fixed some possible bugs
+- Fixed item pipes not working with some storage blocks

@@ -174,7 +174,7 @@ public class ItemPipeType extends PipeType<Item> {
     private boolean isFull(IItemHandler itemHandler) {
         for (int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack stackInSlot = itemHandler.getStackInSlot(i);
-            if (stackInSlot.getCount() < Math.min(stackInSlot.getMaxStackSize(), itemHandler.getSlotLimit(i))) {
+            if (stackInSlot.getCount() < itemHandler.getSlotLimit(i)) {
                 return false;
             }
         }
