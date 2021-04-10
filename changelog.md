@@ -1,1 +1,1 @@
-- Fixed item pipes not working with some storage blocks
+- Allow shift clicking items into item filter
