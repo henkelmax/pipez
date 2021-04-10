@@ -2,21 +2,26 @@ package de.maxhenkel.pipez.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
-import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
+import de.maxhenkel.pipez.utils.GasUtils;
+import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.fluids.FluidUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -263,7 +268,55 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 }
             }
         }
+
+        if (hasShiftDown()) {
+            Slot sl = this.getSlotUnderMouse();
+            if (sl != null && !(sl instanceof UpgradeSlot)) {
+                addQuickFilter(sl.getItem());
+            }
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    public void addQuickFilter(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+
+        if (!filterButton.active) {
+            return;
+        }
+
+        Filter<?> filter = pipeTypes[currentindex].createFilter();
+        filter.setExactMetadata(true);
+
+        if (filter instanceof ItemFilter) {
+            filter.setTag(new SingleElementTag(stack.getItem()));
+            if (stack.hasTag()) {
+                filter.setMetadata(stack.getTag().copy());
+            } else {
+                filter.setMetadata(null);
+            }
+            Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
+        } else if (filter instanceof FluidFilter) {
+            FluidUtil.getFluidContained(stack).ifPresent(s -> {
+                filter.setTag(new SingleElementTag(s.getFluid()));
+                if (s.hasTag()) {
+                    filter.setMetadata(s.getTag().copy());
+                } else {
+                    filter.setMetadata(null);
+                }
+                Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
+            });
+        } else if (filter instanceof GasFilter) {
+            GasStack gas = GasUtils.getGasContained(stack);
+            if (gas != null) {
+                filter.setTag(new SingleElementTag(gas.getType()));
+                filter.setMetadata(null);
+                Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
+            }
+        }
     }
 
     @Override

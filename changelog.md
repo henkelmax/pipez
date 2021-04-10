@@ -1,1 +1,1 @@
-- Allow shift clicking items into item filter
+- Allow shift clicking to create filters

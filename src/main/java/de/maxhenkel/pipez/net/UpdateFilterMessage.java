@@ -4,7 +4,7 @@ import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
-import de.maxhenkel.pipez.gui.FilterContainer;
+import de.maxhenkel.pipez.gui.IPipeContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.nbt.CompoundNBT;
@@ -18,13 +18,15 @@ import java.util.Optional;
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
     private CompoundNBT filter;
+    private int index;
 
     public UpdateFilterMessage() {
 
     }
 
-    public UpdateFilterMessage(Filter<?> filter) {
+    public UpdateFilterMessage(Filter<?> filter, int index) {
         this.filter = filter.serializeNBT();
+        this.index = index;
     }
 
     @Override
@@ -35,12 +37,17 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
         Container container = context.getSender().containerMenu;
-        if (container instanceof FilterContainer) {
-            FilterContainer filterContainer = (FilterContainer) container;
-            PipeType<?> pipeType = filterContainer.getPipe().getPipeTypes()[filterContainer.getIndex()];
+
+        if (container instanceof IPipeContainer) {
+            IPipeContainer pipeContainer = (IPipeContainer) container;
+            PipeType<?>[] pipeTypes = pipeContainer.getPipe().getPipeTypes();
+            if(index>=pipeTypes.length){
+                return;
+            }
+            PipeType<?> pipeType = pipeTypes[index];
             Filter<?> f = pipeType.createFilter();
             f.deserializeNBT(filter);
-            List<Filter<?>> filters = filterContainer.getPipe().getFilters(filterContainer.getSide(), pipeType);
+            List<Filter<?>> filters = pipeContainer.getPipe().getFilters(pipeContainer.getSide(), pipeType);
 
             Optional<Filter<?>> editFilter = filters.stream().filter(f1 -> f.getId().equals(f1.getId())).findFirst();
             if (editFilter.isPresent()) {
@@ -48,20 +55,22 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
             } else {
                 filters.add(f);
             }
-            filterContainer.getPipe().setFilters(filterContainer.getSide(), pipeType, filters);
+            pipeContainer.getPipe().setFilters(pipeContainer.getSide(), pipeType, filters);
 
-            PipeContainerProvider.openGui(context.getSender(), filterContainer.getPipe(), filterContainer.getSide(), filterContainer.getIndex(), (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, filterContainer.getPipe(), filterContainer.getSide(), filterContainer.getIndex()));
+            PipeContainerProvider.openGui(context.getSender(), pipeContainer.getPipe(), pipeContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, pipeContainer.getPipe(), pipeContainer.getSide(), index));
         }
     }
 
     @Override
     public UpdateFilterMessage fromBytes(PacketBuffer packetBuffer) {
         filter = packetBuffer.readNbt();
+        index = packetBuffer.readInt();
         return this;
     }
 
     @Override
     public void toBytes(PacketBuffer packetBuffer) {
         packetBuffer.writeNbt(filter);
+        packetBuffer.writeInt(index);
     }
 }

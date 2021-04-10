@@ -86,7 +86,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         addButton(cancelButton);
 
         submitButton = new Button(leftPos + 91, topPos + 105, 60, 20, new TranslationTextComponent("message.pipez.filter.submit"), button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter));
+            Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, menu.getIndex()));
         });
         addButton(submitButton);
 

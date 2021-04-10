@@ -7,7 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.Direction;
 
-public class FilterContainer extends ContainerBase {
+public class FilterContainer extends ContainerBase implements IPipeContainer{
 
     private PipeLogicTileEntity pipe;
     private Direction side;
@@ -24,6 +24,7 @@ public class FilterContainer extends ContainerBase {
         addPlayerInventorySlots();
     }
 
+    @Override
     public PipeLogicTileEntity getPipe() {
         return pipe;
     }
@@ -36,6 +37,7 @@ public class FilterContainer extends ContainerBase {
         return filter;
     }
 
+    @Override
     public Direction getSide() {
         return side;
     }
