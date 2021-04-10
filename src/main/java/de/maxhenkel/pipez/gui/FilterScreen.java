@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.tags.ITag;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FilterScreen extends ScreenBase<FilterContainer> {
-
     public static final ResourceLocation BACKGROUND = new ResourceLocation(Main.MODID, "textures/gui/container/filter.png");
 
     private TextFieldWidget item;
@@ -363,6 +363,14 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             onInsertDestination(minecraft.player.inventory.getCarried());
             return true;
         }
+
+        if (hasShiftDown()) {
+            Slot sl = this.getSlotUnderMouse();
+            if (sl != null) {
+                onInsertStack(sl.getItem());
+            }
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
