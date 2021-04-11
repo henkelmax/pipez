@@ -125,6 +125,6 @@ Comparison between Pipez' item pipes and Mekanism's logistical transporters with
 
 
 Comparison between Pipez' item pipes and Mekanism's logistical transporters with about 7200 pipes.
-Since Mekanism calculates its pipe connections with a recoursive algorithm it just crashes, due to a stack overflow.
+Since Mekanism calculates its pipe connections with a recursive algorithm it just crashes, due to a stack overflow.
 
 ![](https://i.imgur.com/QTzFnqz.png)
