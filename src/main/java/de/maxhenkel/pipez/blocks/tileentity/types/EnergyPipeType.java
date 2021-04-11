@@ -18,6 +18,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EnergyPipeType extends PipeType<Void> {
@@ -111,26 +112,34 @@ public class EnergyPipeType extends PipeType<Void> {
         }
         int completeAmount = getRate(tileEntity, side);
         int energyToTransfer = completeAmount;
-        boolean[] connectionsFull = new boolean[connections.size()];
+
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
-        while (energyToTransfer > 0 && hasNotInserted(connectionsFull)) {
-            PipeTileEntity.Connection connection = connections.get(p);
+
+        List<IEnergyStorage> destinations = new ArrayList<>(connections.size());
+        for (int i = 0; i < connections.size(); i++) {
+            int index = (i + p) % connections.size();
+
+            PipeTileEntity.Connection connection = connections.get(index);
             IEnergyStorage destination = getEnergyStorage(tileEntity, connection.getPos(), connection.getDirection());
-            boolean hasInserted = false;
-            if (destination != null && destination.canReceive() && !connectionsFull[p]) {
-                int simulatedExtract = energyStorage.extractEnergy(Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), energyToTransfer), true);
-                if (simulatedExtract > 0) {
-                    int transferred = EnergyUtils.pushEnergy(energyStorage, destination, simulatedExtract);
-                    if (transferred > 0) {
-                        energyToTransfer -= transferred;
-                        hasInserted = true;
-                    }
+            if (destination != null && destination.canReceive() && destination.receiveEnergy(1, true) >= 1) {
+                destinations.add(destination);
+            }
+        }
+
+        for (IEnergyStorage destination : destinations) {
+            int simulatedExtract = energyStorage.extractEnergy(Math.min(Math.max(completeAmount / destinations.size(), 1), energyToTransfer), true);
+            if (simulatedExtract > 0) {
+                int transferred = EnergyUtils.pushEnergy(energyStorage, destination, simulatedExtract);
+                if (transferred > 0) {
+                    energyToTransfer -= transferred;
                 }
             }
-            if (!hasInserted) {
-                connectionsFull[p] = true;
-            }
+
             p = (p + 1) % connections.size();
+
+            if (energyToTransfer <= 0) {
+                break;
+            }
         }
 
         tileEntity.setRoundRobinIndex(side, this, p);
@@ -142,30 +151,38 @@ public class EnergyPipeType extends PipeType<Void> {
         }
         int actuallyTransferred = 0;
         int energyToTransfer = maxReceive;
-        boolean[] connectionsFull = new boolean[connections.size()];
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
-        while (energyToTransfer > 0 && hasNotInserted(connectionsFull)) {
-            PipeTileEntity.Connection connection = connections.get(p);
+
+        List<IEnergyStorage> destinations = new ArrayList<>(connections.size());
+        for (int i = 0; i < connections.size(); i++) {
+            int index = (i + p) % connections.size();
+
+            PipeTileEntity.Connection connection = connections.get(index);
             IEnergyStorage destination = getEnergyStorage(tileEntity, connection.getPos(), connection.getDirection());
-            boolean hasInserted = false;
-            if (destination != null && destination.canReceive() && !connectionsFull[p]) {
-                int maxTransfer = Math.min(Math.max(maxReceive / getConnectionsNotFullCount(connectionsFull), 1), energyToTransfer);
-                int extracted = destination.receiveEnergy(Math.min(maxTransfer, maxReceive), simulate);
-                if (extracted > 0) {
-                    energyToTransfer -= extracted;
-                    actuallyTransferred += extracted;
-                    hasInserted = true;
-                }
+            if (destination != null && destination.canReceive() && destination.receiveEnergy(1, true) >= 1) {
+                destinations.add(destination);
             }
-            if (!hasInserted) {
-                connectionsFull[p] = true;
+        }
+
+        for (IEnergyStorage destination : destinations) {
+            int maxTransfer = Math.min(Math.max(maxReceive / destinations.size(), 1), energyToTransfer);
+            int extracted = destination.receiveEnergy(Math.min(maxTransfer, maxReceive), simulate);
+            if (extracted > 0) {
+                energyToTransfer -= extracted;
+                actuallyTransferred += extracted;
             }
+
             p = (p + 1) % connections.size();
+
+            if (energyToTransfer <= 0) {
+                break;
+            }
         }
 
         if (!simulate) {
             tileEntity.setRoundRobinIndex(side, this, p);
         }
+
         return actuallyTransferred;
     }
 

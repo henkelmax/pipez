@@ -1,1 +1,1 @@
-- Fixed console error without mekanism
+- Optimize energy pipes
