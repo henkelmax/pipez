@@ -1,1 +1,1 @@
-- Allow shift clicking to create filters
+- Fixed console error without mekanism

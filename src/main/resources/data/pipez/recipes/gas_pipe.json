@@ -19,5 +19,11 @@
   "result": {
     "item": "pipez:gas_pipe",
     "count": 16
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ]
 }
