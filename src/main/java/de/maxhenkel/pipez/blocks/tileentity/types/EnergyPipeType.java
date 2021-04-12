@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez.blocks.tileentity.types;
 
 import de.maxhenkel.corelib.energy.EnergyUtils;
+import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
@@ -153,26 +154,26 @@ public class EnergyPipeType extends PipeType<Void> {
         int energyToTransfer = maxReceive;
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
 
-        List<IEnergyStorage> destinations = new ArrayList<>(connections.size());
+        List<Pair<IEnergyStorage, Integer>> destinations = new ArrayList<>(connections.size());
         for (int i = 0; i < connections.size(); i++) {
             int index = (i + p) % connections.size();
 
             PipeTileEntity.Connection connection = connections.get(index);
             IEnergyStorage destination = getEnergyStorage(tileEntity, connection.getPos(), connection.getDirection());
             if (destination != null && destination.canReceive() && destination.receiveEnergy(1, true) >= 1) {
-                destinations.add(destination);
+                destinations.add(new Pair<>(destination, index));
             }
         }
 
-        for (IEnergyStorage destination : destinations) {
+        for (Pair<IEnergyStorage, Integer> destination : destinations) {
             int maxTransfer = Math.min(Math.max(maxReceive / destinations.size(), 1), energyToTransfer);
-            int extracted = destination.receiveEnergy(Math.min(maxTransfer, maxReceive), simulate);
+            int extracted = destination.getKey().receiveEnergy(Math.min(maxTransfer, maxReceive), simulate);
             if (extracted > 0) {
                 energyToTransfer -= extracted;
                 actuallyTransferred += extracted;
             }
 
-            p = (p + 1) % connections.size();
+            p = destination.getValue() + 1;
 
             if (energyToTransfer <= 0) {
                 break;
