@@ -60,6 +60,7 @@ public class Main {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(Main.this::clientSetup);
             FMLJavaModLoadingContext.get().getModEventBus().addListener(StitchEvents::onStitch);
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelEvents::onModelRegister);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelEvents::onModelBake);
         });
     }
 

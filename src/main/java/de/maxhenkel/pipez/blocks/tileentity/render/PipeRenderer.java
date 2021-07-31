@@ -17,15 +17,15 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
+
+    private static List<PipeRenderer> renderers = new ArrayList();
 
     protected Minecraft minecraft;
 
@@ -40,7 +40,7 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
             return modelOrMissing.bake(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, getModel());
         });
 
-        FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        renderers.add(this);
     }
 
     @Override
@@ -93,9 +93,10 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
         }
     }
 
-    @SubscribeEvent
-    public void onModelBake(ModelBakeEvent event) {
-        cachedModel.invalidate();
+    public static void reloadModels() {
+        for (PipeRenderer renderer : renderers) {
+            renderer.cachedModel.invalidate();
+        }
     }
 
     abstract ResourceLocation getModel();

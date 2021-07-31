@@ -1,7 +1,9 @@
 package de.maxhenkel.pipez.events;
 
 import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.blocks.tileentity.render.PipeRenderer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 
@@ -19,6 +21,10 @@ public class ModelEvents {
         for (String model : MODELS) {
             ModelLoader.instance().addSpecialModel(new ResourceLocation(Main.MODID, model));
         }
+    }
+
+    public static void onModelBake(ModelBakeEvent event) {
+        PipeRenderer.reloadModels();
     }
 
 }
