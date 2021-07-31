@@ -4,28 +4,23 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import de.maxhenkel.corelib.CachedValue;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
+import de.maxhenkel.pipez.ModelRegistry.Model;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ModelRotation;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
-
-    private static List<PipeRenderer> renderers = new ArrayList();
 
     protected Minecraft minecraft;
 
@@ -34,13 +29,7 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
     public PipeRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
         super(rendererDispatcherIn);
         minecraft = Minecraft.getInstance();
-
-        cachedModel = new CachedValue<>(() -> {
-            IUnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(getModel());
-            return modelOrMissing.bake(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, getModel());
-        });
-
-        renderers.add(this);
+        cachedModel = getModel().getCachedModel();
     }
 
     @Override
@@ -93,12 +82,6 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
         }
     }
 
-    public static void reloadModels() {
-        for (PipeRenderer renderer : renderers) {
-            renderer.cachedModel.invalidate();
-        }
-    }
-
-    abstract ResourceLocation getModel();
+    abstract Model getModel();
 
 }
