@@ -17,8 +17,11 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.List;
 
@@ -36,6 +39,8 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
             IUnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(getModel());
             return modelOrMissing.bake(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, getModel());
         });
+
+        FMLJavaModLoadingContext.get().getModEventBus().register(this);
     }
 
     @Override
@@ -86,6 +91,11 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
                 q.mul(Vector3f.XP.rotationDegrees(270F));
                 return q;
         }
+    }
+
+    @SubscribeEvent
+    public void onModelBake(ModelBakeEvent event) {
+        cachedModel.invalidate();
     }
 
     abstract ResourceLocation getModel();
