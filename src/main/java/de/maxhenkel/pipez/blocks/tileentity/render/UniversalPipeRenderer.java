@@ -1,19 +1,17 @@
 package de.maxhenkel.pipez.blocks.tileentity.render;
 
 import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.ModelRegistry.Model;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.ResourceLocation;
 
 public class UniversalPipeRenderer extends PipeRenderer {
-
-    public static final ResourceLocation EXTRACT_MODEL = new ResourceLocation(Main.MODID, "block/universal_pipe_extract");
 
     public UniversalPipeRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
         super(rendererDispatcherIn);
     }
 
     @Override
-    ResourceLocation getModel() {
-        return EXTRACT_MODEL;
+    Model getModel() {
+        return Model.UNIVERSAL_PIPE_EXTRACT;
     }
 }

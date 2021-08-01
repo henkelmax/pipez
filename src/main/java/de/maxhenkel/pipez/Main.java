@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.CommonRegistry;
+import de.maxhenkel.pipez.ModelRegistry;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
@@ -58,6 +59,8 @@ public class Main {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(Main.this::clientSetup);
             FMLJavaModLoadingContext.get().getModEventBus().addListener(StitchEvents::onStitch);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelRegistry::onModelRegister);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelRegistry::onModelBake);
         });
     }
 
