@@ -1,1 +1,1 @@
-- Fixed energy pipe distribution
+- Fixed extractors not working with resource packs
