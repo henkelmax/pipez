@@ -6,18 +6,18 @@ import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.IPipeContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.List;
 import java.util.Optional;
 
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
-    private CompoundNBT filter;
+    private CompoundTag filter;
     private int index;
 
     public UpdateFilterMessage() {
@@ -36,12 +36,12 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().containerMenu;
+        AbstractContainerMenu container = context.getSender().containerMenu;
 
         if (container instanceof IPipeContainer) {
             IPipeContainer pipeContainer = (IPipeContainer) container;
             PipeType<?>[] pipeTypes = pipeContainer.getPipe().getPipeTypes();
-            if(index>=pipeTypes.length){
+            if (index >= pipeTypes.length) {
                 return;
             }
             PipeType<?> pipeType = pipeTypes[index];
@@ -62,14 +62,14 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
     }
 
     @Override
-    public UpdateFilterMessage fromBytes(PacketBuffer packetBuffer) {
+    public UpdateFilterMessage fromBytes(FriendlyByteBuf packetBuffer) {
         filter = packetBuffer.readNbt();
         index = packetBuffer.readInt();
         return this;
     }
 
     @Override
-    public void toBytes(PacketBuffer packetBuffer) {
+    public void toBytes(FriendlyByteBuf packetBuffer) {
         packetBuffer.writeNbt(filter);
         packetBuffer.writeInt(index);
     }

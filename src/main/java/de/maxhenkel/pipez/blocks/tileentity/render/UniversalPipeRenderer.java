@@ -1,13 +1,12 @@
 package de.maxhenkel.pipez.blocks.tileentity.render;
 
-import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.ModelRegistry.Model;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class UniversalPipeRenderer extends PipeRenderer {
 
-    public UniversalPipeRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
-        super(rendererDispatcherIn);
+    public UniversalPipeRenderer(BlockEntityRendererProvider.Context renderer) {
+        super(renderer);
     }
 
     @Override

@@ -2,14 +2,14 @@ package de.maxhenkel.pipez.gui.containerfactory;
 
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraftforge.fml.network.IContainerFactory;
+import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fmllegacy.network.IContainerFactory;
 
-public class FilterContainerFactory<T extends Container, U extends PipeLogicTileEntity> implements IContainerFactory<T> {
+public class FilterContainerFactory<T extends AbstractContainerMenu, U extends PipeLogicTileEntity> implements IContainerFactory<T> {
 
     private final ContainerCreator<T, U> containerCreator;
 
@@ -18,7 +18,7 @@ public class FilterContainerFactory<T extends Container, U extends PipeLogicTile
     }
 
     @Override
-    public T create(int windowId, PlayerInventory inv, PacketBuffer data) {
+    public T create(int windowId, Inventory inv, FriendlyByteBuf data) {
         try {
             U pipe = (U) inv.player.level.getBlockEntity(data.readBlockPos());
             Direction direction = data.readEnum(Direction.class);
@@ -31,7 +31,7 @@ public class FilterContainerFactory<T extends Container, U extends PipeLogicTile
         }
     }
 
-    public interface ContainerCreator<T extends Container, U extends TileEntity> {
-        T create(int windowId, PlayerInventory inv, U tileEntity, Direction side, int index, Filter<?> filter);
+    public interface ContainerCreator<T extends AbstractContainerMenu, U extends BlockEntity> {
+        T create(int windowId, Inventory inv, U tileEntity, Direction side, int index, Filter<?> filter);
     }
 }

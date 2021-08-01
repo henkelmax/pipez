@@ -8,14 +8,14 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -35,7 +35,7 @@ public class FluidPipeType extends PipeType<Fluid> {
     }
 
     @Override
-    public boolean canInsert(TileEntity tileEntity, Direction direction) {
+    public boolean canInsert(BlockEntity tileEntity, Direction direction) {
         return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction).isPresent();
     }
 
@@ -55,8 +55,8 @@ public class FluidPipeType extends PipeType<Fluid> {
     }
 
     @Override
-    public ITextComponent getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslationTextComponent("tooltip.pipez.rate.fluid", getRate(upgrade));
+    public Component getTransferText(@Nullable Upgrade upgrade) {
+        return new TranslatableComponent("tooltip.pipez.rate.fluid", getRate(upgrade));
     }
 
     @Override
@@ -169,7 +169,7 @@ public class FluidPipeType extends PipeType<Fluid> {
     }
 
     private boolean matches(Filter<Fluid> filter, FluidStack stack) {
-        CompoundNBT metadata = filter.getMetadata();
+        CompoundTag metadata = filter.getMetadata();
         if (metadata == null) {
             return filter.getTag() == null || stack.getFluid().is(filter.getTag());
         }
@@ -180,7 +180,7 @@ public class FluidPipeType extends PipeType<Fluid> {
                 return false;
             }
         } else {
-            CompoundNBT stackNBT = stack.getTag();
+            CompoundTag stackNBT = stack.getTag();
             if (stackNBT == null) {
                 return metadata.size() <= 0;
             }
@@ -202,7 +202,7 @@ public class FluidPipeType extends PipeType<Fluid> {
 
     @Nullable
     private IFluidHandler getFluidHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
+        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

@@ -1,11 +1,11 @@
 package de.maxhenkel.pipez;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class DirectionalPosition implements INBTSerializable<CompoundNBT> {
+public class DirectionalPosition implements INBTSerializable<CompoundTag> {
 
     private BlockPos pos;
     private Direction direction;
@@ -50,9 +50,9 @@ public class DirectionalPosition implements INBTSerializable<CompoundNBT> {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT compound = new CompoundNBT();
-        CompoundNBT p = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag compound = new CompoundTag();
+        CompoundTag p = new CompoundTag();
         p.putInt("X", pos.getX());
         p.putInt("Y", pos.getY());
         p.putInt("Z", pos.getZ());
@@ -62,8 +62,8 @@ public class DirectionalPosition implements INBTSerializable<CompoundNBT> {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT compound) {
-        CompoundNBT p = compound.getCompound("Position");
+    public void deserializeNBT(CompoundTag compound) {
+        CompoundTag p = compound.getCompound("Position");
         pos = new BlockPos(p.getInt("X"), p.getInt("Y"), p.getInt("Z"));
         direction = Direction.from3DDataValue(compound.getByte("Direction"));
     }

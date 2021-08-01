@@ -1,42 +1,41 @@
 package de.maxhenkel.pipez.blocks.tileentity.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import de.maxhenkel.corelib.CachedValue;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.ModelRegistry.Model;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.List;
 
-public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
+public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity> {
 
     protected Minecraft minecraft;
+    protected BlockEntityRendererProvider.Context renderer;
+    protected CachedValue<BakedModel> cachedModel;
 
-    protected CachedValue<IBakedModel> cachedModel;
-
-    public PipeRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
-        super(rendererDispatcherIn);
+    public PipeRenderer(BlockEntityRendererProvider.Context renderer) {
+        this.renderer = renderer;
         minecraft = Minecraft.getInstance();
         cachedModel = getModel().getCachedModel();
     }
 
     @Override
-    public void render(PipeTileEntity pipe, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
-        IBakedModel iBakedModel = cachedModel.get();
+    public void render(PipeTileEntity pipe, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
+        BakedModel iBakedModel = cachedModel.get();
         List<BakedQuad> quads = iBakedModel.getQuads(null, null, minecraft.level.random, EmptyModelData.INSTANCE);
-        IVertexBuilder b = buffer.getBuffer(RenderType.solid());
+        VertexConsumer b = buffer.getBuffer(RenderType.solid());
 
         for (Direction side : Direction.values()) {
             if (pipe.isExtracting(side)) {
@@ -45,7 +44,7 @@ public abstract class PipeRenderer extends TileEntityRenderer<PipeTileEntity> {
         }
     }
 
-    private void renderExtractor(Direction direction, MatrixStack matrixStack, IVertexBuilder b, List<BakedQuad> quads, int combinedLight, int combinedOverlay) {
+    private void renderExtractor(Direction direction, PoseStack matrixStack, VertexConsumer b, List<BakedQuad> quads, int combinedLight, int combinedOverlay) {
         matrixStack.pushPose();
         matrixStack.translate(direction.getStepX() * 0.001D, direction.getStepY() * 0.001D, direction.getStepZ() * 0.001D);
         matrixStack.translate(0.5D, 0.5D, 0.5D);

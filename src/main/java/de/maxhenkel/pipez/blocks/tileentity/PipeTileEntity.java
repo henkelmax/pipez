@@ -1,27 +1,26 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.corelib.blockentity.ITickableBlockEntity;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.ByteNBT;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class PipeTileEntity extends TileEntity implements ITickableTileEntity {
+public abstract class PipeTileEntity extends BlockEntity implements ITickableBlockEntity {
 
     @Nullable
     protected List<Connection> connectionCache;
@@ -33,8 +32,8 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
      */
     private int invalidateCountdown;
 
-    public PipeTileEntity(TileEntityType<?> tileEntityTypeIn) {
-        super(tileEntityTypeIn);
+    public PipeTileEntity(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+        super(tileEntityTypeIn, pos, state);
         extractingSides = new boolean[Direction.values().length];
         disconnectedSides = new boolean[Direction.values().length];
     }
@@ -52,7 +51,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
         return connectionCache;
     }
 
-    public static void markPipesDirty(World world, BlockPos pos) {
+    public static void markPipesDirty(Level world, BlockPos pos) {
         List<BlockPos> travelPositions = new ArrayList<>();
         LinkedList<BlockPos> queue = new LinkedList<>();
         Block block = world.getBlockState(pos).getBlock();
@@ -85,7 +84,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
             }
         }
         for (BlockPos p : travelPositions) {
-            TileEntity te = world.getBlockEntity(p);
+            BlockEntity te = world.getBlockEntity(p);
             if (!(te instanceof PipeTileEntity)) {
                 continue;
             }
@@ -94,7 +93,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
         }
     }
 
-    private static void addToDirtyList(World world, BlockPos pos, PipeBlock pipeBlock, List<BlockPos> travelPositions, LinkedList<BlockPos> queue) {
+    private static void addToDirtyList(Level world, BlockPos pos, PipeBlock pipeBlock, List<BlockPos> travelPositions, LinkedList<BlockPos> queue) {
         for (Direction direction : Direction.values()) {
             if (pipeBlock.isConnected(world, pos, direction)) {
                 BlockPos p = pos.relative(direction);
@@ -134,7 +133,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
         connectionCache = connections.entrySet().stream().map(entry -> new Connection(entry.getKey().getPos(), entry.getKey().getDirection(), entry.getValue())).collect(Collectors.toList());
     }
 
-    public void addToQueue(World world, BlockPos position, Map<BlockPos, Integer> queue, List<BlockPos> travelPositions, Map<DirectionalPosition, Integer> insertPositions, int distance) {
+    public void addToQueue(Level world, BlockPos position, Map<BlockPos, Integer> queue, List<BlockPos> travelPositions, Map<DirectionalPosition, Integer> insertPositions, int distance) {
         Block block = world.getBlockState(position).getBlock();
         if (!(block instanceof PipeBlock)) {
             return;
@@ -162,7 +161,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
     }
 
     public boolean canInsert(BlockPos pos, Direction direction) {
-        TileEntity te = level.getBlockEntity(pos);
+        BlockEntity te = level.getBlockEntity(pos);
         if (te instanceof PipeTileEntity) {
             PipeTileEntity pipe = (PipeTileEntity) te;
             if (pipe.isExtracting(direction)) {
@@ -170,7 +169,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
             }
         }
 
-        TileEntity tileEntity = level.getBlockEntity(pos.relative(direction));
+        BlockEntity tileEntity = level.getBlockEntity(pos.relative(direction));
         if (tileEntity == null) {
             return false;
         }
@@ -180,7 +179,7 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
         return canInsert(tileEntity, direction.getOpposite());
     }
 
-    public abstract boolean canInsert(TileEntity tileEntity, Direction direction);
+    public abstract boolean canInsert(BlockEntity tileEntity, Direction direction);
 
     @Override
     public void tick() {
@@ -232,22 +231,22 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT compound) {
-        super.load(state, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         extractingSides = new boolean[Direction.values().length];
-        ListNBT extractingList = compound.getList("ExtractingSides", Constants.NBT.TAG_BYTE);
+        ListTag extractingList = compound.getList("ExtractingSides", Constants.NBT.TAG_BYTE);
         if (extractingList.size() >= extractingSides.length) {
             for (int i = 0; i < extractingSides.length; i++) {
-                ByteNBT b = (ByteNBT) extractingList.get(i);
+                ByteTag b = (ByteTag) extractingList.get(i);
                 extractingSides[i] = b.getAsByte() != 0;
             }
         }
 
         disconnectedSides = new boolean[Direction.values().length];
-        ListNBT disconnectedList = compound.getList("DisconnectedSides", Constants.NBT.TAG_BYTE);
+        ListTag disconnectedList = compound.getList("DisconnectedSides", Constants.NBT.TAG_BYTE);
         if (disconnectedList.size() >= disconnectedSides.length) {
             for (int i = 0; i < disconnectedSides.length; i++) {
-                ByteNBT b = (ByteNBT) disconnectedList.get(i);
+                ByteTag b = (ByteTag) disconnectedList.get(i);
                 disconnectedSides[i] = b.getAsByte() != 0;
             }
         }
@@ -255,34 +254,34 @@ public abstract class PipeTileEntity extends TileEntity implements ITickableTile
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
-        ListNBT extractingList = new ListNBT();
+    public CompoundTag save(CompoundTag compound) {
+        ListTag extractingList = new ListTag();
         for (boolean extractingSide : extractingSides) {
-            extractingList.add(ByteNBT.valueOf(extractingSide));
+            extractingList.add(ByteTag.valueOf(extractingSide));
         }
         compound.put("ExtractingSides", extractingList);
 
-        ListNBT disconnectedList = new ListNBT();
+        ListTag disconnectedList = new ListTag();
         for (boolean disconnected : disconnectedSides) {
-            disconnectedList.add(ByteNBT.valueOf(disconnected));
+            disconnectedList.add(ByteTag.valueOf(disconnected));
         }
         compound.put("DisconnectedSides", disconnectedList);
         return super.save(compound);
     }
 
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(worldPosition, 1, getUpdateTag());
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return new ClientboundBlockEntityDataPacket(worldPosition, 1, getUpdateTag());
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        handleUpdateTag(getBlockState(), pkt.getTag());
+    public void onDataPacket(net.minecraft.network.Connection net, ClientboundBlockEntityDataPacket pkt) {
+        handleUpdateTag(pkt.getTag());
     }
 
     @Override
-    public CompoundNBT getUpdateTag() {
-        return save(new CompoundNBT());
+    public CompoundTag getUpdateTag() {
+        return save(new CompoundTag());
     }
 
     public static class Connection {

@@ -1,26 +1,26 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
-import de.maxhenkel.pipez.utils.GasUtils;
-import mekanism.api.chemical.gas.GasStack;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidUtil;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
     private FilterList filterList;
 
-    public ExtractScreen(ExtractContainer container, PlayerInventory playerInventory, ITextComponent title) {
+    public ExtractScreen(ExtractContainer container, Inventory playerInventory, Component title) {
         super(BACKGROUND, container, playerInventory, title);
         imageWidth = 176;
         imageHeight = 196;
@@ -71,8 +71,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     protected void init() {
         super.init();
         hoverAreas.clear();
-        buttons.clear();
-        children.clear();
+        clearWidgets();
 
         PipeLogicTileEntity pipe = getMenu().getPipe();
         Direction side = getMenu().getSide();
@@ -94,33 +93,33 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         filterButton = new CycleIconButton(leftPos + 7, topPos + 55, filterModeIcons, filterModeIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleFilterModeMessage(currentindex));
         });
-        addFilterButton = new Button(leftPos + 31, topPos + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.add"), button -> {
+        addFilterButton = new Button(leftPos + 31, topPos + 79, 40, 20, new TranslatableComponent("message.pipez.filter.add"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
         });
-        editFilterButton = new Button(leftPos + 80, topPos + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.edit"), button -> {
+        editFilterButton = new Button(leftPos + 80, topPos + 79, 40, 20, new TranslatableComponent("message.pipez.filter.edit"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
             }
         });
-        removeFilterButton = new Button(leftPos + 129, topPos + 79, 40, 20, new TranslationTextComponent("message.pipez.filter.remove"), button -> {
+        removeFilterButton = new Button(leftPos + 129, topPos + 79, 40, 20, new TranslatableComponent("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
             }
         });
 
-        addButton(redstoneButton);
-        addButton(sortButton);
-        addButton(filterButton);
-        addButton(addFilterButton);
-        addButton(editFilterButton);
-        addButton(removeFilterButton);
+        addRenderableWidget(redstoneButton);
+        addRenderableWidget(sortButton);
+        addRenderableWidget(filterButton);
+        addRenderableWidget(addFilterButton);
+        addRenderableWidget(editFilterButton);
+        addRenderableWidget(removeFilterButton);
 
         if (hasTabs()) {
             for (int i = 0; i < pipeTypes.length; i++) {
                 int tabIndex = i;
                 tabs[i] = new HoverArea(-26 + 3, 5 + 25 * i, 24, 24, () -> {
-                    List<IReorderingProcessor> tooltip = new ArrayList<>();
-                    tooltip.add(new TranslationTextComponent(pipeTypes[tabIndex].getTranslationKey()).getVisualOrderText());
+                    List<FormattedCharSequence> tooltip = new ArrayList<>();
+                    tooltip.add(new TranslatableComponent(pipeTypes[tabIndex].getTranslationKey()).getVisualOrderText());
                     return tooltip;
                 });
                 hoverAreas.add(tabs[i]);
@@ -129,21 +128,21 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
         redstoneArea = new HoverArea(7, 7, 20, 20, () -> {
             if (redstoneButton.active) {
-                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.redstone_mode", new TranslationTextComponent("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(new TranslatableComponent("tooltip.pipez.redstone_mode", new TranslatableComponent("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
         });
         sortArea = new HoverArea(7, 31, 20, 20, () -> {
             if (sortButton.active) {
-                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.distribution", new TranslationTextComponent("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(new TranslatableComponent("tooltip.pipez.distribution", new TranslatableComponent("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
         });
         filterArea = new HoverArea(7, 55, 20, 20, () -> {
             if (filterButton.active) {
-                return Arrays.asList(new TranslationTextComponent("tooltip.pipez.filter_mode", new TranslationTextComponent("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(new TranslatableComponent("tooltip.pipez.filter_mode", new TranslatableComponent("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
@@ -156,8 +155,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    public void tick() {
-        super.tick();
+    protected void containerTick() {
+        super.containerTick();
         checkButtons();
         filterList.tick();
     }
@@ -196,9 +195,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
         super.renderLabels(matrixStack, mouseX, mouseY);
-        font.draw(matrixStack, inventory.getDisplayName(), 8F, (float) (imageHeight - 96 + 3), FONT_COLOR);
+        font.draw(matrixStack, playerInventoryTitle, 8F, (float) (imageHeight - 96 + 3), FONT_COLOR);
 
         filterList.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
 
@@ -206,7 +205,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         super.renderBg(matrixStack, partialTicks, mouseX, mouseY);
         filterList.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
 
@@ -220,9 +219,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             }
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4);
+                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4, 0);
                 } else {
-                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4);
+                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4, 0);
                 }
             }
         }
@@ -261,7 +260,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             for (int i = 0; i < tabs.length; i++) {
                 HoverArea hoverArea = tabs[i];
                 if (currentindex != i && hoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
-                    minecraft.getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
+                    minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
                     currentindex = i;
                     init();
                     return true;
@@ -309,14 +308,16 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 }
                 Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
             });
-        } else if (filter instanceof GasFilter) {
+        }
+        // TODO add back Mekanism
+        /* else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 filter.setTag(new SingleElementTag(gas.getType()));
                 filter.setMetadata(null);
                 Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }
-        }
+        }*/
     }
 
     @Override
@@ -336,8 +337,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    public <T extends Widget> T addButton(T button) {
-        return super.addButton(button);
+    public <T extends GuiEventListener & Widget & NarratableEntry> T addRenderableWidget(T p_169406_) {
+        return super.addRenderableWidget(p_169406_);
     }
 
     public void addHoverArea(HoverArea hoverArea) {

@@ -1,19 +1,19 @@
 package de.maxhenkel.pipez.utils;
 
 import de.maxhenkel.pipez.DirectionalPosition;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ITag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
+public abstract class Filter<T> implements INBTSerializable<CompoundTag> {
 
     @Nullable
-    protected ITag.INamedTag<T> tag;
+    protected Tag.Named<T> tag;
     @Nullable
-    protected CompoundNBT metadata;
+    protected CompoundTag metadata;
     protected boolean exactMetadata;
     @Nullable
     protected DirectionalPosition destination;
@@ -25,20 +25,20 @@ public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
     }
 
     @Nullable
-    public ITag.INamedTag<T> getTag() {
+    public Tag.Named<T> getTag() {
         return tag;
     }
 
-    public void setTag(@Nullable ITag.INamedTag<T> tag) {
+    public void setTag(@Nullable Tag.Named<T> tag) {
         this.tag = tag;
     }
 
     @Nullable
-    public CompoundNBT getMetadata() {
+    public CompoundTag getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(@Nullable CompoundNBT metadata) {
+    public void setMetadata(@Nullable CompoundTag metadata) {
         this.metadata = metadata;
     }
 
@@ -72,12 +72,12 @@ public abstract class Filter<T> implements INBTSerializable<CompoundNBT> {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        return new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        return new CompoundTag();
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
 
     }
 }

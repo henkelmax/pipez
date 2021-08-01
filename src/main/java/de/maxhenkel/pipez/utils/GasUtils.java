@@ -8,23 +8,23 @@ import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nullable;
 
 public class GasUtils {
 
-    public static final ITag.INamedTag<Gas> EMPTY_GAS_TAG = new SingleElementTag<>(GasStack.EMPTY.getType());
+    public static final Tag.Named<Gas> EMPTY_GAS_TAG = new SingleElementTag<>(GasStack.EMPTY.getType());
 
     @Nullable
-    public static ITag.INamedTag<Gas> getGas(String name, boolean nullIfNotExists) {
+    public static Tag.Named<Gas> getGas(String name, boolean nullIfNotExists) {
         ResourceLocation id;
         if (name.startsWith("#")) {
             id = new ResourceLocation(name.substring(1));
-            ITag<Gas> tag = ChemicalTags.GAS.getCollection().getTag(id);
+            Tag<Gas> tag = ChemicalTags.GAS.getCollection().getTag(id);
             if (tag == null) {
                 return nullIfNotExists ? null : EMPTY_GAS_TAG;
             } else {

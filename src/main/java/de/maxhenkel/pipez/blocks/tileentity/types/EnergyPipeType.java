@@ -9,12 +9,12 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -32,7 +32,7 @@ public class EnergyPipeType extends PipeType<Void> {
     }
 
     @Override
-    public boolean canInsert(TileEntity tileEntity, Direction direction) {
+    public boolean canInsert(BlockEntity tileEntity, Direction direction) {
         return tileEntity.getCapability(CapabilityEnergy.ENERGY, direction).isPresent();
     }
 
@@ -58,8 +58,8 @@ public class EnergyPipeType extends PipeType<Void> {
     }
 
     @Override
-    public ITextComponent getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslationTextComponent("tooltip.pipez.rate.energy", getRate(upgrade));
+    public Component getTransferText(@Nullable Upgrade upgrade) {
+        return new TranslatableComponent("tooltip.pipez.rate.energy", getRate(upgrade));
     }
 
     @Override
@@ -238,7 +238,7 @@ public class EnergyPipeType extends PipeType<Void> {
 
     @Nullable
     private IEnergyStorage getEnergyStorage(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
+        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

@@ -5,15 +5,15 @@ import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.FilterContainer;
 import de.maxhenkel.pipez.gui.containerfactory.FilterContainerProvider;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 public class EditFilterMessage implements Message<EditFilterMessage> {
 
-    private CompoundNBT filter;
+    private CompoundTag filter;
     private int index;
 
     public EditFilterMessage() {
@@ -32,7 +32,7 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().containerMenu;
+        AbstractContainerMenu container = context.getSender().containerMenu;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
             Filter<?> f = extractContainer.getPipe().getPipeTypes()[index].createFilter();
@@ -42,14 +42,14 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
     }
 
     @Override
-    public EditFilterMessage fromBytes(PacketBuffer packetBuffer) {
+    public EditFilterMessage fromBytes(FriendlyByteBuf packetBuffer) {
         filter = packetBuffer.readNbt();
         index = packetBuffer.readInt();
         return this;
     }
 
     @Override
-    public void toBytes(PacketBuffer packetBuffer) {
+    public void toBytes(FriendlyByteBuf packetBuffer) {
         packetBuffer.writeNbt(filter);
         packetBuffer.writeInt(index);
     }

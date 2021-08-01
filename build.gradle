@@ -1,25 +1,23 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://maven.maxhenkel.de/repository/public' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-        classpath group: 'de.maxhenkel.forge-update', name: 'forge-update', version: '1.0.2'
-        classpath group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '4.0.4'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.14', changing: true
+        classpath group: 'de.maxhenkel.forge-update', name: 'forge-update', version: '1.0.4'
     }
 }
 
 plugins {
     // https://github.com/matthewprenger/CurseGradle
     id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'forge-update'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'idea'
 
 idea {
@@ -33,7 +31,7 @@ version = mod_version
 group = mod_packagename
 archivesBaseName = mod_id
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 minecraft {
     mappings channel: 'official', version: mod_minecraft_version
@@ -76,26 +74,54 @@ minecraft {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+repositories {
+    mavenLocal()
+    maven {
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
+    maven {
+        name = "henkelmax.public"
+        url = 'https://maven.maxhenkel.de/repository/public'
+    }
+    maven {
+        name 'tterrag maven'
+        url "https://maven.tterrag.com/"
+    }
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
+//    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
+//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
-    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}:api")
-    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}")
+//    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}:api")
+//    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}")
 
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
-    shadow fg.deobf("mekanism:Mekanism:${mekanism_version}:api")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
+//    shadow fg.deobf("mekanism:Mekanism:${mekanism_version}:api")
+
+    implementation fg.deobf("curse.maven:the-one-probe-245211:3402482")
+
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:javadoc")
-
-    compile fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
@@ -113,11 +139,7 @@ jar {
 }
 
 processResources {
-    inputs.property "version", project.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include '**/*.toml'
-
+    filesMatching("**/*.toml") {
         expand 'mod_id': mod_id,
                 'mod_version': mod_version,
                 'mod_vendor': mod_vendor,
@@ -126,9 +148,6 @@ processResources {
                 'mod_loader_version': mod_loader_version,
                 'mod_minecraft_version': mod_minecraft_version,
                 'mod_mekanism_version_range': mod_mekanism_version_range
-    }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude '**/*.toml'
     }
 }
 
@@ -147,6 +166,8 @@ curseforge {
         changelog = file('changelog.md')
         releaseType = curse_release_type
         addGameVersion mod_minecraft_version
+        addGameVersion 'Forge'
+        addGameVersion 'Java 16'
         mainArtifact(jar) {
             displayName = "[${mod_minecraft_version}] ${mod_name} ${mod_version}"
         }
@@ -177,36 +198,12 @@ forgeUpdate {
     tags = recommended == 'true' ? ['recommended'] : []
 }
 
-repositories {
-    maven {
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-    maven {
-        name = "Hwyla"
-        url = "https://maven.tehnut.info"
-    }
-    maven {
-        name = "henkelmax.public"
-        url = 'https://maven.maxhenkel.de/repository/public'
-    }
-    maven {
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-    }
-    mavenLocal()
-}
-
 javadoc {
     failOnError = false
 }
 
 task deobfJar(type: Jar) {
-    classifier = 'deobf'
+    classifier 'deobf'
     from sourceSets.main.output
     manifest {
         attributes(["Specification-Title"     : mod_name,
@@ -220,12 +217,12 @@ task deobfJar(type: Jar) {
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    classifier 'sources'
     from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    classifier 'javadoc'
     from javadoc.getDestinationDir()
 }
 
@@ -241,10 +238,31 @@ jar.finalizedBy('reobfJar')
 shadowJar {
     project.configurations.shadow.setTransitive(true);
     configurations = [project.configurations.shadow]
-    classifier = ""
+    classifier ""
     relocate 'de.maxhenkel.corelib', "de.maxhenkel.${mod_id}.corelib"
 }
 
 reobf {
     shadowJar {}
+}
+
+sourceSets {
+    main {
+        java {
+            exclude 'de/maxhenkel/pipez/integration/jei/**'
+            // TODO add back Mekanism
+            exclude 'de/maxhenkel/pipez/GasFilter.java'
+            exclude 'de/maxhenkel/pipez/utils/WrappedGasStack.java'
+            exclude 'de/maxhenkel/pipez/utils/GasUtils.java'
+            exclude 'de/maxhenkel/pipez/blocks/tileentity/render/GasPipeRenderer.java'
+            exclude 'de/maxhenkel/pipez/blocks/tileentity/types/GasPipeType.java'
+            exclude 'de/maxhenkel/pipez/blocks/tileentity/GasPipeTileEntity.java'
+            exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
+            exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
+        }
+        resources {
+            // TODO add back Mekanism
+            exclude 'data/pipez/loot_tables/blocks/gas_pipe.json'
+        }
+    }
 }

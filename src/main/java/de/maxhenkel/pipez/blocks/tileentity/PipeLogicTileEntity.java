@@ -8,9 +8,11 @@ import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.utils.DummyFluidHandler;
 import de.maxhenkel.pipez.utils.DummyItemHandler;
 import de.maxhenkel.pipez.utils.PipeEnergyStorage;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -26,8 +28,8 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     protected final int[][] rrIndex;
     protected CachedMap<Direction, PipeEnergyStorage> energyCache;
 
-    public PipeLogicTileEntity(TileEntityType<?> tileEntityTypeIn, PipeType<?>[] types) {
-        super(tileEntityTypeIn);
+    public PipeLogicTileEntity(BlockEntityType<?> tileEntityTypeIn, PipeType<?>[] types, BlockPos pos, BlockState state) {
+        super(tileEntityTypeIn, pos, state);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
         energyCache = new CachedMap<>();
@@ -143,7 +145,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     }
 
     @Override
-    public boolean canInsert(TileEntity tileEntity, Direction direction) {
+    public boolean canInsert(BlockEntity tileEntity, Direction direction) {
         for (PipeType<?> type : types) {
             if (type.canInsert(tileEntity, direction)) {
                 return true;

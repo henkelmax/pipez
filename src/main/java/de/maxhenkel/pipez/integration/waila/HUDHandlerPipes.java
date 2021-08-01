@@ -4,40 +4,41 @@ import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
+import mcp.mobius.waila.api.BlockAccessor;
 import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.IDataAccessor;
-import mcp.mobius.waila.api.IPluginConfig;
 import mcp.mobius.waila.api.IServerDataProvider;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import mcp.mobius.waila.api.ITooltip;
+import mcp.mobius.waila.api.config.IPluginConfig;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<TileEntity> {
+public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<BlockEntity> {
 
     static final HUDHandlerPipes INSTANCE = new HUDHandlerPipes();
 
     @Override
-    public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
-        CompoundNBT compound = accessor.getServerData();
+    public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
+        CompoundTag compound = blockAccessor.getServerData();
         if (compound.contains("Upgrade", Constants.NBT.TAG_STRING)) {
-            tooltip.add(ITextComponent.Serializer.fromJson(compound.getString("Upgrade")));
+            iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade")));
         }
-        tooltip.addAll(getTooltips(compound));
+        iTooltip.addAll(getTooltips(compound));
     }
 
     @Override
-    public void appendServerData(CompoundNBT compound, ServerPlayerEntity player, World world, TileEntity te) {
+    public void appendServerData(CompoundTag compound, ServerPlayer player, Level world, BlockEntity te, boolean b) {
         if (te.getBlockState().getBlock() instanceof PipeBlock) {
             PipeBlock pipe = (PipeBlock) te.getBlockState().getBlock();
             Direction selectedSide = pipe.getSelection(te.getBlockState(), world, te.getBlockPos(), player).getKey();
@@ -57,12 +58,12 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
             ItemStack upgrade = pipeTile.getUpgradeItem(selectedSide);
 
             if (upgrade.isEmpty()) {
-                compound.putString("Upgrade", ITextComponent.Serializer.toJson(new TranslationTextComponent("tooltip.pipez.no_upgrade")));
+                compound.putString("Upgrade", Component.Serializer.toJson(new TranslatableComponent("tooltip.pipez.no_upgrade")));
             } else {
-                compound.putString("Upgrade", ITextComponent.Serializer.toJson(upgrade.getHoverName()));
+                compound.putString("Upgrade", Component.Serializer.toJson(upgrade.getHoverName()));
             }
 
-            List<ITextComponent> tooltips = new ArrayList<>();
+            List<Component> tooltips = new ArrayList<>();
             for (PipeType<?> pipeType : pipeTile.getPipeTypes()) {
                 if (pipeTile.isEnabled(selectedSide, pipeType)) {
                     tooltips.add(pipeType.getTransferText(pipeTile.getUpgrade(selectedSide)));
@@ -72,22 +73,22 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
         }
     }
 
-    public void putTooltips(CompoundNBT compound, List<ITextComponent> tooltips) {
-        ListNBT list = new ListNBT();
-        for (ITextComponent tooltip : tooltips) {
-            list.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(tooltip)));
+    public void putTooltips(CompoundTag compound, List<Component> tooltips) {
+        ListTag list = new ListTag();
+        for (Component tooltip : tooltips) {
+            list.add(StringTag.valueOf(Component.Serializer.toJson(tooltip)));
         }
         compound.put("Tooltips", list);
     }
 
-    public List<ITextComponent> getTooltips(CompoundNBT compound) {
-        List<ITextComponent> tooltips = new ArrayList<>();
+    public List<Component> getTooltips(CompoundTag compound) {
+        List<Component> tooltips = new ArrayList<>();
         if (!compound.contains("Tooltips", Constants.NBT.TAG_LIST)) {
             return tooltips;
         }
-        ListNBT list = compound.getList("Tooltips", Constants.NBT.TAG_STRING);
+        ListTag list = compound.getList("Tooltips", Constants.NBT.TAG_STRING);
         for (int i = 0; i < list.size(); i++) {
-            tooltips.add(ITextComponent.Serializer.fromJson(list.getString(i)));
+            tooltips.add(Component.Serializer.fromJson(list.getString(i)));
         }
         return tooltips;
     }

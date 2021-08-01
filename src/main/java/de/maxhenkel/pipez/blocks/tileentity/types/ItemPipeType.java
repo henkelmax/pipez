@@ -9,14 +9,14 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -36,7 +36,7 @@ public class ItemPipeType extends PipeType<Item> {
     }
 
     @Override
-    public boolean canInsert(TileEntity tileEntity, Direction direction) {
+    public boolean canInsert(BlockEntity tileEntity, Direction direction) {
         return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent();
     }
 
@@ -61,8 +61,8 @@ public class ItemPipeType extends PipeType<Item> {
     }
 
     @Override
-    public ITextComponent getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslationTextComponent("tooltip.pipez.rate.item", getRate(upgrade), getSpeed(upgrade));
+    public Component getTransferText(@Nullable Upgrade upgrade) {
+        return new TranslatableComponent("tooltip.pipez.rate.item", getRate(upgrade), getSpeed(upgrade));
     }
 
     @Override
@@ -200,25 +200,25 @@ public class ItemPipeType extends PipeType<Item> {
     }
 
     private boolean matches(Filter<Item> filter, ItemStack stack) {
-        CompoundNBT metadata = filter.getMetadata();
+        CompoundTag metadata = filter.getMetadata();
         if (metadata == null) {
-            return filter.getTag() == null || stack.getItem().is(filter.getTag());
+            return filter.getTag() == null || filter.getTag().contains(stack.getItem());
         }
         if (filter.isExactMetadata()) {
             if (deepExactCompare(metadata, stack.getTag())) {
-                return filter.getTag() == null || stack.getItem().is(filter.getTag());
+                return filter.getTag() == null || filter.getTag().contains(stack.getItem());
             } else {
                 return false;
             }
         } else {
-            CompoundNBT stackNBT = stack.getTag();
+            CompoundTag stackNBT = stack.getTag();
             if (stackNBT == null) {
                 return metadata.size() <= 0;
             }
             if (!deepFuzzyCompare(metadata, stackNBT)) {
                 return false;
             }
-            return filter.getTag() == null || stack.getItem().is(filter.getTag());
+            return filter.getTag() == null || filter.getTag().contains(stack.getItem());
         }
     }
 
@@ -233,7 +233,7 @@ public class ItemPipeType extends PipeType<Item> {
 
     @Nullable
     private IItemHandler getItemHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
+        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

@@ -2,10 +2,10 @@ package de.maxhenkel.pipez.blocks.tileentity.configuration;
 
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ByteNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -18,15 +18,15 @@ public class RedstoneModeCache extends CachedPipeConfiguration<UpgradeTileEntity
     }
 
     @Override
-    public INBT serialize(UpgradeTileEntity.RedstoneMode value) {
-        return ByteNBT.valueOf((byte) value.ordinal());
+    public Tag serialize(UpgradeTileEntity.RedstoneMode value) {
+        return ByteTag.valueOf((byte) value.ordinal());
     }
 
     @Nullable
     @Override
-    public UpgradeTileEntity.RedstoneMode deserialize(PipeType pipeType, INBT inbt) {
-        if (inbt instanceof ByteNBT) {
-            ByteNBT byteNBT = (ByteNBT) inbt;
+    public UpgradeTileEntity.RedstoneMode deserialize(PipeType pipeType, Tag inbt) {
+        if (inbt instanceof ByteTag) {
+            ByteTag byteNBT = (ByteTag) inbt;
             return UpgradeTileEntity.RedstoneMode.values()[byteNBT.getAsByte()];
         }
         return null;

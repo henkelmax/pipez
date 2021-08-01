@@ -4,17 +4,17 @@ import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.EnergyPipeTileEntity;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.energy.CapabilityEnergy;
 
 public class EnergyPipeBlock extends PipeBlock {
@@ -24,32 +24,32 @@ public class EnergyPipeBlock extends PipeBlock {
     }
 
     @Override
-    public boolean canConnectTo(IWorldReader world, BlockPos pos, Direction facing) {
-        TileEntity te = world.getBlockEntity(pos.relative(facing));
+    public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
+        BlockEntity te = world.getBlockEntity(pos.relative(facing));
         return (te != null && te.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).isPresent());
     }
 
     @Override
-    public boolean isPipe(IWorldReader world, BlockPos pos, Direction facing) {
+    public boolean isPipe(LevelAccessor world, BlockPos pos, Direction facing) {
         BlockState state = world.getBlockState(pos.relative(facing));
         return state.getBlock().equals(this);
     }
 
     @Override
-    TileEntity createTileEntity() {
-        return new EnergyPipeTileEntity();
+    BlockEntity createTileEntity(BlockPos pos, BlockState state) {
+        return new EnergyPipeTileEntity(pos, state);
     }
 
     @Override
-    public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
-        TileEntity tileEntity = worldIn.getBlockEntity(pos);
+    public InteractionResult onPipeSideActivated(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
+        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
         if (tileEntity instanceof EnergyPipeTileEntity && isExtracting(worldIn, pos, direction)) {
             if (worldIn.isClientSide) {
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             EnergyPipeTileEntity pipe = (EnergyPipeTileEntity) tileEntity;
             PipeContainerProvider.openGui(player, pipe, direction, -1, (i, playerInventory, playerEntity) -> new ExtractContainer(i, playerInventory, pipe, direction, -1));
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         return super.onPipeSideActivated(state, worldIn, pos, player, handIn, hit, direction);
     }

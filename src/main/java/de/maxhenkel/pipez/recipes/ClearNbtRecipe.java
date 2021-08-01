@@ -2,19 +2,19 @@ package de.maxhenkel.pipez.recipes;
 
 import com.google.gson.JsonObject;
 import de.maxhenkel.pipez.Main;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 
-public class ClearNbtRecipe extends SpecialRecipe {
+public class ClearNbtRecipe extends CustomRecipe {
 
     private Ingredient ingredient;
 
@@ -24,7 +24,7 @@ public class ClearNbtRecipe extends SpecialRecipe {
     }
 
     @Nullable
-    public ItemStack getIngredient(CraftingInventory inv) {
+    public ItemStack getIngredient(CraftingContainer inv) {
         ItemStack found = null;
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stackInSlot = inv.getItem(i);
@@ -42,12 +42,12 @@ public class ClearNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, World worldIn) {
+    public boolean matches(CraftingContainer inv, Level worldIn) {
         return getIngredient(inv) != null;
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack ingredient = getIngredient(inv);
         if (ingredient == null) {
             return ItemStack.EMPTY;
@@ -60,7 +60,7 @@ public class ClearNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return ModRecipes.CLEAR_NBT;
     }
 
@@ -74,7 +74,7 @@ public class ClearNbtRecipe extends SpecialRecipe {
         return ItemStack.EMPTY;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<ClearNbtRecipe> {
+    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<ClearNbtRecipe> {
         public static final ResourceLocation NAME = new ResourceLocation(Main.MODID, "clear_nbt");
 
         @Override
@@ -83,12 +83,12 @@ public class ClearNbtRecipe extends SpecialRecipe {
         }
 
         @Override
-        public ClearNbtRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        public ClearNbtRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             return new ClearNbtRecipe(recipeId, Ingredient.fromNetwork(buffer));
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, ClearNbtRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, ClearNbtRecipe recipe) {
             recipe.ingredient.toNetwork(buffer);
         }
     }

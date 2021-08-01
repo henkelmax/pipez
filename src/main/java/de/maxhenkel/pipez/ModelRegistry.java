@@ -1,11 +1,10 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.CachedValue;
-import de.maxhenkel.pipez.Main;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ModelRotation;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -20,13 +19,13 @@ public class ModelRegistry {
         UNIVERSAL_PIPE_EXTRACT("block/universal_pipe_extract");
 
         private final ResourceLocation resource;
-        private final CachedValue<IBakedModel> cachedModel;
+        private final CachedValue<BakedModel> cachedModel;
 
         Model(String name) {
             resource = new ResourceLocation(Main.MODID, name);
             cachedModel = new CachedValue<>(() -> {
-                IUnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(resource);
-                return modelOrMissing.bake(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, ModelRotation.X0_Y0, resource);
+                UnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(resource);
+                return modelOrMissing.bake(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, BlockModelRotation.X0_Y0, resource);
             });
         }
 
@@ -34,7 +33,7 @@ public class ModelRegistry {
             return resource;
         }
 
-        public CachedValue<IBakedModel> getCachedModel() {
+        public CachedValue<BakedModel> getCachedModel() {
             return cachedModel;
         }
     }

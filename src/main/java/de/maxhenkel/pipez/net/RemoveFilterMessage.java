@@ -4,10 +4,10 @@ import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +33,7 @@ public class RemoveFilterMessage implements Message<RemoveFilterMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().containerMenu;
+        AbstractContainerMenu container = context.getSender().containerMenu;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
             PipeType<?> pipeType = extractContainer.getPipe().getPipeTypes()[index];
@@ -44,14 +44,14 @@ public class RemoveFilterMessage implements Message<RemoveFilterMessage> {
     }
 
     @Override
-    public RemoveFilterMessage fromBytes(PacketBuffer packetBuffer) {
+    public RemoveFilterMessage fromBytes(FriendlyByteBuf packetBuffer) {
         filter = packetBuffer.readUUID();
         index = packetBuffer.readInt();
         return this;
     }
 
     @Override
-    public void toBytes(PacketBuffer packetBuffer) {
+    public void toBytes(FriendlyByteBuf packetBuffer) {
         packetBuffer.writeUUID(filter);
         packetBuffer.writeInt(index);
     }

@@ -6,13 +6,13 @@ import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -26,7 +26,7 @@ public abstract class PipeType<T> {
 
     public abstract int getRate(@Nullable Upgrade upgrade);
 
-    public abstract boolean canInsert(TileEntity tileEntity, Direction direction);
+    public abstract boolean canInsert(BlockEntity tileEntity, Direction direction);
 
     public abstract Filter<T> createFilter();
 
@@ -34,7 +34,7 @@ public abstract class PipeType<T> {
 
     public abstract ItemStack getIcon();
 
-    public abstract ITextComponent getTransferText(@Nullable Upgrade upgrade);
+    public abstract Component getTransferText(@Nullable Upgrade upgrade);
 
     public boolean hasFilter() {
         return true;
@@ -63,20 +63,20 @@ public abstract class PipeType<T> {
         return filter.getDestination().equals(new DirectionalPosition(connection.getPos(), connection.getDirection()));
     }
 
-    public boolean deepExactCompare(INBT meta, INBT item) {
-        if (meta instanceof CompoundNBT) {
-            if (!(item instanceof CompoundNBT)) {
+    public boolean deepExactCompare(Tag meta, Tag item) {
+        if (meta instanceof CompoundTag) {
+            if (!(item instanceof CompoundTag)) {
                 return false;
             }
-            CompoundNBT c = (CompoundNBT) meta;
-            CompoundNBT i = (CompoundNBT) item;
+            CompoundTag c = (CompoundTag) meta;
+            CompoundTag i = (CompoundTag) item;
             Set<String> allKeys = new HashSet<>();
             allKeys.addAll(c.getAllKeys());
             allKeys.addAll(i.getAllKeys());
             for (String key : allKeys) {
                 if (c.contains(key)) {
                     if (i.contains(key)) {
-                        INBT nbt = c.get(key);
+                        Tag nbt = c.get(key);
                         if (!deepExactCompare(nbt, i.get(key))) {
                             return false;
                         }
@@ -88,12 +88,12 @@ public abstract class PipeType<T> {
                 }
             }
             return true;
-        } else if (meta instanceof ListNBT) {
-            ListNBT l = (ListNBT) meta;
-            if (!(item instanceof ListNBT)) {
+        } else if (meta instanceof ListTag) {
+            ListTag l = (ListTag) meta;
+            if (!(item instanceof ListTag)) {
                 return false;
             }
-            ListNBT il = (ListNBT) item;
+            ListTag il = (ListTag) item;
             if (!l.stream().allMatch(inbt -> il.stream().anyMatch(inbt1 -> deepExactCompare(inbt, inbt1)))) {
                 return false;
             }
@@ -106,15 +106,15 @@ public abstract class PipeType<T> {
         }
     }
 
-    public boolean deepFuzzyCompare(INBT meta, INBT item) {
-        if (meta instanceof CompoundNBT) {
-            if (!(item instanceof CompoundNBT)) {
+    public boolean deepFuzzyCompare(Tag meta, Tag item) {
+        if (meta instanceof CompoundTag) {
+            if (!(item instanceof CompoundTag)) {
                 return false;
             }
-            CompoundNBT c = (CompoundNBT) meta;
-            CompoundNBT i = (CompoundNBT) item;
+            CompoundTag c = (CompoundTag) meta;
+            CompoundTag i = (CompoundTag) item;
             for (String key : c.getAllKeys()) {
-                INBT nbt = c.get(key);
+                Tag nbt = c.get(key);
                 if (i.contains(key, nbt.getId())) {
                     if (!deepFuzzyCompare(nbt, i.get(key))) {
                         return false;
@@ -124,12 +124,12 @@ public abstract class PipeType<T> {
                 }
             }
             return true;
-        } else if (meta instanceof ListNBT) {
-            ListNBT l = (ListNBT) meta;
-            if (!(item instanceof ListNBT)) {
+        } else if (meta instanceof ListTag) {
+            ListTag l = (ListTag) meta;
+            if (!(item instanceof ListTag)) {
                 return false;
             }
-            ListNBT il = (ListNBT) item;
+            ListTag il = (ListTag) item;
             return l.stream().allMatch(inbt -> il.stream().anyMatch(inbt1 -> deepFuzzyCompare(inbt, inbt1)));
         } else {
             return meta != null && meta.equals(item);

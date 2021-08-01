@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.items;
 
 import de.maxhenkel.pipez.Upgrade;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 
 public class ModItems {

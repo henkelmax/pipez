@@ -2,10 +2,10 @@ package de.maxhenkel.pipez.blocks.tileentity.configuration;
 
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -23,8 +23,8 @@ public class FilterCache extends CachedPipeConfiguration<List<Filter<?>>> {
     }
 
     @Override
-    public INBT serialize(List<Filter<?>> filters) {
-        ListNBT list = new ListNBT();
+    public Tag serialize(List<Filter<?>> filters) {
+        ListTag list = new ListTag();
         for (Filter<?> filter : filters) {
             list.add(filter.serializeNBT());
         }
@@ -33,9 +33,9 @@ public class FilterCache extends CachedPipeConfiguration<List<Filter<?>>> {
 
     @Nullable
     @Override
-    public List<Filter<?>> deserialize(PipeType<?> pipeType, INBT inbt) {
-        if (inbt instanceof ListNBT) {
-            ListNBT list = (ListNBT) inbt;
+    public List<Filter<?>> deserialize(PipeType<?> pipeType, Tag inbt) {
+        if (inbt instanceof ListTag) {
+            ListTag list = (ListTag) inbt;
             List<Filter<?>> filters = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
                 Filter<?> filter = filterCreator.apply(pipeType);

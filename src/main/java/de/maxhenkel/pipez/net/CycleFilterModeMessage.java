@@ -3,10 +3,10 @@ package de.maxhenkel.pipez.net;
 import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 public class CycleFilterModeMessage implements Message<CycleFilterModeMessage> {
 
@@ -27,7 +27,7 @@ public class CycleFilterModeMessage implements Message<CycleFilterModeMessage> {
 
     @Override
     public void executeServerSide(NetworkEvent.Context context) {
-        Container container = context.getSender().containerMenu;
+        AbstractContainerMenu container = context.getSender().containerMenu;
         if (container instanceof ExtractContainer) {
             ExtractContainer extractContainer = (ExtractContainer) container;
             PipeType<?> pipeType = extractContainer.getPipe().getPipeTypes()[index];
@@ -36,13 +36,13 @@ public class CycleFilterModeMessage implements Message<CycleFilterModeMessage> {
     }
 
     @Override
-    public CycleFilterModeMessage fromBytes(PacketBuffer packetBuffer) {
+    public CycleFilterModeMessage fromBytes(FriendlyByteBuf packetBuffer) {
         this.index = packetBuffer.readInt();
         return this;
     }
 
     @Override
-    public void toBytes(PacketBuffer packetBuffer) {
+    public void toBytes(FriendlyByteBuf packetBuffer) {
         packetBuffer.writeInt(index);
     }
 }

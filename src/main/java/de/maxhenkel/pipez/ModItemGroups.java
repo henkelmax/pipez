@@ -1,12 +1,12 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.pipez.blocks.ModBlocks;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
 public class ModItemGroups {
 
-    public static final ItemGroup TAB_PIPEZ = new ItemGroup("pipez") {
+    public static final CreativeModeTab TAB_PIPEZ = new CreativeModeTab("pipez") {
 
         @Override
         public ItemStack makeIcon() {

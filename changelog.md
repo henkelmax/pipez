@@ -1,1 +1,1 @@
-- Fixed extractors not working with resource packs
+- Updated to 1.17.1

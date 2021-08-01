@@ -1,11 +1,11 @@
 package de.maxhenkel.pipez.blocks.tileentity.configuration;
 
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -47,12 +47,12 @@ public abstract class CachedPipeConfiguration<T> {
         if (stack.isEmpty() || !stack.hasTag()) {
             return putDefault(pipeType, map);
         }
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (!tag.contains(pipeType.getKey(), Constants.NBT.TAG_COMPOUND)) {
             return putDefault(pipeType, map);
         }
 
-        CompoundNBT compound = tag.getCompound(pipeType.getKey());
+        CompoundTag compound = tag.getCompound(pipeType.getKey());
         if (!compound.contains(key)) {
             return putDefault(pipeType, map);
         }
@@ -84,13 +84,13 @@ public abstract class CachedPipeConfiguration<T> {
 
         map.put(pipeType, value);
 
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
 
-        CompoundNBT compound;
+        CompoundTag compound;
         if (tag.contains(pipeType.getKey(), Constants.NBT.TAG_COMPOUND)) {
             compound = tag.getCompound(pipeType.getKey());
         } else {
-            compound = new CompoundNBT();
+            compound = new CompoundTag();
             tag.put(pipeType.getKey(), compound);
         }
 
@@ -106,9 +106,9 @@ public abstract class CachedPipeConfiguration<T> {
         }
     }
 
-    public abstract INBT serialize(T value);
+    public abstract Tag serialize(T value);
 
     @Nullable
-    public abstract T deserialize(PipeType<?> pipeType, INBT inbt);
+    public abstract T deserialize(PipeType<?> pipeType, Tag inbt);
 
 }

@@ -3,21 +3,21 @@ package de.maxhenkel.pipez.recipes;
 import com.google.gson.JsonObject;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.pipez.Main;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CopyNbtRecipe extends SpecialRecipe {
+public class CopyNbtRecipe extends CustomRecipe {
 
     private Ingredient ingredient;
 
@@ -26,7 +26,7 @@ public class CopyNbtRecipe extends SpecialRecipe {
         this.ingredient = ingredient;
     }
 
-    public Pair<ItemStack, List<ItemStack>> getResult(CraftingInventory inv) {
+    public Pair<ItemStack, List<ItemStack>> getResult(CraftingContainer inv) {
         ItemStack source = null;
         List<ItemStack> toCopy = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class CopyNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, World worldIn) {
+    public boolean matches(CraftingContainer inv, Level worldIn) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
 
         if (result.getKey() == null) {
@@ -64,7 +64,7 @@ public class CopyNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
         if (result.getKey() == null) {
             return ItemStack.EMPTY;
@@ -85,7 +85,7 @@ public class CopyNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
         if (result.getKey() == null) {
             return super.getRemainingItems(inv);
@@ -110,7 +110,7 @@ public class CopyNbtRecipe extends SpecialRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return ModRecipes.COPY_NBT;
     }
 
@@ -124,7 +124,7 @@ public class CopyNbtRecipe extends SpecialRecipe {
         return ItemStack.EMPTY;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<CopyNbtRecipe> {
+    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<CopyNbtRecipe> {
         public static final ResourceLocation NAME = new ResourceLocation(Main.MODID, "copy_nbt");
 
         @Override
@@ -133,12 +133,12 @@ public class CopyNbtRecipe extends SpecialRecipe {
         }
 
         @Override
-        public CopyNbtRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        public CopyNbtRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             return new CopyNbtRecipe(recipeId, Ingredient.fromNetwork(buffer));
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, CopyNbtRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, CopyNbtRecipe recipe) {
             recipe.ingredient.toNetwork(buffer);
         }
     }

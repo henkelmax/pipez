@@ -13,12 +13,12 @@ import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -34,7 +34,7 @@ public class GasPipeType extends PipeType<Gas> {
     }
 
     @Override
-    public boolean canInsert(TileEntity tileEntity, Direction direction) {
+    public boolean canInsert(BlockEntity tileEntity, Direction direction) {
         return tileEntity.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, direction).isPresent();
     }
 
@@ -54,8 +54,8 @@ public class GasPipeType extends PipeType<Gas> {
     }
 
     @Override
-    public ITextComponent getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslationTextComponent("tooltip.pipez.rate.gas", getRate(upgrade));
+    public Component getTransferText(@Nullable Upgrade upgrade) {
+        return new TranslatableComponent("tooltip.pipez.rate.gas", getRate(upgrade));
     }
 
     @Override
@@ -188,7 +188,7 @@ public class GasPipeType extends PipeType<Gas> {
 
     @Nullable
     private IGasHandler getGasHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        TileEntity te = tileEntity.getLevel().getBlockEntity(pos);
+        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
         if (te == null) {
             return null;
         }

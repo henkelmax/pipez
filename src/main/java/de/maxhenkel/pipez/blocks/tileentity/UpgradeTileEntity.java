@@ -10,14 +10,15 @@ import de.maxhenkel.pipez.blocks.tileentity.configuration.FilterModeCache;
 import de.maxhenkel.pipez.blocks.tileentity.configuration.RedstoneModeCache;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.items.UpgradeItem;
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     protected FilterModeCache filterModes;
     protected FilterCache filters;
 
-    public UpgradeTileEntity(TileEntityType<?> tileEntityTypeIn) {
-        super(tileEntityTypeIn);
+    public UpgradeTileEntity(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+        super(tileEntityTypeIn, pos, state);
         upgradeInventory = NonNullList.withSize(Direction.values().length, ItemStack.EMPTY);
         inventory = new ItemListInventory(upgradeInventory, this::invalidateAllCaches);
         initCaches();
@@ -60,7 +61,6 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
 
     public ItemStack setUpgradeItem(Direction side, ItemStack upgrade) {
         ItemStack old = upgradeInventory.get(side.get3DDataValue());
-        UpgradeItem.upgradeData(upgrade); //TODO Remove after MC update
         upgradeInventory.set(side.get3DDataValue(), upgrade);
         invalidateAllCaches();
         return old;
@@ -108,34 +108,31 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         if (!extracting) {
             ItemStack stack = upgradeInventory.get(side.get3DDataValue());
             upgradeInventory.set(side.get3DDataValue(), ItemStack.EMPTY);
-            InventoryHelper.dropContents(level, worldPosition, NonNullList.of(ItemStack.EMPTY, stack));
+            Containers.dropContents(level, worldPosition, NonNullList.of(ItemStack.EMPTY, stack));
             setChanged();
         }
     }
 
     @Override
     public void setRemoved() {
-        InventoryHelper.dropContents(level, worldPosition, upgradeInventory);
+        Containers.dropContents(level, worldPosition, upgradeInventory);
         super.setRemoved();
     }
 
-    public IInventory getUpgradeInventory() {
+    public Container getUpgradeInventory() {
         return inventory;
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT compound) {
-        super.load(state, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         upgradeInventory.clear();
         ItemUtils.readInventory(compound, "Upgrades", upgradeInventory);
-        for (ItemStack stack : upgradeInventory) {
-            UpgradeItem.upgradeData(stack); //TODO Remove after MC update
-        }
         invalidateAllCaches();
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
+    public CompoundTag save(CompoundTag compound) {
         ItemUtils.saveInventory(compound, "Upgrades", upgradeInventory);
         return super.save(compound);
     }

@@ -3,13 +3,17 @@ package de.maxhenkel.pipez.items;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.ModItemGroups;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -23,17 +27,17 @@ public class FilterDestinationToolItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool").withStyle(TextFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+        tooltip.add(new TranslatableComponent("tooltip.pipez.filter_destination_tool").withStyle(ChatFormatting.GRAY));
         DirectionalPosition dst = getDestination(stack);
         if (dst != null) {
-            tooltip.add(new TranslationTextComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslationTextComponent("message.pipez.direction." + dst.getDirection().getName()).withStyle(TextFormatting.GREEN)).withStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslatableComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslatableComponent("message.pipez.direction." + dst.getDirection().getName()).withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
         }
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
     }
 
-    private IFormattableTextComponent number(int num) {
-        return new StringTextComponent(String.valueOf(num)).withStyle(TextFormatting.GREEN);
+    private MutableComponent number(int num) {
+        return new TextComponent(String.valueOf(num)).withStyle(ChatFormatting.GREEN);
     }
 
     @Nullable
@@ -41,7 +45,7 @@ public class FilterDestinationToolItem extends Item {
         if (!stack.hasTag()) {
             return null;
         }
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (!tag.contains("Destination", Constants.NBT.TAG_COMPOUND)) {
             return null;
         }
@@ -51,7 +55,7 @@ public class FilterDestinationToolItem extends Item {
     }
 
     public static void setDestination(ItemStack stack, DirectionalPosition dest) {
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
         tag.put("Destination", dest.serializeNBT());
     }
 

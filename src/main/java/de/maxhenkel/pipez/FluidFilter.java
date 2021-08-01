@@ -1,10 +1,10 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -13,8 +13,8 @@ import java.util.UUID;
 public class FluidFilter extends Filter<Fluid> {
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT compound = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag compound = new CompoundTag();
         if (tag != null) {
             if (tag instanceof SingleElementTag) {
                 ResourceLocation key = ForgeRegistries.FLUIDS.getKey(((SingleElementTag<Fluid>) tag).getElement());
@@ -43,7 +43,7 @@ public class FluidFilter extends Filter<Fluid> {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT compound) {
+    public void deserializeNBT(CompoundTag compound) {
         tag = null;
         if (compound.contains("Fluid", Constants.NBT.TAG_STRING)) {
             Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(compound.getString("Fluid")));

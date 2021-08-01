@@ -3,11 +3,11 @@ package de.maxhenkel.pipez.gui;
 import com.mojang.datafixers.util.Pair;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.items.UpgradeItem;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -15,14 +15,8 @@ public class UpgradeSlot extends Slot {
 
     public static final ResourceLocation UPGRADE_SLOT = new ResourceLocation(Main.MODID, "item/upgrade_slot");
 
-    public UpgradeSlot(IInventory inventoryIn, int index, int xPosition, int yPosition) {
+    public UpgradeSlot(Container inventoryIn, int index, int xPosition, int yPosition) {
         super(inventoryIn, index, xPosition, yPosition);
-    }
-
-    @Override
-    public void setChanged() {
-        super.setChanged();
-        UpgradeItem.upgradeData(getItem()); //TODO Remove after MC update
     }
 
     @Override
@@ -38,7 +32,7 @@ public class UpgradeSlot extends Slot {
     @OnlyIn(Dist.CLIENT)
     @Override
     public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-        return Pair.of(PlayerContainer.BLOCK_ATLAS, UPGRADE_SLOT);
+        return Pair.of(InventoryMenu.BLOCK_ATLAS, UPGRADE_SLOT);
     }
 
 }

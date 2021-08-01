@@ -3,18 +3,18 @@ package de.maxhenkel.pipez.gui;
 import de.maxhenkel.corelib.inventory.ContainerBase;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 
-public class FilterContainer extends ContainerBase implements IPipeContainer{
+public class FilterContainer extends ContainerBase implements IPipeContainer {
 
     private PipeLogicTileEntity pipe;
     private Direction side;
     private int index;
     private Filter<?> filter;
 
-    public FilterContainer(int id, IInventory playerInventory, PipeLogicTileEntity pipe, Direction side, int index, Filter<?> filter) {
+    public FilterContainer(int id, Container playerInventory, PipeLogicTileEntity pipe, Direction side, int index, Filter<?> filter) {
         super(Containers.FILTER, id, playerInventory, null);
         this.pipe = pipe;
         this.side = side;
@@ -53,7 +53,7 @@ public class FilterContainer extends ContainerBase implements IPipeContainer{
     }
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return !pipe.isRemoved();
     }
 

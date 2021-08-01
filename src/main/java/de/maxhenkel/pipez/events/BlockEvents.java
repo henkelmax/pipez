@@ -3,12 +3,12 @@ package de.maxhenkel.pipez.events;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,7 +30,7 @@ public class BlockEvents {
         PipeBlock pipe = (PipeBlock) state.getBlock();
 
         Direction side = pipe.getSelection(state, event.getWorld(), event.getPos(), event.getPlayer()).getKey();
-        ActionResultType result = pipe.onPipeSideForceActivated(state, event.getWorld(), event.getPos(), event.getPlayer(), event.getHand(), event.getHitVec(), side);
+        InteractionResult result = pipe.onPipeSideForceActivated(state, event.getWorld(), event.getPos(), event.getPlayer(), event.getHand(), event.getHitVec(), side);
         if (result.consumesAction()) {
             event.setUseItem(Event.Result.ALLOW);
             event.setCancellationResult(result);
@@ -44,7 +44,7 @@ public class BlockEvents {
             return;
         }
 
-        TileEntity te = event.getWorld().getBlockEntity(event.getPos());
+        BlockEntity te = event.getWorld().getBlockEntity(event.getPos());
 
         if (te == null) {
             return;
@@ -56,9 +56,9 @@ public class BlockEvents {
         }
 
         FilterDestinationToolItem.setDestination(heldItem, new DirectionalPosition(event.getPos().immutable(), event.getFace()));
-        event.getPlayer().displayClientMessage(new TranslationTextComponent("message.pipez.filter_destination_tool.destination.set"), true);
+        event.getPlayer().displayClientMessage(new TranslatableComponent("message.pipez.filter_destination_tool.destination.set"), true);
         event.setUseItem(Event.Result.ALLOW);
-        event.setCancellationResult(ActionResultType.SUCCESS);
+        event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);
     }
 

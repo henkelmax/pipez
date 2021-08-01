@@ -1,10 +1,10 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -13,8 +13,8 @@ import java.util.UUID;
 public class ItemFilter extends Filter<Item> {
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT compound = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag compound = new CompoundTag();
         if (tag != null) {
             if (tag instanceof SingleElementTag) {
                 ResourceLocation key = ForgeRegistries.ITEMS.getKey(((SingleElementTag<Item>) tag).getElement());
@@ -43,7 +43,7 @@ public class ItemFilter extends Filter<Item> {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT compound) {
+    public void deserializeNBT(CompoundTag compound) {
         tag = null;
         if (compound.contains("Item", Constants.NBT.TAG_STRING)) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("Item")));

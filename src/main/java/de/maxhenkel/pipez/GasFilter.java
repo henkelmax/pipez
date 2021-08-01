@@ -4,8 +4,8 @@ import de.maxhenkel.corelib.tag.SingleElementTag;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.gas.Gas;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.UUID;
@@ -13,8 +13,8 @@ import java.util.UUID;
 public class GasFilter extends Filter<Gas> {
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT compound = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag compound = new CompoundTag();
         if (tag != null) {
             if (tag instanceof SingleElementTag) {
                 ResourceLocation key = MekanismAPI.gasRegistry().getKey(((SingleElementTag<Gas>) tag).getElement());
@@ -37,7 +37,7 @@ public class GasFilter extends Filter<Gas> {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT compound) {
+    public void deserializeNBT(CompoundTag compound) {
         tag = null;
         if (compound.contains("Gas", Constants.NBT.TAG_STRING)) {
             Gas gas = MekanismAPI.gasRegistry().getValue(new ResourceLocation(compound.getString("Gas")));

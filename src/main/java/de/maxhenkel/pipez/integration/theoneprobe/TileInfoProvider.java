@@ -8,13 +8,13 @@ import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileInfoProvider implements IProbeInfoProvider {
 
@@ -24,8 +24,8 @@ public class TileInfoProvider implements IProbeInfoProvider {
     }
 
     @Override
-    public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, PlayerEntity player, World world, BlockState state, IProbeHitData hitData) {
-        TileEntity te = world.getBlockEntity(hitData.getPos());
+    public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, Player player, Level world, BlockState state, IProbeHitData hitData) {
+        BlockEntity te = world.getBlockEntity(hitData.getPos());
 
         if (state.getBlock() instanceof PipeBlock) {
             PipeBlock pipe = (PipeBlock) state.getBlock();
@@ -47,7 +47,7 @@ public class TileInfoProvider implements IProbeInfoProvider {
 
             IProbeInfo i;
             if (upgrade.isEmpty()) {
-                i = info.text(new TranslationTextComponent("tooltip.pipez.no_upgrade"));
+                i = info.text(new TranslatableComponent("tooltip.pipez.no_upgrade"));
             } else {
                 i = info.horizontal()
                         .item(upgrade)

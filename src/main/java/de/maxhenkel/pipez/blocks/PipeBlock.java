@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.corelib.block.IItemBlock;
 import de.maxhenkel.corelib.block.VoxelUtils;
+import de.maxhenkel.corelib.blockentity.SimpleBlockEntityTicker;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.helpers.Triple;
 import de.maxhenkel.pipez.ModItemGroups;
@@ -9,41 +10,39 @@ import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.items.UpgradeItem;
 import de.maxhenkel.pipez.items.WrenchItem;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.block.material.PushReaction;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.EntitySelectionContext;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.*;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class PipeBlock extends Block implements IItemBlock, IWaterLoggable, ITileEntityProvider {
+public abstract class PipeBlock extends Block implements IItemBlock, SimpleWaterloggedBlock, EntityBlock {
 
     public static final BooleanProperty DOWN = BooleanProperty.create("down");
     public static final BooleanProperty UP = BooleanProperty.create("up");
@@ -74,13 +73,19 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         return new BlockItem(this, new Item.Properties().tab(ModItemGroups.TAB_PIPEZ)).setRegistryName(getRegistryName());
     }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return new SimpleBlockEntityTicker<>();
+    }
+
     @Override
     public PushReaction getPistonPushReaction(BlockState state) {
         return PushReaction.BLOCK;
     }
 
     @Override
-    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         Direction side = getSelection(state, worldIn, pos, player).getKey();
         if (side != null) {
             return onPipeSideActivated(state, worldIn, pos, player, handIn, hit, side);
@@ -89,9 +94,9 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         }
     }
 
-    public ActionResultType onWrenchClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction side) {
+    public InteractionResult onWrenchClicked(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction side) {
         if (!player.isShiftKeyDown()) {
-            return ActionResultType.PASS;
+            return InteractionResult.PASS;
         }
         if (side != null) {
             if (worldIn.getBlockState(pos.relative(side)).getBlock() != this) {
@@ -121,25 +126,25 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         }
 
         PipeTileEntity.markPipesDirty(worldIn, pos);
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public ActionResultType onPipeSideActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit, Direction direction) {
+    public InteractionResult onPipeSideActivated(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
         return super.use(state, worldIn, pos, player, handIn, hit);
     }
 
-    public ActionResultType onPipeSideForceActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit, @Nullable Direction side) {
+    public InteractionResult onPipeSideForceActivated(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, @Nullable Direction side) {
         ItemStack heldItem = player.getItemInHand(hand);
         if (WrenchItem.isWrench(heldItem)) {
             return onWrenchClicked(state, world, pos, player, hand, hit, side);
         } else if (heldItem.getItem() instanceof UpgradeItem && player.isShiftKeyDown() && side != null) {
-            TileEntity te = world.getBlockEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             if (!(te instanceof UpgradeTileEntity)) {
-                return ActionResultType.PASS;
+                return InteractionResult.PASS;
             }
             UpgradeTileEntity upgradeTe = (UpgradeTileEntity) te;
             ItemStack oldUpgrade;
-            if (player.abilities.instabuild) {
+            if (player.getAbilities().instabuild) {
                 oldUpgrade = upgradeTe.setUpgradeItem(side, heldItem.copy().split(1));
             } else {
                 oldUpgrade = upgradeTe.setUpgradeItem(side, heldItem.split(1));
@@ -147,14 +152,14 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             if (heldItem.isEmpty()) {
                 player.setItemInHand(hand, oldUpgrade);
             } else {
-                if (!player.inventory.add(oldUpgrade)) {
+                if (!player.getInventory().add(oldUpgrade)) {
                     player.drop(oldUpgrade, true);
                 }
             }
-            return ActionResultType.sidedSuccess(world.isClientSide);
+            return InteractionResult.sidedSuccess(world.isClientSide);
         }
 
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     public BooleanProperty getProperty(Direction side) {
@@ -175,7 +180,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         }
     }
 
-    public boolean isExtracting(IWorldReader world, BlockPos pos, Direction side) {
+    public boolean isExtracting(LevelAccessor world, BlockPos pos, Direction side) {
         PipeTileEntity pipe = getTileEntity(world, pos);
         if (pipe == null) {
             return false;
@@ -183,7 +188,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         return pipe.isExtracting(side);
     }
 
-    public boolean isDisconnected(IWorldReader world, BlockPos pos, Direction side) {
+    public boolean isDisconnected(LevelAccessor world, BlockPos pos, Direction side) {
         PipeTileEntity pipe = getTileEntity(world, pos);
         if (pipe == null) {
             return false;
@@ -191,12 +196,12 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         return pipe.isDisconnected(side);
     }
 
-    public void setHasData(World world, BlockPos pos, boolean hasData) {
+    public void setHasData(Level world, BlockPos pos, boolean hasData) {
         BlockState blockState = world.getBlockState(pos);
         world.setBlockAndUpdate(pos, blockState.setValue(HAS_DATA, hasData));
     }
 
-    public void setExtracting(World world, BlockPos pos, Direction side, boolean extracting) {
+    public void setExtracting(Level world, BlockPos pos, Direction side, boolean extracting) {
         PipeTileEntity pipe = getTileEntity(world, pos);
         if (pipe == null) {
             if (extracting) {
@@ -219,7 +224,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         world.setBlockAndUpdate(pos, blockState.setValue(sideProperty, connected));
     }
 
-    public void setDisconnected(World world, BlockPos pos, Direction side, boolean disconnected) {
+    public void setDisconnected(Level world, BlockPos pos, Direction side, boolean disconnected) {
         PipeTileEntity pipe = getTileEntity(world, pos);
         if (pipe == null) {
             if (disconnected) {
@@ -240,8 +245,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Nullable
-    public PipeTileEntity getTileEntity(IWorldReader world, BlockPos pos) {
-        TileEntity te = world.getBlockEntity(pos);
+    public PipeTileEntity getTileEntity(LevelAccessor world, BlockPos pos) {
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof PipeTileEntity) {
             return (PipeTileEntity) te;
         }
@@ -249,11 +254,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         return getState(context.getLevel(), context.getClickedPos(), null);
     }
 
-    private BlockState getState(World world, BlockPos pos, @Nullable BlockState oldState) {
+    private BlockState getState(Level world, BlockPos pos, @Nullable BlockState oldState) {
         FluidState fluidState = world.getFluidState(pos);
         boolean hasData = false;
         if (oldState != null && oldState.getBlock() == this) {
@@ -270,7 +275,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
                 .setValue(WATERLOGGED, fluidState.is(FluidTags.WATER) && fluidState.getAmount() == 8);
     }
 
-    public boolean isConnected(IWorldReader world, BlockPos pos, Direction facing) {
+    public boolean isConnected(LevelAccessor world, BlockPos pos, Direction facing) {
         PipeTileEntity pipe = getTileEntity(world, pos);
         PipeTileEntity other = getTileEntity(world, pos.relative(facing));
 
@@ -285,16 +290,16 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         return canSideConnect;
     }
 
-    public boolean isAbleToConnect(IWorldReader world, BlockPos pos, Direction facing) {
+    public boolean isAbleToConnect(LevelAccessor world, BlockPos pos, Direction facing) {
         return isPipe(world, pos, facing) || canConnectTo(world, pos, facing);
     }
 
-    public abstract boolean canConnectTo(IWorldReader world, BlockPos pos, Direction facing);
+    public abstract boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing);
 
-    public abstract boolean isPipe(IWorldReader world, BlockPos pos, Direction facing);
+    public abstract boolean isPipe(LevelAccessor world, BlockPos pos, Direction facing);
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
         if (stateIn.getValue(WATERLOGGED)) {
             worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
         }
@@ -302,7 +307,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos pos1, boolean b) {
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos pos1, boolean b) {
         super.neighborChanged(state, world, pos, block, pos1, b);
         BlockState newState = getState(world, pos, state);
         if (!state.getProperties().stream().allMatch(property -> state.getValue(property).equals(newState.getValue(property)))) {
@@ -312,28 +317,28 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, HAS_DATA, WATERLOGGED);
     }
 
-    public static final VoxelShape SHAPE_NORTH = Block.box(5D, 5D, 5D, 11D, 11D, 0D);
+    public static final VoxelShape SHAPE_NORTH = Block.box(5D, 5D, 0D, 11D, 11D, 5D);
     public static final VoxelShape SHAPE_SOUTH = Block.box(5D, 5D, 11D, 11D, 11D, 16D);
     public static final VoxelShape SHAPE_EAST = Block.box(11D, 5D, 5D, 16D, 11D, 11D);
-    public static final VoxelShape SHAPE_WEST = Block.box(5D, 5D, 5D, 0D, 11D, 11D);
+    public static final VoxelShape SHAPE_WEST = Block.box(0D, 5D, 5D, 5D, 11D, 11D);
     public static final VoxelShape SHAPE_UP = Block.box(5D, 11D, 5D, 11D, 16D, 11D);
-    public static final VoxelShape SHAPE_DOWN = Block.box(5D, 5D, 5D, 11D, 0D, 11D);
+    public static final VoxelShape SHAPE_DOWN = Block.box(5D, 0D, 5D, 11D, 5D, 11D);
     public static final VoxelShape SHAPE_CORE = Block.box(5D, 5D, 5D, 11D, 11D, 11D);
-    public static final VoxelShape SHAPE_EXTRACT_NORTH = VoxelUtils.combine(SHAPE_NORTH, Block.box(4D, 4D, 1D, 12D, 12D, 0D));
+    public static final VoxelShape SHAPE_EXTRACT_NORTH = VoxelUtils.combine(SHAPE_NORTH, Block.box(4D, 4D, 0D, 12D, 12D, 1D));
     public static final VoxelShape SHAPE_EXTRACT_SOUTH = VoxelUtils.combine(SHAPE_SOUTH, Block.box(4D, 4D, 15D, 12D, 12D, 16D));
     public static final VoxelShape SHAPE_EXTRACT_EAST = VoxelUtils.combine(SHAPE_EAST, Block.box(15D, 4D, 4D, 16D, 12D, 12D));
-    public static final VoxelShape SHAPE_EXTRACT_WEST = VoxelUtils.combine(SHAPE_WEST, Block.box(1D, 4D, 4D, 0D, 12D, 12D));
+    public static final VoxelShape SHAPE_EXTRACT_WEST = VoxelUtils.combine(SHAPE_WEST, Block.box(0D, 4D, 4D, 1D, 12D, 12D));
     public static final VoxelShape SHAPE_EXTRACT_UP = VoxelUtils.combine(SHAPE_UP, Block.box(4D, 15D, 4D, 12D, 16D, 12D));
-    public static final VoxelShape SHAPE_EXTRACT_DOWN = VoxelUtils.combine(SHAPE_DOWN, Block.box(4D, 1D, 4D, 12D, 0D, 12D));
+    public static final VoxelShape SHAPE_EXTRACT_DOWN = VoxelUtils.combine(SHAPE_DOWN, Block.box(4D, 0D, 4D, 12D, 1D, 12D));
 
-    public VoxelShape getShape(IBlockReader blockReader, BlockPos pos, BlockState state, boolean advanced) {
+    public VoxelShape getShape(BlockGetter blockReader, BlockPos pos, BlockState state, boolean advanced) {
         PipeTileEntity pipe = null;
-        if (advanced && blockReader instanceof IWorldReader) {
-            pipe = getTileEntity((IWorldReader) blockReader, pos);
+        if (advanced && blockReader instanceof LevelAccessor) {
+            pipe = getTileEntity((LevelAccessor) blockReader, pos);
         }
 
         VoxelShape shape = SHAPE_CORE;
@@ -383,11 +388,10 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        if (context instanceof EntitySelectionContext) {
-            EntitySelectionContext ctx = (EntitySelectionContext) context;
-            if (ctx.getEntity() instanceof PlayerEntity) {
-                PlayerEntity player = (PlayerEntity) ctx.getEntity();
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+        if (context instanceof EntityCollisionContext) {
+            EntityCollisionContext ctx = (EntityCollisionContext) context;
+            if (ctx.getEntity().orElse(null) instanceof Player player) {
                 if (player.level.isClientSide) {
                     return getSelectionShape(state, worldIn, pos, player);
                 }
@@ -396,7 +400,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         return getShape(worldIn, pos, state, true);
     }
 
-    public VoxelShape getSelectionShape(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
+    public VoxelShape getSelectionShape(BlockState state, BlockGetter world, BlockPos pos, Player player) {
         Pair<Direction, VoxelShape> selection = getSelection(state, world, pos, player);
 
         if (selection.getKey() == null) {
@@ -430,9 +434,9 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             new Pair<>(SHAPE_EXTRACT_DOWN, Direction.DOWN)
     );
 
-    public Pair<Direction, VoxelShape> getSelection(BlockState state, IBlockReader blockReader, BlockPos pos, PlayerEntity player) {
-        Vector3d start = player.getEyePosition(1F);
-        Vector3d end = start.add(player.getLookAngle().normalize().scale(getBlockReachDistance(player)));
+    public Pair<Direction, VoxelShape> getSelection(BlockState state, BlockGetter blockReader, BlockPos pos, Player player) {
+        Vec3 start = player.getEyePosition(1F);
+        Vec3 end = start.add(player.getLookAngle().normalize().scale(getBlockReachDistance(player)));
 
         Direction direction = null;
         VoxelShape selection = null;
@@ -443,11 +447,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
             shortest = d;
         }
 
-        if (!(blockReader instanceof IWorldReader)) {
+        if (!(blockReader instanceof LevelAccessor)) {
             return new Pair<>(direction, selection);
         }
 
-        PipeTileEntity pipe = getTileEntity((IWorldReader) blockReader, pos);
+        PipeTileEntity pipe = getTileEntity((LevelAccessor) blockReader, pos);
 
         for (int i = 0; i < Direction.values().length; i++) {
             Pair<VoxelShape, Direction> extract = EXTRACT_SHAPES.get(i);
@@ -471,27 +475,27 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
         return new Pair<>(direction, selection);
     }
 
-    public float getBlockReachDistance(PlayerEntity player) {
+    public float getBlockReachDistance(Player player) {
         float distance = (float) player.getAttribute(net.minecraftforge.common.ForgeMod.REACH_DISTANCE.get()).getValue();
         return player.isCreative() ? distance : distance - 0.5F;
     }
 
-    private double checkShape(BlockState state, IBlockReader world, BlockPos pos, Vector3d start, Vector3d end, VoxelShape shape, BooleanProperty direction) {
+    private double checkShape(BlockState state, BlockGetter world, BlockPos pos, Vec3 start, Vec3 end, VoxelShape shape, BooleanProperty direction) {
         if (direction != null && !state.getValue(direction)) {
             return Double.MAX_VALUE;
         }
-        BlockRayTraceResult blockRayTraceResult = world.clipWithInteractionOverride(start, end, pos, shape, state);
+        BlockHitResult blockRayTraceResult = world.clipWithInteractionOverride(start, end, pos, shape, state);
         if (blockRayTraceResult == null) {
             return Double.MAX_VALUE;
         }
         return blockRayTraceResult.getLocation().distanceTo(start);
     }
 
-    private double checkShape(BlockState state, IBlockReader world, BlockPos pos, Vector3d start, Vector3d end, VoxelShape shape, @Nullable PipeTileEntity pipe, Direction side) {
+    private double checkShape(BlockState state, BlockGetter world, BlockPos pos, Vec3 start, Vec3 end, VoxelShape shape, @Nullable PipeTileEntity pipe, Direction side) {
         if (pipe != null && !pipe.isExtracting(side)) {
             return Double.MAX_VALUE;
         }
-        BlockRayTraceResult blockRayTraceResult = world.clipWithInteractionOverride(start, end, pos, shape, state);
+        BlockHitResult blockRayTraceResult = world.clipWithInteractionOverride(start, end, pos, shape, state);
         if (blockRayTraceResult == null) {
             return Double.MAX_VALUE;
         }
@@ -499,7 +503,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Override
-    public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.is(newState.getBlock())) {
             if (!newState.getValue(HAS_DATA)) {
                 worldIn.removeBlockEntity(pos);
@@ -510,27 +514,27 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Override
-    public VoxelShape getOcclusionShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter worldIn, BlockPos pos) {
         return getShape(worldIn, pos, state, false);
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getVisualShape(BlockState state, BlockGetter reader, BlockPos pos, CollisionContext context) {
         return getShape(reader, pos, state, false);
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return getShape(worldIn, pos, state, false);
     }
 
     @Override
-    public VoxelShape getBlockSupportShape(BlockState state, IBlockReader reader, BlockPos pos) {
+    public VoxelShape getBlockSupportShape(BlockState state, BlockGetter reader, BlockPos pos) {
         return getShape(reader, pos, state, false);
     }
 
     @Override
-    public VoxelShape getInteractionShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public VoxelShape getInteractionShape(BlockState state, BlockGetter worldIn, BlockPos pos) {
         return getShape(worldIn, pos, state, false);
     }
 
@@ -540,31 +544,20 @@ public abstract class PipeBlock extends Block implements IItemBlock, IWaterLogga
     }
 
     @Override
-    public BlockRenderType getRenderShape(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Nullable
     @Override
-    public TileEntity newBlockEntity(IBlockReader worldIn) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         if (state.getValue(HAS_DATA)) {
-            return createTileEntity();
+            return createTileEntity(pos, state);
         } else {
             return null;
         }
     }
 
-    abstract TileEntity createTileEntity();
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return state.getValue(HAS_DATA);
-    }
+    abstract BlockEntity createTileEntity(BlockPos pos, BlockState state);
 
 }

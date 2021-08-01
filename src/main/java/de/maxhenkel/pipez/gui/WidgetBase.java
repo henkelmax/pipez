@@ -1,9 +1,9 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.components.Button;
 
 public abstract class WidgetBase {
 
@@ -29,11 +29,11 @@ public abstract class WidgetBase {
 
     }
 
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void drawGuiContainerForegroundLayer(PoseStack matrixStack, int mouseX, int mouseY) {
 
     }
 
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
 
     }
 
@@ -50,7 +50,7 @@ public abstract class WidgetBase {
     }
 
     protected void addButton(Button widget) {
-        screen.addButton(widget);
+        screen.addRenderableWidget(widget);
     }
 
     public ExtractContainer getContainer() {
