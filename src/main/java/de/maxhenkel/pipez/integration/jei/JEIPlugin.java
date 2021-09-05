@@ -3,10 +3,11 @@ package de.maxhenkel.pipez.integration.jei;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.gui.ExtractScreen;
 import mezz.jei.api.IModPlugin;
+import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
-@mezz.jei.api.JeiPlugin
+@JeiPlugin
 public class JEIPlugin implements IModPlugin {
 
     @Override
