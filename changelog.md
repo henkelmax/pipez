@@ -1,1 +1,1 @@
-- Fixed extractors not working with resource packs
+- Fixed capabilities not invalidated
