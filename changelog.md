@@ -1,1 +1,1 @@
-- Re added JEI integration
+- Fixed capabilities not invalidated

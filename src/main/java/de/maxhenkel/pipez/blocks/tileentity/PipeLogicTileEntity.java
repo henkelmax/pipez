@@ -5,6 +5,7 @@ import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
+import de.maxhenkel.pipez.utils.DirectionalLazyOptionalCache;
 import de.maxhenkel.pipez.utils.DummyFluidHandler;
 import de.maxhenkel.pipez.utils.DummyItemHandler;
 import de.maxhenkel.pipez.utils.PipeEnergyStorage;
@@ -26,13 +27,17 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     protected PipeType<?>[] types;
     protected final int[][] rrIndex;
-    protected CachedMap<Direction, PipeEnergyStorage> energyCache;
+    protected DirectionalLazyOptionalCache<PipeEnergyStorage> energyCache;
+    protected DirectionalLazyOptionalCache<DummyFluidHandler> fluidCache;
+    protected DirectionalLazyOptionalCache<DummyItemHandler> itemCache;
 
     public PipeLogicTileEntity(BlockEntityType<?> tileEntityTypeIn, PipeType<?>[] types, BlockPos pos, BlockState state) {
         super(tileEntityTypeIn, pos, state);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
-        energyCache = new CachedMap<>();
+        energyCache = new DirectionalLazyOptionalCache<>();
+        fluidCache = new DirectionalLazyOptionalCache<>();
+        itemCache = new DirectionalLazyOptionalCache<>();
     }
 
     @Nonnull
@@ -43,16 +48,16 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         }
 
         if (cap == CapabilityEnergy.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
-            if (side != null && isExtracting(side)) {
-                return LazyOptional.of(() -> energyCache.get(side, () -> new PipeEnergyStorage(this, side))).cast();
+            if (side != null) {
+                return energyCache.get(side).cast();
             }
         } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && hasType(FluidPipeType.INSTANCE)) {
-            if (side == null || isExtracting(side)) {
-                return LazyOptional.of(() -> DummyFluidHandler.INSTANCE).cast();
+            if (side == null) {
+                return fluidCache.get(side).cast();
             }
         } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && hasType(ItemPipeType.INSTANCE)) {
-            if (side == null || isExtracting(side)) {
-                return LazyOptional.of(() -> DummyItemHandler.INSTANCE).cast();
+            if (side == null) {
+                return itemCache.get(side).cast();
             }
         }
 
@@ -136,12 +141,46 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         if (hasType(EnergyPipeType.INSTANCE)) {
             for (Direction side : Direction.values()) {
                 if (isExtracting(side)) {
-                    PipeEnergyStorage energyStorage = energyCache.get(side, () -> new PipeEnergyStorage(this, side));
-                    energyStorage.tick();
+                    energyCache.get(side).ifPresent(PipeEnergyStorage::tick);
                 }
             }
-
         }
+    }
+
+    @Override
+    public void setExtracting(Direction side, boolean extracting) {
+        super.setExtracting(side, extracting);
+        if (hasType(EnergyPipeType.INSTANCE)) {
+            energyCache.revalidate(side, s -> extracting, (s) -> new PipeEnergyStorage(this, s));
+        }
+        if (hasType(FluidPipeType.INSTANCE)) {
+            fluidCache.revalidate(side, s -> extracting, (s) -> DummyFluidHandler.INSTANCE);
+        }
+        if (hasType(ItemPipeType.INSTANCE)) {
+            itemCache.revalidate(side, s -> extracting, (s) -> DummyItemHandler.INSTANCE);
+        }
+    }
+
+    @Override
+    public void load(CompoundTag compound) {
+        super.load(compound);
+        if (hasType(EnergyPipeType.INSTANCE)) {
+            energyCache.revalidate(this::isExtracting, (s) -> new PipeEnergyStorage(this, s));
+        }
+        if (hasType(FluidPipeType.INSTANCE)) {
+            fluidCache.revalidate(this::isExtracting, (s) -> DummyFluidHandler.INSTANCE);
+        }
+        if (hasType(ItemPipeType.INSTANCE)) {
+            itemCache.revalidate(this::isExtracting, (s) -> DummyItemHandler.INSTANCE);
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        energyCache.invalidate();
+        fluidCache.invalidate();
+        itemCache.invalidate();
+        super.setRemoved();
     }
 
     @Override
