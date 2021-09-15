@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
-import de.maxhenkel.corelib.CachedMap;
 import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
@@ -11,6 +10,7 @@ import de.maxhenkel.pipez.utils.DummyItemHandler;
 import de.maxhenkel.pipez.utils.PipeEnergyStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;

@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.utils;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.HashMap;
