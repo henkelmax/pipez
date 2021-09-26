@@ -52,11 +52,11 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
                 return energyCache.get(side).cast();
             }
         } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && hasType(FluidPipeType.INSTANCE)) {
-            if (side == null) {
+            if (side != null) {
                 return fluidCache.get(side).cast();
             }
         } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && hasType(ItemPipeType.INSTANCE)) {
-            if (side == null) {
+            if (side != null) {
                 return itemCache.get(side).cast();
             }
         }
