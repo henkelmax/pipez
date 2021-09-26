@@ -1,1 +1,1 @@
-- Fixed capabilities not invalidated
+- Fixed null pointer exception
