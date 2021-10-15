@@ -1,1 +1,1 @@
-- Fixed null pointer exception
+- Fixed GUI textures
