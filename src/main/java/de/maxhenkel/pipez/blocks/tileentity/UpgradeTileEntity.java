@@ -113,12 +113,6 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         }
     }
 
-    @Override
-    public void setRemoved() {
-        Containers.dropContents(level, worldPosition, upgradeInventory);
-        super.setRemoved();
-    }
-
     public Container getUpgradeInventory() {
         return inventory;
     }

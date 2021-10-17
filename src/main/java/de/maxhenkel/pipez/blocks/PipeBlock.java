@@ -13,6 +13,7 @@ import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -199,6 +200,9 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public void setHasData(Level world, BlockPos pos, boolean hasData) {
         BlockState blockState = world.getBlockState(pos);
         world.setBlockAndUpdate(pos, blockState.setValue(HAS_DATA, hasData));
+        if (!hasData) {
+//            world.removeBlockEntity(pos);
+        }
     }
 
     public void setExtracting(Level world, BlockPos pos, Direction side, boolean extracting) {
@@ -503,13 +507,17 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.is(newState.getBlock())) {
             if (!newState.getValue(HAS_DATA)) {
-                worldIn.removeBlockEntity(pos);
+                level.removeBlockEntity(pos);
             }
         } else {
-            super.onRemove(state, worldIn, pos, newState, isMoving);
+            BlockEntity blockentity = level.getBlockEntity(pos);
+            if (blockentity instanceof UpgradeTileEntity upgrade) {
+                Containers.dropContents(level, pos, upgrade.getUpgradeInventory());
+            }
+            super.onRemove(state, level, pos, newState, isMoving);
         }
     }
 

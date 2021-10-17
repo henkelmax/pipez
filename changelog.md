@@ -1,1 +1,1 @@
-- Fixed GUI textures
+- Fixed upgrades duplicating
