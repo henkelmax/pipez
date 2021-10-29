@@ -1,1 +1,1 @@
-- Fixed GUI textures
+- Fixed filter NBT data not applied correctly
