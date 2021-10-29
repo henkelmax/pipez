@@ -123,13 +123,13 @@ public class FilterList extends WidgetBase {
         if (o instanceof Item) {
             ItemStack stack = new ItemStack((Item) o);
             if (filter.getMetadata() != null) {
-                stack.setTag(filter.getMetadata());
+                stack.setTag(filter.getMetadata().copy());
             }
             return new WrappedItemStack(stack);
         } else if (o instanceof Fluid) {
             FluidStack stack = new FluidStack((Fluid) o, 1000);
             if (filter.getMetadata() != null) {
-                stack.setTag(filter.getMetadata());
+                stack.setTag(filter.getMetadata().copy());
             }
             return new WrappedFluidStack(stack);
         }

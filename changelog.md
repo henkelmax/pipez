@@ -1,1 +1,1 @@
-- Fixed upgrades duplicating
+- Fixed filter NBT data not applied correctly
