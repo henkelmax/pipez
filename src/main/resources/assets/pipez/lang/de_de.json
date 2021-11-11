@@ -42,7 +42,7 @@
   "tooltip.pipez.filter.unknown_block": "Unbekannter Block",
   "tooltip.pipez.filter.destination_location": "Bei X=%s, Y=%s, Z=%s",
   "tooltip.pipez.filter.destination_distance": "%s Blöcke entfernt",
-  "tooltip.pipez.filter.destination_side": "Zugewandt %s",
+  "tooltip.pipez.filter.destination_side": "Orientierung %s",
   "tooltip.pipez.upgrade.configured": "Eingestellt für %s",
   "tooltip.pipez.upgrade.configured.item": "Items",
   "tooltip.pipez.upgrade.configured.energy": "Energie",
