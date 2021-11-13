@@ -32,7 +32,7 @@
   "tooltip.pipez.filter.nbt_string.description": "NBT Daten",
   "tooltip.pipez.filter.nbt_string.no_nbt": "Dieser Typ kann keine NBT Tags haben",
   "tooltip.pipez.filter.nbt.exact": "Genaue Übereinstimmung der Tags",
-  "tooltip.pipez.filter.nbt.not_exact": "Nur bereitgestellte Tags abgleichen ",
+  "tooltip.pipez.filter.nbt.not_exact": "Nur bereitgestellte Tags abgleichen",
   "tooltip.pipez.filter.not_inverted": "Regulär",
   "tooltip.pipez.filter.inverted": "Invertiert",
   "tooltip.pipez.filter_destination_tool": "Klicke auf einen Block, um das Ziel festzulegen",
