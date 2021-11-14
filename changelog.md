@@ -1,1 +1,1 @@
-- Fixed filter NBT data not applied correctly
+- Added german translation
