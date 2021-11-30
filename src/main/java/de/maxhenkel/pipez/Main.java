@@ -6,7 +6,7 @@ import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
 import de.maxhenkel.pipez.events.StitchEvents;
 import de.maxhenkel.pipez.gui.Containers;
-import de.maxhenkel.pipez.integration.IMC;
+//import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
@@ -25,7 +25,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,7 +49,7 @@ public class Main {
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(MenuType.class, Containers::registerContainers);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(RecipeSerializer.class, ModRecipes::registerRecipes);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
+//        FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ModTagProviders::gatherData);
 
         SERVER_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.SERVER, ServerConfig.class);

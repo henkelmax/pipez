@@ -7,7 +7,7 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ForgeModelBakery;
 
 public class ModelRegistry {
 
@@ -24,8 +24,8 @@ public class ModelRegistry {
         Model(String name) {
             resource = new ResourceLocation(Main.MODID, name);
             cachedModel = new CachedValue<>(() -> {
-                UnbakedModel modelOrMissing = ModelLoader.instance().getModelOrMissing(resource);
-                return modelOrMissing.bake(ModelLoader.instance(), ModelLoader.instance().getSpriteMap()::getSprite, BlockModelRotation.X0_Y0, resource);
+                UnbakedModel modelOrMissing = ForgeModelBakery.instance().getModelOrMissing(resource);
+                return modelOrMissing.bake(ForgeModelBakery.instance(), ForgeModelBakery.instance().getSpriteMap()::getSprite, BlockModelRotation.X0_Y0, resource);
             });
         }
 
@@ -40,7 +40,7 @@ public class ModelRegistry {
 
     public static void onModelRegister(ModelRegistryEvent event) {
         for (Model model : Model.values()) {
-            ModelLoader.instance().addSpecialModel(model.getResourceLocation());
+            ForgeModelBakery.instance().addSpecialModel(model.getResourceLocation());
         }
     }
 

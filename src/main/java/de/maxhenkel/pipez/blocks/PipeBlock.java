@@ -305,7 +305,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     @Override
     public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
         if (stateIn.getValue(WATERLOGGED)) {
-            worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+            worldIn.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
         }
         return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
     }
@@ -395,7 +395,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (context instanceof EntityCollisionContext) {
             EntityCollisionContext ctx = (EntityCollisionContext) context;
-            if (ctx.getEntity().orElse(null) instanceof Player player) {
+            if (ctx.getEntity() instanceof Player player) {
                 if (player.level.isClientSide) {
                     return getSelectionShape(state, worldIn, pos, player);
                 }

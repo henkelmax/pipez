@@ -5,6 +5,7 @@ import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.ModItemGroups;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
@@ -14,7 +15,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -46,7 +46,7 @@ public class FilterDestinationToolItem extends Item {
             return null;
         }
         CompoundTag tag = stack.getTag();
-        if (!tag.contains("Destination", Constants.NBT.TAG_COMPOUND)) {
+        if (!tag.contains("Destination", Tag.TAG_COMPOUND)) {
             return null;
         }
         DirectionalPosition dest = new DirectionalPosition();

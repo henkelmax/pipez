@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.fmllegacy.network.IContainerFactory;
+import net.minecraftforge.network.IContainerFactory;
 
 public class PipeContainerFactory<T extends AbstractContainerMenu, U extends UpgradeTileEntity> implements IContainerFactory<T> {
 

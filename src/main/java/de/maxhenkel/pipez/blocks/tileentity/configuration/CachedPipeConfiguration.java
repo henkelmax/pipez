@@ -6,7 +6,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public abstract class CachedPipeConfiguration<T> {
             return putDefault(pipeType, map);
         }
         CompoundTag tag = stack.getTag();
-        if (!tag.contains(pipeType.getKey(), Constants.NBT.TAG_COMPOUND)) {
+        if (!tag.contains(pipeType.getKey(), Tag.TAG_COMPOUND)) {
             return putDefault(pipeType, map);
         }
 
@@ -87,7 +86,7 @@ public abstract class CachedPipeConfiguration<T> {
         CompoundTag tag = stack.getOrCreateTag();
 
         CompoundTag compound;
-        if (tag.contains(pipeType.getKey(), Constants.NBT.TAG_COMPOUND)) {
+        if (tag.contains(pipeType.getKey(), Tag.TAG_COMPOUND)) {
             compound = tag.getCompound(pipeType.getKey());
         } else {
             compound = new CompoundTag();

@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.22', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: 'de.maxhenkel.forge-update', name: 'forge-update', version: '1.0.4'
     }
 }
@@ -31,7 +31,7 @@ version = mod_version
 group = mod_packagename
 archivesBaseName = mod_id
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
     mappings channel: 'official', version: mod_minecraft_version
@@ -103,8 +103,8 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
+//    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
+//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
 //    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}:api")
 //    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}")
@@ -115,9 +115,9 @@ dependencies {
 //    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 //    shadow fg.deobf("mekanism:Mekanism:${mekanism_version}:api")
 
-    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")
+//    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")
 
-    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+//    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
@@ -167,7 +167,7 @@ curseforge {
         releaseType = curse_release_type
         addGameVersion mod_minecraft_version
         addGameVersion 'Forge'
-        addGameVersion 'Java 16'
+        addGameVersion 'Java 17'
         mainArtifact(jar) {
             displayName = "[${mod_minecraft_version}] ${mod_name} ${mod_version}"
         }
@@ -258,6 +258,8 @@ sourceSets {
             exclude 'de/maxhenkel/pipez/blocks/tileentity/GasPipeTileEntity.java'
             exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
             exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
+
+            exclude 'de/maxhenkel/pipez/integration/*/**'
         }
         resources {
             // TODO add back Mekanism

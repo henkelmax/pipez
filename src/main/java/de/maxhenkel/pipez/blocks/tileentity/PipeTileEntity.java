@@ -8,13 +8,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -234,7 +234,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     public void load(CompoundTag compound) {
         super.load(compound);
         extractingSides = new boolean[Direction.values().length];
-        ListTag extractingList = compound.getList("ExtractingSides", Constants.NBT.TAG_BYTE);
+        ListTag extractingList = compound.getList("ExtractingSides", Tag.TAG_BYTE);
         if (extractingList.size() >= extractingSides.length) {
             for (int i = 0; i < extractingSides.length; i++) {
                 ByteTag b = (ByteTag) extractingList.get(i);
@@ -243,7 +243,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         }
 
         disconnectedSides = new boolean[Direction.values().length];
-        ListTag disconnectedList = compound.getList("DisconnectedSides", Constants.NBT.TAG_BYTE);
+        ListTag disconnectedList = compound.getList("DisconnectedSides", Tag.TAG_BYTE);
         if (disconnectedList.size() >= disconnectedSides.length) {
             for (int i = 0; i < disconnectedSides.length; i++) {
                 ByteTag b = (ByteTag) disconnectedList.get(i);
@@ -271,7 +271,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return new ClientboundBlockEntityDataPacket(worldPosition, 1, getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
     }
 
     @Override

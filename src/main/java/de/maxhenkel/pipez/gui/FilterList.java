@@ -87,7 +87,7 @@ public class FilterList extends WidgetBase {
                     if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                         tooltip.add(new TranslatableComponent("tooltip.pipez.filter.accepts_tag", new TextComponent(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                     }
-                    screen.renderToolTip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
+                    screen.renderTooltip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
                 }
             } else if (blockHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 if (filter.getDestination() != null) {
@@ -102,7 +102,7 @@ public class FilterList extends WidgetBase {
                     tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
                     tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
                     tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination_side", new TranslatableComponent("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
-                    screen.renderToolTip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
+                    screen.renderTooltip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
                 }
             }
         }
@@ -213,7 +213,7 @@ public class FilterList extends WidgetBase {
             BlockState state = null;
             if (mc.level.isAreaLoaded(destination.getPos(), 1)) {
                 state = mc.level.getBlockState(destination.getPos());
-                ItemStack pickBlock = state.getBlock().getPickBlock(state, new BlockHitResult(new Vec3(destination.getPos().getX() + 0.5D, destination.getPos().getY() + 0.5D, destination.getPos().getZ() + 0.5D), destination.getDirection(), destination.getPos(), true), mc.level, destination.getPos(), mc.player);
+                ItemStack pickBlock = state.getBlock().getCloneItemStack(state, new BlockHitResult(new Vec3(destination.getPos().getX() + 0.5D, destination.getPos().getY() + 0.5D, destination.getPos().getZ() + 0.5D), destination.getDirection(), destination.getPos(), true), mc.level, destination.getPos(), mc.player);
                 if (pickBlock != null && !pickBlock.isEmpty()) {
                     stack = pickBlock;
                 }
