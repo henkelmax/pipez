@@ -13,13 +13,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
         CompoundTag compound = blockAccessor.getServerData();
-        if (compound.contains("Upgrade", Constants.NBT.TAG_STRING)) {
+        if (compound.contains("Upgrade", Tag.TAG_STRING)) {
             iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade")));
         }
         iTooltip.addAll(getTooltips(compound));
@@ -83,10 +83,10 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
 
     public List<Component> getTooltips(CompoundTag compound) {
         List<Component> tooltips = new ArrayList<>();
-        if (!compound.contains("Tooltips", Constants.NBT.TAG_LIST)) {
+        if (!compound.contains("Tooltips", Tag.TAG_LIST)) {
             return tooltips;
         }
-        ListTag list = compound.getList("Tooltips", Constants.NBT.TAG_STRING);
+        ListTag list = compound.getList("Tooltips", Tag.TAG_STRING);
         for (int i = 0; i < list.size(); i++) {
             tooltips.add(Component.Serializer.fromJson(list.getString(i)));
         }

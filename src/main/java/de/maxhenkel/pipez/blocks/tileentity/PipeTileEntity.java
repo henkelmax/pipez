@@ -9,6 +9,8 @@ import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -254,7 +256,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
+    protected void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
+
         ListTag extractingList = new ListTag();
         for (boolean extractingSide : extractingSides) {
             extractingList.add(ByteTag.valueOf(extractingSide));
@@ -266,12 +270,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             disconnectedList.add(ByteTag.valueOf(disconnected));
         }
         compound.put("DisconnectedSides", disconnectedList);
-        return super.save(compound);
     }
 
     @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
@@ -281,7 +284,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
     @Override
     public CompoundTag getUpdateTag() {
-        return save(new CompoundTag());
+        CompoundTag updateTag = new CompoundTag();
+        saveAdditional(updateTag);
+        return updateTag;
     }
 
     public static class Connection {

@@ -117,7 +117,7 @@ dependencies {
 
 //    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")
 
-//    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
@@ -170,6 +170,9 @@ curseforge {
         addGameVersion 'Java 17'
         mainArtifact(jar) {
             displayName = "[${mod_minecraft_version}] ${mod_name} ${mod_version}"
+            relations {
+                optionalDependency 'jade'
+            }
         }
     }
 }
@@ -259,7 +262,9 @@ sourceSets {
             exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
             exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
 
-            exclude 'de/maxhenkel/pipez/integration/*/**'
+            exclude 'de/maxhenkel/pipez/integration/jei/*/**'
+            exclude 'de/maxhenkel/pipez/integration/theoneprobe/*/**'
+            exclude 'de/maxhenkel/pipez/integration/IMC.java'
         }
         resources {
             // TODO add back Mekanism

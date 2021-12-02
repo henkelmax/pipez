@@ -126,9 +126,10 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
+    protected void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
+
         ItemUtils.saveInventory(compound, "Upgrades", upgradeInventory);
-        return super.save(compound);
     }
 
     @Nullable
