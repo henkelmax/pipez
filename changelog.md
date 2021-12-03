@@ -1,1 +1,1 @@
-- Fixed blocks not saving
+- Added swedish translation
