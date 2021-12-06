@@ -1,1 +1,1 @@
-- Added swedish translation
+- Re added JEI and The One Probe integration

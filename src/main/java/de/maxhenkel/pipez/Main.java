@@ -6,7 +6,7 @@ import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
 import de.maxhenkel.pipez.events.StitchEvents;
 import de.maxhenkel.pipez.gui.Containers;
-//import de.maxhenkel.pipez.integration.IMC;
+import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
@@ -49,7 +49,7 @@ public class Main {
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(MenuType.class, Containers::registerContainers);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(RecipeSerializer.class, ModRecipes::registerRecipes);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-//        FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ModTagProviders::gatherData);
 
         SERVER_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.SERVER, ServerConfig.class);

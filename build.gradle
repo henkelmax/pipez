@@ -103,8 +103,8 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-//    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
-//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
 //    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}:api")
 //    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${theoneprobe_mc_version}:${theoneprobe_mc_version}-${theoneprobe_version}")
@@ -115,7 +115,7 @@ dependencies {
 //    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 //    shadow fg.deobf("mekanism:Mekanism:${mekanism_version}:api")
 
-//    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")
+    implementation fg.deobf("curse.maven:the-one-probe-245211:3550084")
 
     implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
@@ -171,6 +171,8 @@ curseforge {
         mainArtifact(jar) {
             displayName = "[${mod_minecraft_version}] ${mod_name} ${mod_version}"
             relations {
+                optionalDependency 'jei'
+                optionalDependency 'the-one-probe'
                 optionalDependency 'jade'
             }
         }
@@ -261,10 +263,6 @@ sourceSets {
             exclude 'de/maxhenkel/pipez/blocks/tileentity/GasPipeTileEntity.java'
             exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
             exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
-
-            exclude 'de/maxhenkel/pipez/integration/jei/*/**'
-            exclude 'de/maxhenkel/pipez/integration/theoneprobe/*/**'
-            exclude 'de/maxhenkel/pipez/integration/IMC.java'
         }
         resources {
             // TODO add back Mekanism
