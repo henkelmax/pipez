@@ -30,7 +30,7 @@ public class WrenchItem extends Item {
     }
 
     public static boolean isWrench(ItemStack stack) {
-        return ModItemTags.WRENCH_TAG.contains(stack.getItem()) || ModItemTags.WRENCHES_TAG.contains(stack.getItem());
+        return stack.is(ModItemTags.WRENCH_TAG) || stack.is(ModItemTags.WRENCHES_TAG);
     }
 
     public static boolean isHoldingWrench(Player player) {

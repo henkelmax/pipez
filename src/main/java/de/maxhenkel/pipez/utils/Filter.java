@@ -1,8 +1,8 @@
 package de.maxhenkel.pipez.utils;
 
+import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.tags.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
@@ -11,7 +11,7 @@ import java.util.UUID;
 public abstract class Filter<T> implements INBTSerializable<CompoundTag> {
 
     @Nullable
-    protected Tag.Named<T> tag;
+    protected Tag<T> tag;
     @Nullable
     protected CompoundTag metadata;
     protected boolean exactMetadata;
@@ -25,11 +25,11 @@ public abstract class Filter<T> implements INBTSerializable<CompoundTag> {
     }
 
     @Nullable
-    public Tag.Named<T> getTag() {
+    public Tag<T> getTag() {
         return tag;
     }
 
-    public void setTag(@Nullable Tag.Named<T> tag) {
+    public void setTag(@Nullable Tag<T> tag) {
         this.tag = tag;
     }
 

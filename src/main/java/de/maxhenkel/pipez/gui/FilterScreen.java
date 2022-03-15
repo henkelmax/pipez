@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.corelib.tag.TagUtils;
 import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
@@ -21,7 +22,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -211,7 +211,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (filter instanceof ItemFilter) {
-            Tag.Named tag = TagUtils.getItem(text, true);
+            Tag tag = TagUtils.getItem(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
                 item.setTextColor(ChatFormatting.DARK_RED.getColor());
@@ -219,7 +219,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
         } else if (filter instanceof FluidFilter) {
-            Tag.Named tag = TagUtils.getFluid(text, true);
+            Tag tag = TagUtils.getFluid(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
                 item.setTextColor(ChatFormatting.DARK_RED.getColor());

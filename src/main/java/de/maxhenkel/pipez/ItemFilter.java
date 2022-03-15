@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.corelib.tag.TagUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -48,11 +49,11 @@ public class ItemFilter extends Filter<Item> {
         if (compound.contains("Item", Tag.TAG_STRING)) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("Item")));
             if (item != null) {
-                tag = new SingleElementTag<>(item);
+                tag = new SingleElementTag<>(item.getRegistryName(), item);
             }
         }
         if (compound.contains("Tag", Tag.TAG_STRING)) {
-            tag = ItemTags.createOptional(new ResourceLocation(compound.getString("Tag")));
+            tag = TagUtils.getItemTag(new ResourceLocation(compound.getString("Tag")));
         }
 
         if (compound.contains("Metadata", Tag.TAG_COMPOUND)) {

@@ -9,6 +9,7 @@ import de.maxhenkel.corelib.helpers.WrappedFluidStack;
 import de.maxhenkel.corelib.helpers.WrappedItemStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
@@ -19,7 +20,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -31,6 +31,7 @@ import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -253,9 +254,9 @@ public class FilterList extends WidgetBase {
         matrixStack.popPose();
     }
 
-    public static <T> T get(Tag.Named<T> tag) {
+    public static <T> T get(Tag<T> tag) {
         long time = Minecraft.getInstance().level.getGameTime();
-        List<T> allElements = tag.getValues();
+        List<T> allElements = tag.getAll().stream().toList();
         return allElements.get((int) (time / 20L % allElements.size()));
     }
 

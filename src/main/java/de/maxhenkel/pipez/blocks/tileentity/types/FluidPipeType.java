@@ -171,11 +171,11 @@ public class FluidPipeType extends PipeType<Fluid> {
     private boolean matches(Filter<Fluid> filter, FluidStack stack) {
         CompoundTag metadata = filter.getMetadata();
         if (metadata == null) {
-            return filter.getTag() == null || stack.getFluid().is(filter.getTag());
+            return filter.getTag() == null || filter.getTag().contains(stack.getFluid());
         }
         if (filter.isExactMetadata()) {
             if (deepExactCompare(metadata, stack.getTag())) {
-                return filter.getTag() == null || stack.getFluid().is(filter.getTag());
+                return filter.getTag() == null || filter.getTag().contains(stack.getFluid());
             } else {
                 return false;
             }
@@ -187,7 +187,7 @@ public class FluidPipeType extends PipeType<Fluid> {
             if (!deepFuzzyCompare(metadata, stackNBT)) {
                 return false;
             }
-            return filter.getTag() == null || stack.getFluid().is(filter.getTag());
+            return filter.getTag() == null || filter.getTag().contains(stack.getFluid());
         }
     }
 

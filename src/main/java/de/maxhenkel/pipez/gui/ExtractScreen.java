@@ -291,7 +291,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         filter.setExactMetadata(true);
 
         if (filter instanceof ItemFilter) {
-            filter.setTag(new SingleElementTag(stack.getItem()));
+            filter.setTag(new SingleElementTag(stack.getItem().getRegistryName(), stack.getItem()));
             if (stack.hasTag()) {
                 filter.setMetadata(stack.getTag().copy());
             } else {
@@ -300,7 +300,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
-                filter.setTag(new SingleElementTag(s.getFluid()));
+                filter.setTag(new SingleElementTag(s.getFluid().getRegistryName(), s.getFluid()));
                 if (s.hasTag()) {
                     filter.setMetadata(s.getTag().copy());
                 } else {

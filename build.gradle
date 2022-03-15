@@ -115,7 +115,7 @@ dependencies {
 //    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 //    shadow fg.deobf("mekanism:Mekanism:${mekanism_version}:api")
 
-    implementation fg.deobf("curse.maven:the-one-probe-245211:3550084")
+    implementation fg.deobf("curse.maven:the-one-probe-245211:3671753")
 
     implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
