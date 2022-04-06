@@ -1,1 +1,1 @@
-- Added russian translation
+- Fixed recursion crash
