@@ -12,11 +12,14 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -71,6 +74,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                         if (!pipeTe.hasReasonToStay()) {
                             pipeBlock.setHasData(world, pos, false);
                         }
+                        pipeTe.syncData();
                     }
                 }
             }
@@ -277,14 +281,21 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @Override
-    public void onDataPacket(net.minecraft.network.Connection net, ClientboundBlockEntityDataPacket pkt) {
-        handleUpdateTag(pkt.getTag());
+    public void syncData(ServerPlayer player) {
+        player.connection.send(getUpdatePacket());
+    }
+
+    public void syncData() {
+        if (level == null || level.isClientSide) {
+            return;
+        }
+        LevelChunk chunk = level.getChunkAt(getBlockPos());
+        ((ServerChunkCache) level.getChunkSource()).chunkMap.getPlayers(chunk.getPos(), false).forEach(e -> e.connection.send(getUpdatePacket()));
     }
 
     @Override
     public CompoundTag getUpdateTag() {
-        CompoundTag updateTag = new CompoundTag();
+        CompoundTag updateTag = super.getUpdateTag();
         saveAdditional(updateTag);
         return updateTag;
     }

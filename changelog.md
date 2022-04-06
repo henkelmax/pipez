@@ -1,1 +1,1 @@
-- Updated to 1.18.2
+- Fixed breaking blocks next to extracting pipes causes visual desync
