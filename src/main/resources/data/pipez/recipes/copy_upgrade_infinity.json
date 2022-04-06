@@ -1,0 +1,23 @@
+{
+  "type": "pipez:copy_nbt",
+  "source": {
+    "tag": "pipez:upgrades"
+  },
+  "target": {
+    "item": "pipez:infinity_upgrade"
+  },
+  "tags": [
+    "Item.RedstoneMode",
+    "Energy.RedstoneMode",
+    "Fluid.RedstoneMode",
+    "Gas.RedstoneMode",
+    "Item.Distribution",
+    "Energy.Distribution",
+    "Fluid.Distribution",
+    "Gas.Distribution",
+    "Item.Filters",
+    "Energy.Filters",
+    "Fluid.Filters",
+    "Gas.Filters"
+  ]
+}
