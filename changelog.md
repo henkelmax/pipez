@@ -1,1 +1,1 @@
-- Fixed breaking blocks next to extracting pipes causes visual desync
+- Fixed recursion crash

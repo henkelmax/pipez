@@ -31,6 +31,8 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     protected DirectionalLazyOptionalCache<DummyFluidHandler> fluidCache;
     protected DirectionalLazyOptionalCache<DummyItemHandler> itemCache;
 
+    private int recursionDepth;
+
     public PipeLogicTileEntity(BlockEntityType<?> tileEntityTypeIn, PipeType<?>[] types, BlockPos pos, BlockState state) {
         super(tileEntityTypeIn, pos, state);
         this.types = types;
@@ -192,4 +194,17 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         }
         return false;
     }
+
+    public boolean pushRecursion() {
+        if (recursionDepth >= 1) {
+            return true;
+        }
+        recursionDepth++;
+        return false;
+    }
+
+    public void popRecursion() {
+        recursionDepth--;
+    }
+
 }

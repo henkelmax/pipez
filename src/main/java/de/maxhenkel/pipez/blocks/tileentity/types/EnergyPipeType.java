@@ -150,6 +150,9 @@ public class EnergyPipeType extends PipeType<Void> {
         if (connections.isEmpty() || maxReceive <= 0) {
             return 0;
         }
+        if (tileEntity.pushRecursion()) {
+            return 0;
+        }
         int actuallyTransferred = 0;
         int energyToTransfer = maxReceive;
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
@@ -183,7 +186,7 @@ public class EnergyPipeType extends PipeType<Void> {
         if (!simulate) {
             tileEntity.setRoundRobinIndex(side, this, p);
         }
-
+        tileEntity.popRecursion();
         return actuallyTransferred;
     }
 
@@ -208,6 +211,9 @@ public class EnergyPipeType extends PipeType<Void> {
     }
 
     protected int receiveOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, int maxReceive, boolean simulate) {
+        if (tileEntity.pushRecursion()) {
+            return 0;
+        }
         int actuallyTransferred = 0;
         int energyToTransfer = maxReceive;
 
@@ -224,6 +230,7 @@ public class EnergyPipeType extends PipeType<Void> {
             energyToTransfer -= extracted;
             actuallyTransferred += extracted;
         }
+        tileEntity.popRecursion();
         return actuallyTransferred;
     }
 
