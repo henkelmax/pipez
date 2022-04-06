@@ -9,10 +9,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
@@ -90,10 +93,10 @@ public class CopyNbtRecipe extends SpecialRecipe {
         } else if (result.getValue().size() == 1) {
             ItemStack stack = result.getValue().get(0).copy();
             stack.setCount(1);
-            CompoundTag tag = result.getKey().getTag();
-            CompoundTag copy = new CompoundTag();
+            CompoundNBT tag = result.getKey().getTag();
+            CompoundNBT copy = new CompoundNBT();
             for (String s : tags) {
-                Tag element = getPath(s, tag);
+                INBT element = getPath(s, tag);
                 if (element != null) {
                     setPath(s, copy, element);
                 }
@@ -106,11 +109,11 @@ public class CopyNbtRecipe extends SpecialRecipe {
     }
 
     @Nullable
-    private Tag getPath(String path, CompoundTag tag) {
+    private INBT getPath(String path, CompoundNBT tag) {
         String[] p = path.split("\\.");
-        CompoundTag c = tag;
+        CompoundNBT c = tag;
         for (int i = 0; i < p.length - 1; i++) {
-            if (c.contains(p[i], Tag.TAG_COMPOUND)) {
+            if (c.contains(p[i], Constants.NBT.TAG_COMPOUND)) {
                 c = c.getCompound(p[i]);
             } else {
                 return null;
@@ -119,14 +122,14 @@ public class CopyNbtRecipe extends SpecialRecipe {
         return c.get(p[p.length - 1]);
     }
 
-    private void setPath(String path, CompoundTag tag, Tag element) {
+    private void setPath(String path, CompoundNBT tag, INBT element) {
         String[] p = path.split("\\.");
-        CompoundTag c = tag;
+        CompoundNBT c = tag;
         for (int i = 0; i < p.length - 1; i++) {
-            if (c.contains(p[i], Tag.TAG_COMPOUND)) {
+            if (c.contains(p[i], Constants.NBT.TAG_COMPOUND)) {
                 c = c.getCompound(p[i]);
             } else {
-                CompoundTag newTag = new CompoundTag();
+                CompoundNBT newTag = new CompoundNBT();
                 c.put(p[i], newTag);
                 c = newTag;
             }
