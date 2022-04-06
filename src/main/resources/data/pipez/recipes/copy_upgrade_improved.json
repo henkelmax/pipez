@@ -1,0 +1,19 @@
+{
+  "type": "pipez:copy_nbt",
+  "source": {
+    "tag": "pipez:upgrades"
+  },
+  "target": {
+    "item": "pipez:improved_upgrade"
+  },
+  "tags": [
+    "Item.RedstoneMode",
+    "Energy.RedstoneMode",
+    "Fluid.RedstoneMode",
+    "Gas.RedstoneMode",
+    "Item.Distribution",
+    "Energy.Distribution",
+    "Fluid.Distribution",
+    "Gas.Distribution"
+  ]
+}
