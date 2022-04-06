@@ -24,6 +24,12 @@ description='''Simple and efficient pipes'''
     versionRange="[${mod_minecraft_version}]"
     ordering="NONE"
     side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="jei"
+    mandatory=false
+    versionRange="${jei_version_range}"
+    ordering="NONE"
+    side="BOTH"
 # [[dependencies.${mod_id}]]
 #     modId="mekanism"
 #     mandatory=false

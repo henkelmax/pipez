@@ -115,7 +115,7 @@ dependencies {
 //    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 //    shadow fg.deobf("mekanism:Mekanism:${mekanism_version}:api")
 
-    implementation fg.deobf("curse.maven:the-one-probe-245211:3671753")
+    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
 
     implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
@@ -147,7 +147,8 @@ processResources {
                 'mod_forge_version': mod_forge_version,
                 'mod_loader_version': mod_loader_version,
                 'mod_minecraft_version': mod_minecraft_version,
-                'mod_mekanism_version_range': mod_mekanism_version_range
+                'mod_mekanism_version_range': mod_mekanism_version_range,
+                'jei_version_range': jei_version_range
     }
 }
 
