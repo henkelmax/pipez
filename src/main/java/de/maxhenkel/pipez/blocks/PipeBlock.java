@@ -55,7 +55,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     protected PipeBlock() {
-        super(Block.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL));
+        super(Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL));
 
         registerDefaultState(stateDefinition.any()
                 .setValue(UP, false)
@@ -73,6 +73,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public Item toItem() {
         return new BlockItem(this, new Item.Properties().tab(ModItemGroups.TAB_PIPEZ)).setRegistryName(getRegistryName());
     }
+
+
 
     @Nullable
     @Override

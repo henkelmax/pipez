@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "pipez:energy_pipe",
+    "pipez:fluid_pipe",
+    "pipez:item_pipe",
+    "pipez:universal_pipe"
+  ]
+}

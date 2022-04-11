@@ -1,2 +1,1 @@
-- Fixed copy upgrade recipes
-- Fixed recursion crash
+- Fixed block breaking speeds
