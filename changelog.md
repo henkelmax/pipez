@@ -1,1 +1,1 @@
-- Fixed recursion crash
+- Added korean translation
