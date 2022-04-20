@@ -26,7 +26,7 @@
     "tooltip.pipez.filter_mode": "필터 모드: %s",
     "tooltip.pipez.filter_mode.whitelist": "화이트리스트",
     "tooltip.pipez.filter_mode.blacklist": "블랙리스트",
-    "tooltip.pipez.filter.not": "(제외)",
+    "tooltip.pipez.filter.not": "Not",
     "tooltip.pipez.filter.accepts_tag": "모든 %s",
     "tooltip.pipez.filter.item_tag.description": "태그는 접두사로 # 이나 아이템 ID를 가집니다.",
     "tooltip.pipez.filter.nbt_string.description": "NBT 데이터",
