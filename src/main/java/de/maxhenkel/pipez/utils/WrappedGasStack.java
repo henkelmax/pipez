@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.WrappedFluidStack;
 import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -18,6 +19,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,15 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
 
     public WrappedGasStack(GasStack stack) {
         super(stack);
+    }
+
+    @Nullable
+    public static WrappedGasStack dummyStack(Object o) {
+        if (o instanceof Gas) {
+            GasStack stack = new GasStack((Gas) o, 1000);
+            return new WrappedGasStack(stack);
+        }
+        return null;
     }
 
     @OnlyIn(Dist.CLIENT)

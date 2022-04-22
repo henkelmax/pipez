@@ -1,1 +1,2 @@
-- Added korean translation
+- Added back gas pipes
+- Re added Mekanism support

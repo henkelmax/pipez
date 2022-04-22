@@ -7,6 +7,8 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
+import de.maxhenkel.pipez.utils.GasUtils;
+import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -308,16 +310,14 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 }
                 Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
             });
-        }
-        // TODO add back Mekanism
-        /* else if (filter instanceof GasFilter) {
+        } else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
-                filter.setTag(new SingleElementTag(gas.getType()));
+                filter.setTag(new SingleElementTag(gas.getType().getRegistryName(), gas.getType()));
                 filter.setMetadata(null);
                 Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }
-        }*/
+        }
     }
 
     @Override

@@ -12,6 +12,8 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
+import de.maxhenkel.pipez.utils.GasUtils;
+import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -194,8 +196,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     private boolean hasNBT() {
-        // TODO add back Mekanism
-        return true/*!(filter instanceof GasFilter)*/;
+        return !(filter instanceof GasFilter);
     }
 
     @Override
@@ -226,17 +227,15 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
-        }
-        // TODO add back Mekanism
-        /* else if (filter instanceof GasFilter) {
-            Tag.Named tag = GasUtils.getGas(text, true);
+        } else if (filter instanceof GasFilter) {
+            Tag tag = GasUtils.getGas(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
                 item.setTextColor(ChatFormatting.DARK_RED.getColor());
             } else {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
-        }*/
+        }
     }
 
     public void onNbtTextChanged(String text) {
@@ -277,15 +276,13 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                     nbt.setValue("");
                 }
             });
-        }
-        // TODO add back Mekanism
-        /* else if (filter instanceof GasFilter) {
+        } else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 item.setValue(gas.getType().getRegistryName().toString());
                 nbt.setValue("");
             }
-        }*/
+        }
     }
 
     public void onInsertDestination(ItemStack stack) {

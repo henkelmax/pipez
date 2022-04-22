@@ -13,6 +13,7 @@ import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -28,10 +29,10 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -134,11 +135,13 @@ public class FilterList extends WidgetBase {
             }
             return new WrappedFluidStack(stack);
         }
-        // TODO add back Mekanism
-        /* else if (o instanceof Gas) {
-            GasStack stack = new GasStack((Gas) o, 1000);
-            return new WrappedGasStack(stack);
-        }*/
+
+        if (ModList.get().isLoaded("mekanism")) {
+            AbstractStack<?> gasStack = WrappedGasStack.dummyStack(o);
+            if (gasStack != null) {
+                return gasStack;
+            }
+        }
 
         return null;
     }

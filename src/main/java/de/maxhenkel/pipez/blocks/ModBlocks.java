@@ -10,20 +10,16 @@ public class ModBlocks {
     public static final FluidPipeBlock FLUID_PIPE = new FluidPipeBlock();
     public static final EnergyPipeBlock ENERGY_PIPE = new EnergyPipeBlock();
     public static final UniversalPipeBlock UNIVERSAL_PIPE = new UniversalPipeBlock();
-    // TODO add back Mekanism
-    // public static final GasPipeBlock GAS_PIPE = new GasPipeBlock();
+    public static final GasPipeBlock GAS_PIPE = new GasPipeBlock();
 
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().registerAll(
                 ITEM_PIPE,
                 FLUID_PIPE,
                 ENERGY_PIPE,
+                GAS_PIPE,
                 UNIVERSAL_PIPE
         );
-        // TODO add back Mekanism
-        /*if (ModList.get().isLoaded("mekanism")) {
-            event.getRegistry().register(GAS_PIPE);
-        }*/
     }
 
     public static void registerItems(RegistryEvent.Register<Item> event) {
@@ -31,12 +27,9 @@ public class ModBlocks {
                 ITEM_PIPE.toItem(),
                 FLUID_PIPE.toItem(),
                 ENERGY_PIPE.toItem(),
+                GAS_PIPE.toItem(),
                 UNIVERSAL_PIPE.toItem()
         );
-        // TODO add back Mekanism
-        /*if (ModList.get().isLoaded("mekanism")) {
-            event.getRegistry().register(GAS_PIPE.toItem());
-        }*/
     }
 
 }

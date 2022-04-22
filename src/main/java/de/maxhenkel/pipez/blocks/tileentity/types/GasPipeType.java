@@ -174,7 +174,7 @@ public class GasPipeType extends PipeType<Gas> {
     }
 
     private boolean matches(Filter<Gas> filter, GasStack stack) {
-        return filter.getTag() == null || stack.getType().isIn(filter.getTag());
+        return filter.getTag() == null || filter.getTag().contains(stack.getType());
     }
 
     private boolean hasNotInserted(boolean[] inventoriesFull) {

@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.utils;
 
-import de.maxhenkel.corelib.tag.NamedTagWrapper;
 import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalTags;
@@ -9,26 +9,33 @@ import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.registries.tags.ITag;
+import net.minecraftforge.registries.tags.ITagManager;
 
 import javax.annotation.Nullable;
 
 public class GasUtils {
 
-    public static final Tag.Named<Gas> EMPTY_GAS_TAG = new SingleElementTag<>(GasStack.EMPTY.getType());
+    public static final Tag<Gas> EMPTY_GAS_TAG = new SingleElementTag<>(GasStack.EMPTY.getType().getRegistryName(), GasStack.EMPTY.getType());
 
     @Nullable
-    public static Tag.Named<Gas> getGas(String name, boolean nullIfNotExists) {
+    public static Tag<Gas> getGas(String name, boolean nullIfNotExists) {
         ResourceLocation id;
         if (name.startsWith("#")) {
             id = new ResourceLocation(name.substring(1));
-            Tag<Gas> tag = ChemicalTags.GAS.getCollection().getTag(id);
-            if (tag == null) {
+            TagKey<Gas> tagKey = ChemicalTags.GAS.tag(id);
+            ITagManager<Gas> tags = MekanismAPI.gasRegistry().tags();
+            if (tags == null) {
+                return nullIfNotExists ? null : EMPTY_GAS_TAG;
+            }
+            ITag<Gas> tag = tags.getTag(tagKey);
+            if (tag.isEmpty()) {
                 return nullIfNotExists ? null : EMPTY_GAS_TAG;
             } else {
-                return new NamedTagWrapper<>(tag, id);
+                return new GasTag(tag, id);
             }
         } else {
             id = new ResourceLocation(name);
@@ -39,9 +46,25 @@ public class GasUtils {
                 if (gas == null) {
                     return nullIfNotExists ? null : EMPTY_GAS_TAG;
                 } else {
-                    return new SingleElementTag<>(gas);
+                    return new SingleElementTag<>(id, gas);
                 }
             }
+        }
+    }
+
+    @Nullable
+    public static Tag<Gas> getGasTag(String name, boolean nullIfNotExists) {
+        ResourceLocation id = new ResourceLocation(name);
+        TagKey<Gas> tagKey = ChemicalTags.GAS.tag(id);
+        ITagManager<Gas> tags = MekanismAPI.gasRegistry().tags();
+        if (tags == null) {
+            return nullIfNotExists ? null : EMPTY_GAS_TAG;
+        }
+        ITag<Gas> tag = tags.getTag(tagKey);
+        if (tag.isEmpty()) {
+            return nullIfNotExists ? null : EMPTY_GAS_TAG;
+        } else {
+            return new GasTag(tag, id);
         }
     }
 
