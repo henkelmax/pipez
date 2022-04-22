@@ -172,6 +172,7 @@ curseforge {
                 optionalDependency 'jei'
                 optionalDependency 'the-one-probe'
                 optionalDependency 'jade'
+                optionalDependency 'mekanism'
             }
         }
     }
