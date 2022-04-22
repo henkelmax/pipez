@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.utils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import de.maxhenkel.corelib.client.RenderUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.WrappedFluidStack;
 import mekanism.api.MekanismAPI;
@@ -43,7 +44,8 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
     public void render(PoseStack matrixStack, int x, int y) {
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getType().getIcon());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        int chemicalTint = stack.getChemicalTint();
+        RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), RenderUtils.getAlphaFloat(chemicalTint));
         RenderSystem.setShaderTexture(0, texture.atlas().location());
         WrappedFluidStack.fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getType().getTint());
     }
