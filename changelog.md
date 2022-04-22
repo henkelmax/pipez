@@ -1,2 +1,1 @@
-- Added back gas pipes
-- Re added Mekanism support
+- Fixed mods.toml
