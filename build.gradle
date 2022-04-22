@@ -106,11 +106,12 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
+    compileOnly "mekanism:Mekanism:${mekanism_version}:api"
+
     runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
     runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
     runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
     runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
-    shadow fg.deobf("mekanism:Mekanism:${mekanism_version}:api")
 
     implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
 
