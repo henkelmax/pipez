@@ -243,6 +243,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             nbt.setTextColor(ChatFormatting.WHITE.getColor());
             nbtButton.active = false;
             filter.setExactMetadata(false);
+            filter.setMetadata(null);
             return;
         }
         nbtButton.active = true;

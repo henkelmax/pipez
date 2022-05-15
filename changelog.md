@@ -1,1 +1,1 @@
-- Fixed fluid filter rendering
+- Fixed removing NBT data not applying
