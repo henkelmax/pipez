@@ -1,1 +1,1 @@
-- Fixed removing NBT data not applying
+- Updated russian translation
