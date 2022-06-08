@@ -1,7 +1,6 @@
 package de.maxhenkel.pipez.recipes;
 
 import com.google.gson.JsonObject;
-import de.maxhenkel.pipez.Main;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -10,7 +9,6 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 
@@ -61,7 +59,7 @@ public class ClearNbtRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.CLEAR_NBT;
+        return ModRecipes.CLEAR_NBT.get();
     }
 
     @Override
@@ -74,8 +72,7 @@ public class ClearNbtRecipe extends CustomRecipe {
         return ItemStack.EMPTY;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<ClearNbtRecipe> {
-        public static final ResourceLocation NAME = new ResourceLocation(Main.MODID, "clear_nbt");
+    public static class Serializer implements RecipeSerializer<ClearNbtRecipe> {
 
         @Override
         public ClearNbtRecipe fromJson(ResourceLocation recipeId, JsonObject json) {

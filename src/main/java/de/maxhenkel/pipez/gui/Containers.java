@@ -1,34 +1,37 @@
 package de.maxhenkel.pipez.gui;
 
+import de.maxhenkel.corelib.ClientRegistry;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.gui.containerfactory.FilterContainerFactory;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerFactory;
-import de.maxhenkel.corelib.ClientRegistry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class Containers {
 
-    public static MenuType<ExtractContainer> EXTRACT;
-    public static MenuType<FilterContainer> FILTER;
+    private static final DeferredRegister<MenuType<?>> MENU_TYPE_REGISTER = DeferredRegister.create(ForgeRegistries.CONTAINERS, Main.MODID);
+
+    public static final RegistryObject<MenuType<ExtractContainer>> EXTRACT = MENU_TYPE_REGISTER.register("extract", () ->
+            IForgeMenuType.create(new PipeContainerFactory<>(ExtractContainer::new))
+    );
+    public static final RegistryObject<MenuType<FilterContainer>> FILTER = MENU_TYPE_REGISTER.register("filter", () ->
+            IForgeMenuType.create(new FilterContainerFactory<>(FilterContainer::new))
+    );
 
     @OnlyIn(Dist.CLIENT)
     public static void clientSetup() {
-        ClientRegistry.registerScreen(EXTRACT, ExtractScreen::new);
-        ClientRegistry.registerScreen(FILTER, FilterScreen::new);
+        ClientRegistry.registerScreen(EXTRACT.get(), ExtractScreen::new);
+        ClientRegistry.registerScreen(FILTER.get(), FilterScreen::new);
     }
 
-    public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) {
-        EXTRACT = new MenuType<>(new PipeContainerFactory<>(ExtractContainer::new));
-        EXTRACT.setRegistryName(new ResourceLocation(Main.MODID, "extract"));
-        event.getRegistry().register(EXTRACT);
-
-        FILTER = new MenuType<>(new FilterContainerFactory<>(FilterContainer::new));
-        FILTER.setRegistryName(new ResourceLocation(Main.MODID, "filter"));
-        event.getRegistry().register(FILTER);
+    public static void init() {
+        MENU_TYPE_REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
 }

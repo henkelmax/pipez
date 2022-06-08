@@ -1,12 +1,10 @@
 package de.maxhenkel.pipez.blocks;
 
-import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.EnergyPipeTileEntity;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +18,6 @@ import net.minecraftforge.energy.CapabilityEnergy;
 public class EnergyPipeBlock extends PipeBlock {
 
     protected EnergyPipeBlock() {
-        setRegistryName(new ResourceLocation(Main.MODID, "energy_pipe"));
     }
 
     @Override

@@ -13,7 +13,7 @@ import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.utils.WrappedGasStack;
+//import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -84,10 +84,10 @@ public class FilterList extends WidgetBase {
                 if (stack != null && !stack.isEmpty()) {
                     List<Component> tooltip = stack.getTooltip(screen);
                     if (filter.isInvert()) {
-                        tooltip.set(0, new TranslatableComponent("tooltip.pipez.filter.not").withStyle(ChatFormatting.DARK_RED).append(" ").append(tooltip.get(0)));
+                        tooltip.set(0, Component.translatable("tooltip.pipez.filter.not").withStyle(ChatFormatting.DARK_RED).append(" ").append(tooltip.get(0)));
                     }
                     if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
-                        tooltip.add(new TranslatableComponent("tooltip.pipez.filter.accepts_tag", new TextComponent(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+                        tooltip.add(Component.translatable("tooltip.pipez.filter.accepts_tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                     }
                     screen.renderTooltip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
                 }
@@ -96,14 +96,14 @@ public class FilterList extends WidgetBase {
                     List<Component> tooltip = new ArrayList<>();
                     Pair<BlockState, ItemStack> destPair = getBlockAt(filter.getDestination());
                     if (destPair.getKey() == null) {
-                        tooltip.add(ComponentUtils.wrapInSquareBrackets(new TranslatableComponent("tooltip.pipez.filter.unknown_block")).withStyle(ChatFormatting.DARK_RED));
+                        tooltip.add(ComponentUtils.wrapInSquareBrackets(Component.translatable("tooltip.pipez.filter.unknown_block")).withStyle(ChatFormatting.DARK_RED));
                     } else {
                         tooltip.add(destPair.getKey().getBlock().getName().withStyle(ChatFormatting.BLUE));
                     }
                     BlockPos pos = filter.getDestination().getPos();
-                    tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
-                    tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
-                    tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination_side", new TranslatableComponent("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
+                    tooltip.add(Component.translatable("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
+                    tooltip.add(Component.translatable("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
+                    tooltip.add(Component.translatable("tooltip.pipez.filter.destination_side", Component.translatable("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
                     screen.renderTooltip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
                 }
             }
@@ -111,7 +111,7 @@ public class FilterList extends WidgetBase {
     }
 
     private MutableComponent number(int num) {
-        return new TextComponent(String.valueOf(num)).withStyle(ChatFormatting.DARK_GREEN);
+        return Component.literal(String.valueOf(num)).withStyle(ChatFormatting.DARK_GREEN);
     }
 
     @Nullable
@@ -136,12 +136,13 @@ public class FilterList extends WidgetBase {
             return new WrappedFluidStack(stack);
         }
 
-        if (ModList.get().isLoaded("mekanism")) {
+        /*if (ModList.get().isLoaded("mekanism")) {
             AbstractStack<?> gasStack = WrappedGasStack.dummyStack(o);
             if (gasStack != null) {
                 return gasStack;
             }
-        }
+        }*/
+        // TODO Add back Mekanism
 
         return null;
     }
@@ -169,25 +170,25 @@ public class FilterList extends WidgetBase {
                 stack.render(matrixStack, guiLeft + 3, startY + 3);
                 if (filter.getTag() != null) {
                     if (filter.getTag() instanceof SingleElementTag) {
-                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslatableComponent("message.pipez.filter.item", new TranslatableComponent(stack.getDisplayName().getString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
+                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.item", Component.translatable(stack.getDisplayName().getString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
                     } else {
-                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslatableComponent("message.pipez.filter.tag", new TextComponent(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
+                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
                     }
                 }
             } else {
-                drawStringSmall(matrixStack, guiLeft + 22, startY + 5, new TranslatableComponent("message.pipez.filter.any_item").withStyle(ChatFormatting.WHITE));
+                drawStringSmall(matrixStack, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.any_item").withStyle(ChatFormatting.WHITE));
             }
             if (filter.getMetadata() != null && filter.getMetadata().size() > 0) {
-                MutableComponent tags = new TranslatableComponent("message.pipez.filter.nbt.tag" + (filter.getMetadata().size() != 1 ? "s" : ""), filter.getMetadata().size()).withStyle(ChatFormatting.DARK_PURPLE);
-                MutableComponent nbtStr = new TranslatableComponent("message.pipez.filter.nbt", tags).withStyle(ChatFormatting.WHITE);
+                MutableComponent tags = Component.translatable("message.pipez.filter.nbt.tag" + (filter.getMetadata().size() != 1 ? "s" : ""), filter.getMetadata().size()).withStyle(ChatFormatting.DARK_PURPLE);
+                MutableComponent nbtStr = Component.translatable("message.pipez.filter.nbt", tags).withStyle(ChatFormatting.WHITE);
                 if (filter.isExactMetadata()) {
-                    nbtStr.append(" ").append(new TranslatableComponent("message.pipez.filter.nbt.exact"));
+                    nbtStr.append(" ").append(Component.translatable("message.pipez.filter.nbt.exact"));
                 }
                 drawStringSmall(matrixStack, guiLeft + 22, startY + 10, nbtStr);
             }
 
             if (filter.isInvert()) {
-                drawStringSmall(matrixStack, guiLeft + 22, startY + 15, new TranslatableComponent("message.pipez.filter.inverted").withStyle(ChatFormatting.DARK_RED));
+                drawStringSmall(matrixStack, guiLeft + 22, startY + 15, Component.translatable("message.pipez.filter.inverted").withStyle(ChatFormatting.DARK_RED));
             }
 
             if (filter.getDestination() != null) {

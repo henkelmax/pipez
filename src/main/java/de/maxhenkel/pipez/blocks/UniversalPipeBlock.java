@@ -1,13 +1,11 @@
 package de.maxhenkel.pipez.blocks;
 
-import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.UniversalPipeTileEntity;
-import de.maxhenkel.pipez.capabilities.ModCapabilities;
+//import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +21,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 public class UniversalPipeBlock extends PipeBlock {
 
     protected UniversalPipeBlock() {
-        setRegistryName(new ResourceLocation(Main.MODID, "universal_pipe"));
     }
 
     @Override
@@ -33,7 +30,7 @@ public class UniversalPipeBlock extends PipeBlock {
                 te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
                         || te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
                         || te.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).isPresent()
-                        || te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
+                // || te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent() //TODO Add back Mekanism
         );
     }
 

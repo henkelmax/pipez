@@ -12,7 +12,6 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class UpgradeTagProvider extends TagsProvider<Item> {
 
@@ -23,16 +22,17 @@ public class UpgradeTagProvider extends TagsProvider<Item> {
     @Override
     protected void addTags() {
         tag(ModItemTags.UPGRADES_TAG)
-                .add(ModItems.BASIC_UPGRADE)
-                .add(ModItems.IMPROVED_UPGRADE)
-                .add(ModItems.ADVANCED_UPGRADE)
-                .add(ModItems.ULTIMATE_UPGRADE)
-                .add(ModItems.INFINITY_UPGRADE);
+                .add(ModItems.BASIC_UPGRADE.get())
+                .add(ModItems.IMPROVED_UPGRADE.get())
+                .add(ModItems.ADVANCED_UPGRADE.get())
+                .add(ModItems.ULTIMATE_UPGRADE.get())
+                .add(ModItems.INFINITY_UPGRADE.get());
     }
 
     @Override
     protected Path getPath(ResourceLocation id) {
-        return generator.getOutputFolder().resolve(Paths.get("data", id.getNamespace(), "tags", "items", id.getPath() + ".json"));
+        //TODO Check path
+        return pathProvider.json(new ResourceLocation(id.getNamespace(), "/data/tags/items/" + id.getPath() + ".json"));
     }
 
     @Override

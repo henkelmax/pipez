@@ -5,7 +5,6 @@ import de.maxhenkel.corelib.tag.TagUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -49,7 +48,7 @@ public class ItemFilter extends Filter<Item> {
         if (compound.contains("Item", Tag.TAG_STRING)) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("Item")));
             if (item != null) {
-                tag = new SingleElementTag<>(item.getRegistryName(), item);
+                tag = new SingleElementTag<>(ForgeRegistries.ITEMS.getKey(item), item);
             }
         }
         if (compound.contains("Tag", Tag.TAG_STRING)) {

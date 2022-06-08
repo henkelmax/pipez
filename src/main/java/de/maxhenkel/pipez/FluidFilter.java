@@ -48,7 +48,7 @@ public class FluidFilter extends Filter<Fluid> {
         if (compound.contains("Fluid", Tag.TAG_STRING)) {
             Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(compound.getString("Fluid")));
             if (fluid != null) {
-                tag = new SingleElementTag<>(fluid.getRegistryName(), fluid);
+                tag = new SingleElementTag<>(ForgeRegistries.FLUIDS.getKey(fluid), fluid);
             }
         }
         if (compound.contains("Tag", Tag.TAG_STRING)) {

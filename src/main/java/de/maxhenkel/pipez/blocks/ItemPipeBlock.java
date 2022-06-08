@@ -1,12 +1,10 @@
 package de.maxhenkel.pipez.blocks;
 
-import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.ItemPipeTileEntity;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +18,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 public class ItemPipeBlock extends PipeBlock {
 
     protected ItemPipeBlock() {
-        setRegistryName(new ResourceLocation(Main.MODID, "item_pipe"));
     }
 
     @Override

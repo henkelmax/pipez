@@ -16,7 +16,6 @@ import mekanism.api.chemical.gas.IGasHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -50,12 +49,12 @@ public class GasPipeType extends PipeType<Gas> {
 
     @Override
     public ItemStack getIcon() {
-        return new ItemStack(ModBlocks.GAS_PIPE);
+        return new ItemStack(ModBlocks.GAS_PIPE.get());
     }
 
     @Override
     public Component getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslatableComponent("tooltip.pipez.rate.gas", getRate(upgrade));
+        return Component.translatable("tooltip.pipez.rate.gas", getRate(upgrade));
     }
 
     @Override

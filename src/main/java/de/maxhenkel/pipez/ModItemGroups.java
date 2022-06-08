@@ -10,7 +10,7 @@ public class ModItemGroups {
 
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(ModBlocks.ITEM_PIPE);
+            return new ItemStack(ModBlocks.ITEM_PIPE.get());
         }
 
     };

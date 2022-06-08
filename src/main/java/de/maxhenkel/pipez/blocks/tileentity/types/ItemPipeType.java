@@ -13,7 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -57,12 +56,12 @@ public class ItemPipeType extends PipeType<Item> {
 
     @Override
     public ItemStack getIcon() {
-        return new ItemStack(ModBlocks.ITEM_PIPE);
+        return new ItemStack(ModBlocks.ITEM_PIPE.get());
     }
 
     @Override
     public Component getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslatableComponent("tooltip.pipez.rate.item", getRate(upgrade), getSpeed(upgrade));
+        return Component.translatable("tooltip.pipez.rate.item", getRate(upgrade), getSpeed(upgrade));
     }
 
     @Override

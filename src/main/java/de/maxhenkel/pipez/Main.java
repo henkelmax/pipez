@@ -6,17 +6,12 @@ import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
 import de.maxhenkel.pipez.events.StitchEvents;
 import de.maxhenkel.pipez.gui.Containers;
-import de.maxhenkel.pipez.integration.IMC;
+//import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
 import de.maxhenkel.pipez.tagproviders.ModTagProviders;
 import de.maxhenkel.pipez.tags.ModItemTags;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -43,14 +38,8 @@ public class Main {
     public static SimpleChannel SIMPLE_CHANNEL;
 
     public Main() {
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, ModBlocks::registerItems);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, ModItems::registerItems);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, ModBlocks::registerBlocks);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(BlockEntityType.class, ModTileEntities::registerTileEntities);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(MenuType.class, Containers::registerContainers);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(RecipeSerializer.class, ModRecipes::registerRecipes);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
+//        FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ModTagProviders::gatherData);
         System.out.println(ModItemTags.TOOLS_TAG);
 
@@ -63,6 +52,12 @@ public class Main {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelRegistry::onModelRegister);
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelRegistry::onModelBake);
         });
+
+        ModBlocks.init();
+        ModItems.init();
+        ModRecipes.init();
+        Containers.init();
+        ModTileEntities.init();
     }
 
     public void commonSetup(FMLCommonSetupEvent event) {

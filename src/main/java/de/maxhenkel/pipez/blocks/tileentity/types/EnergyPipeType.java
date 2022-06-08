@@ -12,7 +12,6 @@ import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -54,12 +53,12 @@ public class EnergyPipeType extends PipeType<Void> {
 
     @Override
     public ItemStack getIcon() {
-        return new ItemStack(ModBlocks.ENERGY_PIPE);
+        return new ItemStack(ModBlocks.ENERGY_PIPE.get());
     }
 
     @Override
     public Component getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslatableComponent("tooltip.pipez.rate.energy", getRate(upgrade));
+        return Component.translatable("tooltip.pipez.rate.energy", getRate(upgrade));
     }
 
     @Override

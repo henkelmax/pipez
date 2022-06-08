@@ -13,7 +13,7 @@ public class ExtractContainer extends ContainerBase implements IPipeContainer {
     private int index;
 
     public ExtractContainer(int id, Container playerInventory, PipeLogicTileEntity pipe, Direction side, int index) {
-        super(Containers.EXTRACT, id, playerInventory, null);
+        super(Containers.EXTRACT.get(), id, playerInventory, null);
         this.pipe = pipe;
         this.side = side;
         this.index = index;

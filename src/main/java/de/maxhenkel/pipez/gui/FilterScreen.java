@@ -12,7 +12,7 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
-import de.maxhenkel.pipez.utils.GasUtils;
+//import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -21,13 +21,12 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -83,17 +82,17 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         });
         addRenderableWidget(invertButton);
 
-        cancelButton = new Button(leftPos + 25, topPos + 105, 60, 20, new TranslatableComponent("message.pipez.filter.cancel"), button -> {
+        cancelButton = new Button(leftPos + 25, topPos + 105, 60, 20, Component.translatable("message.pipez.filter.cancel"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage(getMenu().getIndex()));
         });
         addRenderableWidget(cancelButton);
 
-        submitButton = new Button(leftPos + 91, topPos + 105, 60, 20, new TranslatableComponent("message.pipez.filter.submit"), button -> {
+        submitButton = new Button(leftPos + 91, topPos + 105, 60, 20, Component.translatable("message.pipez.filter.submit"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, menu.getIndex()));
         });
         addRenderableWidget(submitButton);
 
-        item = new EditBox(font, leftPos + 30, topPos + 18, 138, 16, TextComponent.EMPTY);
+        item = new EditBox(font, leftPos + 30, topPos + 18, 138, 16, Component.empty());
         item.setTextColor(ChatFormatting.WHITE.getColor());
         item.setBordered(true);
         item.setMaxLength(1024);
@@ -113,7 +112,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         });
         addRenderableWidget(item);
 
-        nbt = new EditBox(font, leftPos + 8, topPos + 50, 160, 16, TextComponent.EMPTY);
+        nbt = new EditBox(font, leftPos + 8, topPos + 50, 160, 16, Component.empty());
         nbt.setTextColor(ChatFormatting.WHITE.getColor());
         nbt.setBordered(true);
         nbt.setMaxLength(1024);
@@ -132,7 +131,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             if (stack != null) {
                 tooltip = stack.getTooltip(this);
                 if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
-                    tooltip.add(new TranslatableComponent("tooltip.pipez.filter.accepts_tag", new TextComponent(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+                    tooltip.add(Component.translatable("tooltip.pipez.filter.accepts_tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                 }
             }
             return tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList());
@@ -140,16 +139,16 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         hoverAreas.add(itemHoverArea);
         itemTextHoverArea = new HoverArea(29, 17, 140, 18, () -> {
             List<Component> tooltip = new ArrayList<>();
-            tooltip.add(new TranslatableComponent("tooltip.pipez.filter.item_tag.description"));
+            tooltip.add(Component.translatable("tooltip.pipez.filter.item_tag.description"));
             return tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(itemTextHoverArea);
         nbtTextHoverArea = new HoverArea(7, 49, 162, 18, () -> {
             List<Component> tooltip = new ArrayList<>();
             if (hasNBT()) {
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter.nbt_string.description"));
+                tooltip.add(Component.translatable("tooltip.pipez.filter.nbt_string.description"));
             } else {
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter.nbt_string.no_nbt"));
+                tooltip.add(Component.translatable("tooltip.pipez.filter.nbt_string.no_nbt"));
             }
             return tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList());
         });
@@ -157,9 +156,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         exactNBTHoverArea = new HoverArea(126, 82, 20, 20, () -> {
             List<Component> tooltip = new ArrayList<>();
             if (filter.isExactMetadata()) {
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter.nbt.exact"));
+                tooltip.add(Component.translatable("tooltip.pipez.filter.nbt.exact"));
             } else {
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter.nbt.not_exact"));
+                tooltip.add(Component.translatable("tooltip.pipez.filter.nbt.not_exact"));
             }
             return tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList());
         });
@@ -167,18 +166,18 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         invertHoverArea = new HoverArea(150, 82, 20, 20, () -> {
             List<Component> tooltip = new ArrayList<>();
             if (filter.isInvert()) {
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter.inverted"));
+                tooltip.add(Component.translatable("tooltip.pipez.filter.inverted"));
             } else {
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter.not_inverted"));
+                tooltip.add(Component.translatable("tooltip.pipez.filter.not_inverted"));
             }
             return tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList());
         });
         hoverAreas.add(invertHoverArea);
         destinationHoverArea = new HoverArea(8, 83, 16, 16, () -> {
             List<Component> tooltip = new ArrayList<>();
-            tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination.description"));
+            tooltip.add(Component.translatable("tooltip.pipez.filter.destination.description"));
             if (filter.getDestination() != null) {
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter.destination.click_to_remove").withStyle(ChatFormatting.GRAY));
+                tooltip.add(Component.translatable("tooltip.pipez.filter.destination.click_to_remove").withStyle(ChatFormatting.GRAY));
             }
             return tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList());
         });
@@ -188,7 +187,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             List<Component> tooltip = new ArrayList<>();
             if (filter.getDestination() != null) {
                 DirectionalPosition dst = filter.getDestination();
-                tooltip.add(new TranslatableComponent("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TranslatableComponent("message.pipez.direction." + dst.getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
+                tooltip.add(Component.translatable("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.translatable("message.pipez.direction." + dst.getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
             }
             return tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList());
         });
@@ -196,7 +195,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     private boolean hasNBT() {
-        return !(filter instanceof GasFilter);
+        return true; //!(filter instanceof GasFilter); // TODO Add back Mekanism
     }
 
     @Override
@@ -227,7 +226,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
-        } else if (filter instanceof GasFilter) {
+        }/* else if (filter instanceof GasFilter) {
             Tag tag = GasUtils.getGas(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
@@ -235,7 +234,8 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
-        }
+        }*/
+        // TODO Add back Mekanism
     }
 
     public void onNbtTextChanged(String text) {
@@ -262,7 +262,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (filter instanceof ItemFilter) {
-            item.setValue(stack.getItem().getRegistryName().toString());
+            item.setValue(ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
             if (stack.hasTag()) {
                 nbt.setValue(stack.getTag().toString());
             } else {
@@ -270,20 +270,21 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             }
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
-                item.setValue(s.getFluid().getRegistryName().toString());
+                item.setValue(ForgeRegistries.FLUIDS.getKey(s.getFluid()).toString());
                 if (s.hasTag()) {
                     nbt.setValue(s.getTag().toString());
                 } else {
                     nbt.setValue("");
                 }
             });
-        } else if (filter instanceof GasFilter) {
+        }/* else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 item.setValue(gas.getType().getRegistryName().toString());
                 nbt.setValue("");
             }
-        }
+        }*/
+        // TODO Add back Mekanism
     }
 
     public void onInsertDestination(ItemStack stack) {
@@ -298,9 +299,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
         super.renderLabels(matrixStack, mouseX, mouseY);
-        font.draw(matrixStack, new TranslatableComponent("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR);
-        font.draw(matrixStack, new TranslatableComponent("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR);
-        font.draw(matrixStack, new TranslatableComponent("message.pipez.filter.destination"), 8, 71, FONT_COLOR);
+        font.draw(matrixStack, Component.translatable("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR);
+        font.draw(matrixStack, Component.translatable("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR);
+        font.draw(matrixStack, Component.translatable("message.pipez.filter.destination"), 8, 71, FONT_COLOR);
         font.draw(matrixStack, playerInventoryTitle, 8, (float) (imageHeight - 96 + 3), FONT_COLOR);
 
         drawHoverAreas(matrixStack, mouseX, mouseY);
@@ -320,9 +321,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         matrixStack.scale(0.5F, 0.5F, 1F);
         if (filter.getDestination() != null) {
             DirectionalPosition dst = filter.getDestination();
-            font.draw(matrixStack, new TranslatableComponent("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), new TextComponent(String.valueOf(dst.getDirection().name().charAt(0))).withStyle(ChatFormatting.DARK_GREEN)), 0, 0, 0xFFFFFF);
+            font.draw(matrixStack, Component.translatable("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.literal(String.valueOf(dst.getDirection().name().charAt(0))).withStyle(ChatFormatting.DARK_GREEN)), 0, 0, 0xFFFFFF);
         } else {
-            font.draw(matrixStack, new TranslatableComponent("message.pipez.filter_destination_tool.destination.any"), 0, 0, 0xFFFFFF);
+            font.draw(matrixStack, Component.translatable("message.pipez.filter_destination_tool.destination.any"), 0, 0, 0xFFFFFF);
         }
         matrixStack.popPose();
 
@@ -335,7 +336,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     private MutableComponent number(int num) {
-        return new TextComponent(String.valueOf(num)).withStyle(ChatFormatting.DARK_GREEN);
+        return Component.literal(String.valueOf(num)).withStyle(ChatFormatting.DARK_GREEN);
     }
 
     private void drawHoverSlot(PoseStack matrixStack, int posX, int posY) {

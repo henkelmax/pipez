@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class CycleIconButton extends Button {
     private Supplier<Integer> index;
 
     public CycleIconButton(int x, int y, List<Icon> icons, Supplier<Integer> index, OnPress pressedAction) {
-        super(x, y, 20, 20, TextComponent.EMPTY, pressedAction);
+        super(x, y, 20, 20, Component.empty(), pressedAction);
         this.icons = icons;
         this.index = index;
     }

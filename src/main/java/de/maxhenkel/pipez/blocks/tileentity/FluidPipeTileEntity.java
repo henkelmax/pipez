@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class FluidPipeTileEntity extends PipeLogicTileEntity {
 
     public FluidPipeTileEntity(BlockPos pos, BlockState state) {
-        super(ModTileEntities.FLUID_PIPE, new PipeType[]{FluidPipeType.INSTANCE}, pos, state);
+        super(ModTileEntities.FLUID_PIPE.get(), new PipeType[]{FluidPipeType.INSTANCE}, pos, state);
     }
 
 }

@@ -4,7 +4,6 @@ import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -24,7 +23,7 @@ public class FilterContainerProvider implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return new TranslatableComponent(pipe.getBlockState().getBlock().getDescriptionId());
+        return Component.translatable(pipe.getBlockState().getBlock().getDescriptionId());
     }
 
     public static void openGui(Player player, PipeLogicTileEntity tileEntity, Direction direction, Filter<?> filter, int index, ContainerCreator containerCreator) {

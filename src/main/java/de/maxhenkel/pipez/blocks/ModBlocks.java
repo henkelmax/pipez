@@ -1,35 +1,25 @@
 package de.maxhenkel.pipez.blocks;
 
-import net.minecraft.world.item.Item;
+import de.maxhenkel.pipez.Main;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModBlocks {
 
-    public static final ItemPipeBlock ITEM_PIPE = new ItemPipeBlock();
-    public static final FluidPipeBlock FLUID_PIPE = new FluidPipeBlock();
-    public static final EnergyPipeBlock ENERGY_PIPE = new EnergyPipeBlock();
-    public static final UniversalPipeBlock UNIVERSAL_PIPE = new UniversalPipeBlock();
-    public static final GasPipeBlock GAS_PIPE = new GasPipeBlock();
+    private static final DeferredRegister<Block> BLOCK_REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, Main.MODID);
 
-    public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().registerAll(
-                ITEM_PIPE,
-                FLUID_PIPE,
-                ENERGY_PIPE,
-                GAS_PIPE,
-                UNIVERSAL_PIPE
-        );
-    }
+    public static final RegistryObject<ItemPipeBlock> ITEM_PIPE = BLOCK_REGISTER.register("item_pipe", ItemPipeBlock::new);
+    public static final RegistryObject<FluidPipeBlock> FLUID_PIPE = BLOCK_REGISTER.register("fluid_pipe", FluidPipeBlock::new);
+    public static final RegistryObject<EnergyPipeBlock> ENERGY_PIPE = BLOCK_REGISTER.register("energy_pipe", EnergyPipeBlock::new);
+    public static final RegistryObject<UniversalPipeBlock> UNIVERSAL_PIPE = BLOCK_REGISTER.register("universal_pipe", UniversalPipeBlock::new);
+    // TODO Add back Mekanism
+    // public static final RegistryObject<GasPipeBlock> GAS_PIPE = BLOCK_REGISTER.register("gas_pipe", GasPipeBlock::new);
 
-    public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().registerAll(
-                ITEM_PIPE.toItem(),
-                FLUID_PIPE.toItem(),
-                ENERGY_PIPE.toItem(),
-                GAS_PIPE.toItem(),
-                UNIVERSAL_PIPE.toItem()
-        );
+    public static void init() {
+        BLOCK_REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
 }

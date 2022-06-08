@@ -14,7 +14,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
@@ -60,7 +59,7 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
         if (Minecraft.getInstance().options.advancedItemTooltips) {
             ResourceLocation registryName = MekanismAPI.gasRegistry().getKey(stack.getType());
             if (registryName != null) {
-                tooltip.add((new TextComponent(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
+                tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
 
@@ -69,7 +68,7 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
 
     @Override
     public Component getDisplayName() {
-        return new TextComponent("").append(stack.getTextComponent());
+        return Component.empty().append(stack.getTextComponent());
     }
 
     @Override

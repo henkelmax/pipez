@@ -4,7 +4,7 @@ import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -56,7 +56,7 @@ public class BlockEvents {
         }
 
         FilterDestinationToolItem.setDestination(heldItem, new DirectionalPosition(event.getPos().immutable(), event.getFace()));
-        event.getPlayer().displayClientMessage(new TranslatableComponent("message.pipez.filter_destination_tool.destination.set"), true);
+        event.getPlayer().displayClientMessage(Component.translatable("message.pipez.filter_destination_tool.destination.set"), true);
         event.setUseItem(Event.Result.ALLOW);
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);

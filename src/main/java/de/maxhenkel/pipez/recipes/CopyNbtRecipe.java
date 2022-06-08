@@ -3,7 +3,6 @@ package de.maxhenkel.pipez.recipes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.maxhenkel.corelib.helpers.Pair;
-import de.maxhenkel.pipez.Main;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -15,7 +14,6 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -163,7 +161,7 @@ public class CopyNbtRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.COPY_NBT;
+        return ModRecipes.COPY_NBT.get();
     }
 
     @Override
@@ -176,8 +174,7 @@ public class CopyNbtRecipe extends CustomRecipe {
         return ItemStack.EMPTY;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<CopyNbtRecipe> {
-        public static final ResourceLocation NAME = new ResourceLocation(Main.MODID, "copy_nbt");
+    public static class Serializer implements RecipeSerializer<CopyNbtRecipe> {
 
         @Override
         public CopyNbtRecipe fromJson(ResourceLocation recipeId, JsonObject json) {

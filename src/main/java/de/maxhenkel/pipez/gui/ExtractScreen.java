@@ -7,7 +7,7 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
-import de.maxhenkel.pipez.utils.GasUtils;
+//import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Widget;
@@ -16,7 +16,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -24,6 +23,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,15 +95,15 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         filterButton = new CycleIconButton(leftPos + 7, topPos + 55, filterModeIcons, filterModeIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleFilterModeMessage(currentindex));
         });
-        addFilterButton = new Button(leftPos + 31, topPos + 79, 40, 20, new TranslatableComponent("message.pipez.filter.add"), button -> {
+        addFilterButton = new Button(leftPos + 31, topPos + 79, 40, 20, Component.translatable("message.pipez.filter.add"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
         });
-        editFilterButton = new Button(leftPos + 80, topPos + 79, 40, 20, new TranslatableComponent("message.pipez.filter.edit"), button -> {
+        editFilterButton = new Button(leftPos + 80, topPos + 79, 40, 20, Component.translatable("message.pipez.filter.edit"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
             }
         });
-        removeFilterButton = new Button(leftPos + 129, topPos + 79, 40, 20, new TranslatableComponent("message.pipez.filter.remove"), button -> {
+        removeFilterButton = new Button(leftPos + 129, topPos + 79, 40, 20, Component.translatable("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
             }
@@ -121,7 +121,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 int tabIndex = i;
                 tabs[i] = new HoverArea(-26 + 3, 5 + 25 * i, 24, 24, () -> {
                     List<FormattedCharSequence> tooltip = new ArrayList<>();
-                    tooltip.add(new TranslatableComponent(pipeTypes[tabIndex].getTranslationKey()).getVisualOrderText());
+                    tooltip.add(Component.translatable(pipeTypes[tabIndex].getTranslationKey()).getVisualOrderText());
                     return tooltip;
                 });
                 hoverAreas.add(tabs[i]);
@@ -130,21 +130,21 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
         redstoneArea = new HoverArea(7, 7, 20, 20, () -> {
             if (redstoneButton.active) {
-                return Arrays.asList(new TranslatableComponent("tooltip.pipez.redstone_mode", new TranslatableComponent("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.redstone_mode", Component.translatable("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
         });
         sortArea = new HoverArea(7, 31, 20, 20, () -> {
             if (sortButton.active) {
-                return Arrays.asList(new TranslatableComponent("tooltip.pipez.distribution", new TranslatableComponent("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.distribution", Component.translatable("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
         });
         filterArea = new HoverArea(7, 55, 20, 20, () -> {
             if (filterButton.active) {
-                return Arrays.asList(new TranslatableComponent("tooltip.pipez.filter_mode", new TranslatableComponent("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.filter_mode", Component.translatable("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
                 return Collections.emptyList();
             }
@@ -293,7 +293,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         filter.setExactMetadata(true);
 
         if (filter instanceof ItemFilter) {
-            filter.setTag(new SingleElementTag(stack.getItem().getRegistryName(), stack.getItem()));
+            filter.setTag(new SingleElementTag(ForgeRegistries.ITEMS.getKey(stack.getItem()), stack.getItem()));
             if (stack.hasTag()) {
                 filter.setMetadata(stack.getTag().copy());
             } else {
@@ -302,7 +302,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
-                filter.setTag(new SingleElementTag(s.getFluid().getRegistryName(), s.getFluid()));
+                filter.setTag(new SingleElementTag(ForgeRegistries.FLUIDS.getKey(s.getFluid()), s.getFluid()));
                 if (s.hasTag()) {
                     filter.setMetadata(s.getTag().copy());
                 } else {
@@ -310,14 +310,15 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 }
                 Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
             });
-        } else if (filter instanceof GasFilter) {
+        }/* else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 filter.setTag(new SingleElementTag(gas.getType().getRegistryName(), gas.getType()));
                 filter.setMetadata(null);
                 Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }
-        }
+        }*/
+        // TODO Add back Mekanism
     }
 
     @Override

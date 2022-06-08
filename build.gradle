@@ -1,16 +1,15 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://maven.maxhenkel.de/repository/public' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: 'de.maxhenkel.forge-update', name: 'forge-update', version: '1.0.4'
     }
 }
 
 plugins {
+    id 'net.minecraftforge.gradle' version '5.+'
     // https://github.com/matthewprenger/CurseGradle
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.github.johnrengelman.shadow" version "7.1.0"
@@ -103,19 +102,19 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
+//    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
+//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
 
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 
-    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
+//    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
 
-    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+//    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
@@ -148,6 +147,10 @@ processResources {
                 'mod_mekanism_version_range': mod_mekanism_version_range,
                 'jei_version_range': jei_version_range
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 curseforge {
@@ -249,4 +252,27 @@ shadowJar {
 
 reobf {
     shadowJar {}
+}
+
+sourceSets {
+    main {
+        java {
+            // TODO Add back Mekanism
+            exclude 'de/maxhenkel/pipez/GasFilter.java'
+            exclude 'de/maxhenkel/pipez/utils/WrappedGasStack.java'
+            exclude 'de/maxhenkel/pipez/utils/GasUtils.java'
+            exclude 'de/maxhenkel/pipez/utils/GasTag.java'
+            exclude 'de/maxhenkel/pipez/blocks/tileentity/render/GasPipeRenderer.java'
+            exclude 'de/maxhenkel/pipez/blocks/tileentity/types/GasPipeType.java'
+            exclude 'de/maxhenkel/pipez/blocks/tileentity/GasPipeTileEntity.java'
+            exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
+            exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
+
+            exclude 'de/maxhenkel/pipez/integration/*/**'
+        }
+        resources {
+            // TODO Add back Mekanism
+            exclude 'data/pipez/loot_tables/blocks/gas_pipe.json'
+        }
+    }
 }

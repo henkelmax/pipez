@@ -12,7 +12,6 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class WrenchTagProvider extends TagsProvider<Item> {
 
@@ -23,13 +22,14 @@ public class WrenchTagProvider extends TagsProvider<Item> {
     @Override
     protected void addTags() {
         tag(ModItemTags.WRENCHES_TAG).addTag(ModItemTags.WRENCH_TAG);
-        tag(ModItemTags.WRENCH_TAG).add(ModItems.WRENCH);
+        tag(ModItemTags.WRENCH_TAG).add(ModItems.WRENCH.get());
         tag(ModItemTags.TOOLS_TAG).addTag(ModItemTags.WRENCH_TAG);
     }
 
     @Override
     protected Path getPath(ResourceLocation id) {
-        return generator.getOutputFolder().resolve(Paths.get("data", id.getNamespace(), "tags", "items", id.getPath() + ".json"));
+        //TODO Check path
+        return pathProvider.json(new ResourceLocation(id.getNamespace(), "/data/tags/items/" + id.getPath() + ".json"));
     }
 
     @Override

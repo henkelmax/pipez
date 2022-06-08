@@ -10,8 +10,8 @@ public class ModTagProviders {
         DataGenerator gen = event.getGenerator();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         if (event.includeServer() || event.includeClient()) {
-            gen.addProvider(new WrenchTagProvider(gen, existingFileHelper));
-            gen.addProvider(new UpgradeTagProvider(gen, existingFileHelper));
+            gen.addProvider(false, new WrenchTagProvider(gen, existingFileHelper));
+            gen.addProvider(false, new UpgradeTagProvider(gen, existingFileHelper));
         }
     }
 

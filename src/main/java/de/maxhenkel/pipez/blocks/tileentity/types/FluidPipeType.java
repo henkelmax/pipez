@@ -12,7 +12,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
@@ -51,12 +50,12 @@ public class FluidPipeType extends PipeType<Fluid> {
 
     @Override
     public ItemStack getIcon() {
-        return new ItemStack(ModBlocks.FLUID_PIPE);
+        return new ItemStack(ModBlocks.FLUID_PIPE.get());
     }
 
     @Override
     public Component getTransferText(@Nullable Upgrade upgrade) {
-        return new TranslatableComponent("tooltip.pipez.rate.fluid", getRate(upgrade));
+        return Component.translatable("tooltip.pipez.rate.fluid", getRate(upgrade));
     }
 
     @Override

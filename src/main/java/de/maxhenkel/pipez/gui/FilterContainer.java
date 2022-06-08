@@ -15,7 +15,7 @@ public class FilterContainer extends ContainerBase implements IPipeContainer {
     private Filter<?> filter;
 
     public FilterContainer(int id, Container playerInventory, PipeLogicTileEntity pipe, Direction side, int index, Filter<?> filter) {
-        super(Containers.FILTER, id, playerInventory, null);
+        super(Containers.FILTER.get(), id, playerInventory, null);
         this.pipe = pipe;
         this.side = side;
         this.index = index;
