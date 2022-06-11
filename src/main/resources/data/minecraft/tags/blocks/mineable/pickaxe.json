@@ -3,7 +3,10 @@
   "values": [
     "pipez:energy_pipe",
     "pipez:fluid_pipe",
-    "pipez:gas_pipe",
+    {
+      "id": "pipez:gas_pipe",
+      "required": false
+    },
     "pipez:item_pipe",
     "pipez:universal_pipe"
   ]
