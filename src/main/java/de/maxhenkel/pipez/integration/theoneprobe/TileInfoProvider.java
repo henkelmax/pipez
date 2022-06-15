@@ -9,7 +9,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -50,7 +50,7 @@ public class TileInfoProvider implements IProbeInfoProvider {
 
             IProbeInfo i;
             if (upgrade.isEmpty()) {
-                i = info.text(new TranslatableComponent("tooltip.pipez.no_upgrade"));
+                i = info.text(Component.translatable("tooltip.pipez.no_upgrade"));
             } else {
                 i = info.horizontal()
                         .item(upgrade)

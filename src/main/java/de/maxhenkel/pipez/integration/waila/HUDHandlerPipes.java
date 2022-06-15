@@ -1,32 +1,35 @@
 package de.maxhenkel.pipez.integration.waila;
 
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.IServerDataProvider;
-import mcp.mobius.waila.api.ITooltip;
-import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.IServerDataProvider;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<BlockEntity> {
+public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProvider<BlockEntity> {
 
     static final HUDHandlerPipes INSTANCE = new HUDHandlerPipes();
+
+    private static final ResourceLocation UID = new ResourceLocation(Main.MODID, "pipe");
 
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
@@ -58,7 +61,7 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
             ItemStack upgrade = pipeTile.getUpgradeItem(selectedSide);
 
             if (upgrade.isEmpty()) {
-                compound.putString("Upgrade", Component.Serializer.toJson(new TranslatableComponent("tooltip.pipez.no_upgrade")));
+                compound.putString("Upgrade", Component.Serializer.toJson(Component.translatable("tooltip.pipez.no_upgrade")));
             } else {
                 compound.putString("Upgrade", Component.Serializer.toJson(upgrade.getHoverName()));
             }
@@ -93,4 +96,8 @@ public class HUDHandlerPipes implements IComponentProvider, IServerDataProvider<
         return tooltips;
     }
 
+    @Override
+    public ResourceLocation getUid() {
+        return UID;
+    }
 }

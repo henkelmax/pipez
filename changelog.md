@@ -1,1 +1,2 @@
-- Fixed pipes not minable
+- Re added Jade support
+- Re added The One Probe support

@@ -112,9 +112,9 @@ dependencies {
 //    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
 //    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 
-//    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
+    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
 
-//    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
@@ -268,7 +268,7 @@ sourceSets {
             exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
             exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
 
-            exclude 'de/maxhenkel/pipez/integration/*/**'
+            exclude 'de/maxhenkel/pipez/integration/jei/*/**'
         }
         resources {
             // TODO Add back Mekanism
