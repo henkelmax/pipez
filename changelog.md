@@ -1,2 +1,2 @@
-- Re added Jade support
-- Re added The One Probe support
+- Re added JEI integration
+- Updated russian translation

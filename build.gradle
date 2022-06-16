@@ -102,8 +102,10 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-//    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
-//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
+//    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge-api:${jei_version}")
+//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
+
+    implementation fg.deobf("curse.maven:jei-238222:3834070")
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
 
@@ -267,8 +269,6 @@ sourceSets {
             exclude 'de/maxhenkel/pipez/blocks/tileentity/GasPipeTileEntity.java'
             exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
             exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
-
-            exclude 'de/maxhenkel/pipez/integration/jei/*/**'
         }
         resources {
             // TODO Add back Mekanism
