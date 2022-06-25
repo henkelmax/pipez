@@ -1,3 +1,5 @@
+<!-- modrinth_exclude.start -->
+
 # Pipez ![](http://cf.way2muchnoise.eu/full_443900_downloads.svg) ![](http://cf.way2muchnoise.eu/versions/443900.svg)
 
 ## Links
@@ -9,6 +11,8 @@
 - [Credits](https://modrepo.de/minecraft/pipez/credits)
 
 ---
+
+<!-- modrinth_exclude.end -->
 
 This mod adds simple and highly configurable pipes that are designed to create as little lag as possible.
 
