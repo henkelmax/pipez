@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
     @Override
     public void render(PipeTileEntity pipe, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         BakedModel iBakedModel = cachedModel.get();
-        List<BakedQuad> quads = iBakedModel.getQuads(null, null, minecraft.level.random, EmptyModelData.INSTANCE);
+        List<BakedQuad> quads = iBakedModel.getQuads(null, null, minecraft.level.random, ModelData.EMPTY, RenderType.solid());
         VertexConsumer b = buffer.getBuffer(RenderType.solid());
 
         for (Direction side : Direction.values()) {

@@ -1,13 +1,13 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.CachedValue;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ForgeModelBakery;
+import net.minecraftforge.client.event.ModelEvent;
 
 public class ModelRegistry {
 
@@ -24,8 +24,9 @@ public class ModelRegistry {
         Model(String name) {
             resource = new ResourceLocation(Main.MODID, name);
             cachedModel = new CachedValue<>(() -> {
-                UnbakedModel modelOrMissing = ForgeModelBakery.instance().getModelOrMissing(resource);
-                return modelOrMissing.bake(ForgeModelBakery.instance(), ForgeModelBakery.instance().getSpriteMap()::getSprite, BlockModelRotation.X0_Y0, resource);
+                ModelBakery modelBakery = Minecraft.getInstance().getModelManager().getModelBakery();
+                UnbakedModel modelOrMissing = modelBakery.getModel(resource);
+                return modelOrMissing.bake(modelBakery, modelBakery.getAtlasSet()::getSprite, BlockModelRotation.X0_Y0, resource);
             });
         }
 
@@ -38,13 +39,14 @@ public class ModelRegistry {
         }
     }
 
-    public static void onModelRegister(ModelRegistryEvent event) {
+    public static void onModelRegister(ModelEvent.RegisterAdditional event) {
         for (Model model : Model.values()) {
-            ForgeModelBakery.instance().addSpecialModel(model.getResourceLocation());
+            event.register(model.getResourceLocation());
+//            ModelBakery.instance().addSpecialModel(model.getResourceLocation());
         }
     }
 
-    public static void onModelBake(ModelBakeEvent event) {
+    public static void onModelBake(ModelEvent.BakingCompleted event) {
         for (Model model : Model.values()) {
             model.getCachedModel().invalidate();
         }

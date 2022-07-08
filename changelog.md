@@ -1,2 +1,1 @@
-- Re added JEI integration
-- Updated russian translation
+- Updated Forge version
