@@ -22,15 +22,15 @@ public class BlockEvents {
     }
 
     private void onPipeClick(PlayerInteractEvent.RightClickBlock event) {
-        BlockState state = event.getWorld().getBlockState(event.getPos());
+        BlockState state = event.getLevel().getBlockState(event.getPos());
         if (!(state.getBlock() instanceof PipeBlock)) {
             return;
         }
 
         PipeBlock pipe = (PipeBlock) state.getBlock();
 
-        Direction side = pipe.getSelection(state, event.getWorld(), event.getPos(), event.getPlayer()).getKey();
-        InteractionResult result = pipe.onPipeSideForceActivated(state, event.getWorld(), event.getPos(), event.getPlayer(), event.getHand(), event.getHitVec(), side);
+        Direction side = pipe.getSelection(state, event.getLevel(), event.getPos(), event.getEntity()).getKey();
+        InteractionResult result = pipe.onPipeSideForceActivated(state, event.getLevel(), event.getPos(), event.getEntity(), event.getHand(), event.getHitVec(), side);
         if (result.consumesAction()) {
             event.setUseItem(Event.Result.ALLOW);
             event.setCancellationResult(result);
@@ -39,24 +39,24 @@ public class BlockEvents {
     }
 
     private void onDestinationToolClick(PlayerInteractEvent.RightClickBlock event) {
-        ItemStack heldItem = event.getPlayer().getItemInHand(event.getHand());
+        ItemStack heldItem = event.getEntity().getItemInHand(event.getHand());
         if (!(heldItem.getItem() instanceof FilterDestinationToolItem)) {
             return;
         }
 
-        BlockEntity te = event.getWorld().getBlockEntity(event.getPos());
+        BlockEntity te = event.getLevel().getBlockEntity(event.getPos());
 
         if (te == null) {
             return;
         }
 
-        BlockState blockState = event.getWorld().getBlockState(event.getPos());
+        BlockState blockState = event.getLevel().getBlockState(event.getPos());
         if (blockState.getBlock() instanceof PipeBlock) {
             return;
         }
 
         FilterDestinationToolItem.setDestination(heldItem, new DirectionalPosition(event.getPos().immutable(), event.getFace()));
-        event.getPlayer().displayClientMessage(Component.translatable("message.pipez.filter_destination_tool.destination.set"), true);
+        event.getEntity().displayClientMessage(Component.translatable("message.pipez.filter_destination_tool.destination.set"), true);
         event.setUseItem(Event.Result.ALLOW);
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);

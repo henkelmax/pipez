@@ -27,7 +27,7 @@ public class PipeContainerProvider implements MenuProvider {
 
     public static void openGui(Player player, UpgradeTileEntity tileEntity, Direction direction, int index, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayer) {
-            NetworkHooks.openGui((ServerPlayer) player, new PipeContainerProvider(containerCreator, tileEntity), packetBuffer -> {
+            NetworkHooks.openScreen((ServerPlayer) player, new PipeContainerProvider(containerCreator, tileEntity), packetBuffer -> {
                 packetBuffer.writeBlockPos(tileEntity.getBlockPos());
                 packetBuffer.writeEnum(direction);
                 packetBuffer.writeInt(index);
