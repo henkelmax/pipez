@@ -13,7 +13,7 @@ import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
-//import de.maxhenkel.pipez.utils.WrappedGasStack;
+import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -136,13 +136,12 @@ public class FilterList extends WidgetBase {
             return new WrappedFluidStack(stack);
         }
 
-        /*if (ModList.get().isLoaded("mekanism")) {
+        if (ModList.get().isLoaded("mekanism")) {
             AbstractStack<?> gasStack = WrappedGasStack.dummyStack(o);
             if (gasStack != null) {
                 return gasStack;
             }
-        }*/
-        // TODO Add back Mekanism
+        }
 
         return null;
     }

@@ -12,8 +12,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import javax.annotation.Nullable;
-
 public class ModTileEntities {
 
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_REGISTER = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Main.MODID);
@@ -27,10 +25,9 @@ public class ModTileEntities {
     public static final RegistryObject<BlockEntityType<EnergyPipeTileEntity>> ENERGY_PIPE = BLOCK_ENTITY_REGISTER.register("energy_pipe", () ->
             BlockEntityType.Builder.of(EnergyPipeTileEntity::new, ModBlocks.ENERGY_PIPE.get()).build(null)
     );
-    // TODO Add back Mekanism
-    /*public static final RegistryObject<BlockEntityType<GasPipeTileEntity>> GAS_PIPE = BLOCK_ENTITY_REGISTER.register("gas_pipe", () ->
+    public static final RegistryObject<BlockEntityType<GasPipeTileEntity>> GAS_PIPE = BLOCK_ENTITY_REGISTER.register("gas_pipe", () ->
             BlockEntityType.Builder.of(GasPipeTileEntity::new, ModBlocks.GAS_PIPE.get()).build(null)
-    );*/
+    );
     public static final RegistryObject<BlockEntityType<UniversalPipeTileEntity>> UNIVERSAL_PIPE = BLOCK_ENTITY_REGISTER.register("universal_pipe", () ->
             BlockEntityType.Builder.of(UniversalPipeTileEntity::new, ModBlocks.UNIVERSAL_PIPE.get()).build(null)
     );
@@ -44,8 +41,7 @@ public class ModTileEntities {
         BlockEntityRenderers.register(ITEM_PIPE.get(), ItemPipeRenderer::new);
         BlockEntityRenderers.register(FLUID_PIPE.get(), FluidPipeRenderer::new);
         BlockEntityRenderers.register(ENERGY_PIPE.get(), EnergyPipeRenderer::new);
-        // TODO Add back Mekanism
-        // BlockEntityRenderers.register(GAS_PIPE.get(), GasPipeRenderer::new);
+        BlockEntityRenderers.register(GAS_PIPE.get(), GasPipeRenderer::new);
         BlockEntityRenderers.register(UNIVERSAL_PIPE.get(), UniversalPipeRenderer::new);
     }
 

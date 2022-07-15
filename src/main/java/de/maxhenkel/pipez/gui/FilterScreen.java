@@ -12,7 +12,7 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
-//import de.maxhenkel.pipez.utils.GasUtils;
+import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -195,7 +195,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     private boolean hasNBT() {
-        return true; //!(filter instanceof GasFilter); // TODO Add back Mekanism
+        return !(filter instanceof GasFilter);
     }
 
     @Override
@@ -226,7 +226,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
-        }/* else if (filter instanceof GasFilter) {
+        } else if (filter instanceof GasFilter) {
             Tag tag = GasUtils.getGas(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
@@ -234,8 +234,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             } else {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
-        }*/
-        // TODO Add back Mekanism
+        }
     }
 
     public void onNbtTextChanged(String text) {
@@ -277,14 +276,13 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                     nbt.setValue("");
                 }
             });
-        }/* else if (filter instanceof GasFilter) {
+        } else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 item.setValue(gas.getType().getRegistryName().toString());
                 nbt.setValue("");
             }
-        }*/
-        // TODO Add back Mekanism
+        }
     }
 
     public void onInsertDestination(ItemStack stack) {

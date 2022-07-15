@@ -106,18 +106,17 @@ dependencies {
 //    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge-api:${jei_version}")
 //    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
 
-    compileOnly fg.deobf("curse.maven:jei-238222:3834070")
+    implementation fg.deobf("curse.maven:jei-238222:3876379")
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 
-//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
-//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
-//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
-//    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
+    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
 
-    compileOnly fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
-
-    compileOnly fg.deobf("curse.maven:jade-324717:${jade_id}")
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
@@ -276,25 +275,4 @@ shadowJar {
 
 reobf {
     shadowJar {}
-}
-
-sourceSets {
-    main {
-        java {
-            // TODO Add back Mekanism
-            exclude 'de/maxhenkel/pipez/GasFilter.java'
-            exclude 'de/maxhenkel/pipez/utils/WrappedGasStack.java'
-            exclude 'de/maxhenkel/pipez/utils/GasUtils.java'
-            exclude 'de/maxhenkel/pipez/utils/GasTag.java'
-            exclude 'de/maxhenkel/pipez/blocks/tileentity/render/GasPipeRenderer.java'
-            exclude 'de/maxhenkel/pipez/blocks/tileentity/types/GasPipeType.java'
-            exclude 'de/maxhenkel/pipez/blocks/tileentity/GasPipeTileEntity.java'
-            exclude 'de/maxhenkel/pipez/blocks/GasPipeBlock.java'
-            exclude 'de/maxhenkel/pipez/capabilities/ModCapabilities.java'
-        }
-        resources {
-            // TODO Add back Mekanism
-            exclude 'data/pipez/loot_tables/blocks/gas_pipe.json'
-        }
-    }
 }

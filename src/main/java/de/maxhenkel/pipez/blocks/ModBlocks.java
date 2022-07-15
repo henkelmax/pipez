@@ -15,8 +15,7 @@ public class ModBlocks {
     public static final RegistryObject<FluidPipeBlock> FLUID_PIPE = BLOCK_REGISTER.register("fluid_pipe", FluidPipeBlock::new);
     public static final RegistryObject<EnergyPipeBlock> ENERGY_PIPE = BLOCK_REGISTER.register("energy_pipe", EnergyPipeBlock::new);
     public static final RegistryObject<UniversalPipeBlock> UNIVERSAL_PIPE = BLOCK_REGISTER.register("universal_pipe", UniversalPipeBlock::new);
-    // TODO Add back Mekanism
-    // public static final RegistryObject<GasPipeBlock> GAS_PIPE = BLOCK_REGISTER.register("gas_pipe", GasPipeBlock::new);
+    public static final RegistryObject<GasPipeBlock> GAS_PIPE = BLOCK_REGISTER.register("gas_pipe", GasPipeBlock::new);
 
     public static void init() {
         BLOCK_REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());

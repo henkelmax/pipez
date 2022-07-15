@@ -25,8 +25,7 @@ public class ModItems {
     public static final RegistryObject<Item> FLUID_PIPE = ITEM_REGISTER.register("fluid_pipe", () -> ModBlocks.FLUID_PIPE.get().toItem());
     public static final RegistryObject<Item> ENERGY_PIPE = ITEM_REGISTER.register("energy_pipe", () -> ModBlocks.ENERGY_PIPE.get().toItem());
     public static final RegistryObject<Item> UNIVERSAL_PIPE = ITEM_REGISTER.register("universal_pipe", () -> ModBlocks.UNIVERSAL_PIPE.get().toItem());
-    // TODO Add back Mekanism
-    // public static final RegistryObject<Item> GAS_PIPE = ITEM_REGISTER.register("gas_pipe", () -> ModBlocks.GAS_PIPE.get().toItem());
+    public static final RegistryObject<Item> GAS_PIPE = ITEM_REGISTER.register("gas_pipe", () -> ModBlocks.GAS_PIPE.get().toItem());
 
     public static void init() {
         ITEM_REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
