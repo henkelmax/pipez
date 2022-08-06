@@ -30,9 +30,9 @@ description='''Simple and efficient pipes'''
     versionRange="${jei_version_range}"
     ordering="NONE"
     side="BOTH"
-#[[dependencies.${mod_id}]]
-#    modId="mekanism"
-#    mandatory=false
-#    versionRange="${mod_mekanism_version_range}"
-#    ordering="AFTER"
-#    side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="mekanism"
+    mandatory=false
+    versionRange="${mod_mekanism_version_range}"
+    ordering="AFTER"
+    side="BOTH"
