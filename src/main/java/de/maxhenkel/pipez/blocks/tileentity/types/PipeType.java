@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
@@ -13,6 +14,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -20,6 +23,7 @@ import java.util.Set;
 
 public abstract class PipeType<T> {
 
+    protected Logger logger = LogManager.getLogger(Main.MODID);
     public abstract String getKey();
 
     public abstract void tick(PipeLogicTileEntity tileEntity);

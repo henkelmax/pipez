@@ -9,6 +9,7 @@ import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
+import de.maxhenkel.pipez.events.ServerTickEvents;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -18,7 +19,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -27,6 +31,8 @@ import java.util.stream.Collectors;
 public class GasPipeType extends PipeType<Gas> {
 
     public static final GasPipeType INSTANCE = new GasPipeType();
+
+    protected Logger logger = LogManager.getLogger(Main.MODID);
 
     @Override
     public String getKey() {
@@ -67,7 +73,7 @@ public class GasPipeType extends PipeType<Gas> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IGasHandler gasHandler = getGasHandler(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
+            IGasHandler gasHandler = getGasHandler(tileEntity.getLevel(), tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (gasHandler == null) {
                 continue;
             }
@@ -92,7 +98,7 @@ public class GasPipeType extends PipeType<Gas> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IGasHandler destination = getGasHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IGasHandler destination = getGasHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < gasHandler.getTanks(); j++) {
@@ -126,7 +132,7 @@ public class GasPipeType extends PipeType<Gas> {
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            IGasHandler destination = getGasHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IGasHandler destination = getGasHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             if (destination == null) {
                 continue;
             }
@@ -187,31 +193,28 @@ public class GasPipeType extends PipeType<Gas> {
     }
 
     @Nullable
-    private IGasHandler getGasHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
-        if (te == null) {
-            return null;
-        }
-        return te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, direction).orElse(null);
+    private IGasHandler getGasHandler(Level level, BlockPos pos, Direction direction) {
+        return ServerTickEvents.capabilityCache.getGasCapabilityResult(level, pos, direction);
     }
 
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.gasPipeAmount.get();
+            return ServerTickEvents.gasPipeAmount;
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.gasPipeAmountBasic.get();
+                return ServerTickEvents.gasPipeAmountBasic;
             case IMPROVED:
-                return Main.SERVER_CONFIG.gasPipeAmountImproved.get();
+                return ServerTickEvents.gasPipeAmountImproved;
             case ADVANCED:
-                return Main.SERVER_CONFIG.gasPipeAmountAdvanced.get();
+                return ServerTickEvents.gasPipeAmountAdvanced;
             case ULTIMATE:
-                return Main.SERVER_CONFIG.gasPipeAmountUltimate.get();
+                return ServerTickEvents.gasPipeAmountUltimate;
             case INFINITY:
-            default:
                 return Integer.MAX_VALUE;
+            default:
+                return 1;
         }
     }
 

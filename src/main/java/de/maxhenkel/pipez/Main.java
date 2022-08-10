@@ -4,6 +4,7 @@ import de.maxhenkel.corelib.CommonRegistry;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
+import de.maxhenkel.pipez.events.ServerTickEvents;
 import de.maxhenkel.pipez.events.StitchEvents;
 import de.maxhenkel.pipez.gui.Containers;
 import de.maxhenkel.pipez.integration.IMC;
@@ -76,6 +77,8 @@ public class Main {
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 4, RemoveFilterMessage.class);
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 5, EditFilterMessage.class);
         CommonRegistry.registerMessage(SIMPLE_CHANNEL, 6, OpenExtractMessage.class);
+
+        MinecraftForge.EVENT_BUS.register(new ServerTickEvents());
     }
 
     @OnlyIn(Dist.CLIENT)

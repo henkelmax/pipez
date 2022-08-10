@@ -3,12 +3,13 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.ItemFilter;
-import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.capabilities.CapabilityCache;
+import de.maxhenkel.pipez.events.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -16,7 +17,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -24,6 +27,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ItemPipeType extends PipeType<Item> {
@@ -67,21 +71,38 @@ public class ItemPipeType extends PipeType<Item> {
 
     @Override
     public void tick(PipeLogicTileEntity tileEntity) {
+        Level worldLevel = tileEntity.getLevel();
+        long gameTime = worldLevel.getGameTime();
         for (Direction side : Direction.values()) {
-            if (tileEntity.getLevel().getGameTime() % getSpeed(tileEntity, side) != 0) {
-                continue;
-            }
             if (!tileEntity.isExtracting(side)) {
                 continue;
             }
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IItemHandler itemHandler = getItemHandler(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
-            if (itemHandler == null) {
+            if (gameTime % getSpeed(tileEntity, side) != 0) {
+                continue;
+            }
+            // Check there is an item to send.
+            LazyOptional<IItemHandler> lazyOptionalItemHandler = CapabilityCache.getInstance().getItemCapability(worldLevel, tileEntity.getBlockPos().relative(side), side.getOpposite());
+            if (!lazyOptionalItemHandler.isPresent()) {
+                continue;
+            }
+            IItemHandler itemHandler = lazyOptionalItemHandler.resolve().get();
+
+            // Check there is any item to put of.
+            boolean isEmptyItem = true;
+            for (int i = 0; i < itemHandler.getSlots(); i += 1) {
+                if (!itemHandler.getStackInSlot(i).isEmpty()) {
+                    isEmptyItem = false;
+                    break;
+                }
+            }
+            if (isEmptyItem) {
                 continue;
             }
 
+            // Check there's no connection
             List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
 
             if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
@@ -101,7 +122,7 @@ public class ItemPipeType extends PipeType<Item> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (itemsToTransfer > 0 && hasNotInserted(inventoriesFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IItemHandler destination = getItemHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IItemHandler destination = getItemHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
             if (destination != null && !inventoriesFull[p] && !isFull(destination)) {
                 for (int j = 0; j < itemHandler.getSlots(); j++) {
@@ -139,7 +160,7 @@ public class ItemPipeType extends PipeType<Item> {
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
             nonFittingItems.clear();
-            IItemHandler destination = getItemHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IItemHandler destination = getItemHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             if (destination == null) {
                 continue;
             }
@@ -232,12 +253,8 @@ public class ItemPipeType extends PipeType<Item> {
     }
 
     @Nullable
-    private IItemHandler getItemHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
-        if (te == null) {
-            return null;
-        }
-        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).orElse(null);
+    private IItemHandler getItemHandler(Level level, BlockPos pos, Direction direction) {
+        return ServerTickEvents.capabilityCache.getItemCapabilityResult(level, pos, direction);
     }
 
     public int getSpeed(PipeLogicTileEntity tileEntity, Direction direction) {
@@ -246,40 +263,42 @@ public class ItemPipeType extends PipeType<Item> {
 
     public int getSpeed(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.itemPipeSpeed.get();
+            return ServerTickEvents.itemPipeSpeed;
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.itemPipeSpeedBasic.get();
+                return ServerTickEvents.itemPipeSpeedBasic;
             case IMPROVED:
-                return Main.SERVER_CONFIG.itemPipeSpeedImproved.get();
+                return ServerTickEvents.itemPipeSpeedImproved;
             case ADVANCED:
-                return Main.SERVER_CONFIG.itemPipeSpeedAdvanced.get();
+                return ServerTickEvents.itemPipeSpeedAdvanced;
             case ULTIMATE:
-                return Main.SERVER_CONFIG.itemPipeSpeedUltimate.get();
+                return ServerTickEvents.itemPipeSpeedUltimate;
             case INFINITY:
-            default:
                 return 1;
+            default:
+                return 20;
         }
     }
 
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.itemPipeAmount.get();
+            return ServerTickEvents.itemPipeAmount;
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.itemPipeAmountBasic.get();
+                return ServerTickEvents.itemPipeAmountBasic;
             case IMPROVED:
-                return Main.SERVER_CONFIG.itemPipeAmountImproved.get();
+                return ServerTickEvents.itemPipeAmountImproved;
             case ADVANCED:
-                return Main.SERVER_CONFIG.itemPipeAmountAdvanced.get();
+                return ServerTickEvents.itemPipeAmountAdvanced;
             case ULTIMATE:
-                return Main.SERVER_CONFIG.itemPipeAmountUltimate.get();
+                return ServerTickEvents.itemPipeAmountUltimate;
             case INFINITY:
-            default:
                 return Integer.MAX_VALUE;
+            default:
+                return 1;
         }
     }
 }

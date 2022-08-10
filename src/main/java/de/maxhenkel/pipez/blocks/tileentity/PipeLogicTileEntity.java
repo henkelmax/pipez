@@ -1,13 +1,16 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
+import de.maxhenkel.pipez.events.ServerTickEvents;
 import de.maxhenkel.pipez.utils.DirectionalLazyOptionalCache;
 import de.maxhenkel.pipez.utils.DummyFluidHandler;
 import de.maxhenkel.pipez.utils.DummyItemHandler;
 import de.maxhenkel.pipez.utils.PipeEnergyStorage;
+import mekanism.api.chemical.gas.IGasHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -17,11 +20,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashMap;
 
 public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
@@ -31,7 +44,11 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     protected DirectionalLazyOptionalCache<DummyFluidHandler> fluidCache;
     protected DirectionalLazyOptionalCache<DummyItemHandler> itemCache;
 
+    protected Logger logger = LogManager.getLogger(Main.MODID);
+
     private int recursionDepth;
+
+    private long tickCount = 0;
 
     public PipeLogicTileEntity(BlockEntityType<?> tileEntityTypeIn, PipeType<?>[] types, BlockPos pos, BlockState state) {
         super(tileEntityTypeIn, pos, state);
@@ -136,8 +153,26 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
             return;
         }
 
+        // print consumed ys
+        ArrayList<Long> partTime = new ArrayList<>();
+        long startTime = System.nanoTime();
+        long pTime = startTime;
+
         for (PipeType<?> type : getPipeTypes()) {
             type.tick(this);
+            long nowTime = System.nanoTime();
+            partTime.add(nowTime - pTime);
+            pTime = nowTime;
+        }
+
+        long endTime = System.nanoTime();
+        if (tickCount++ % 20 == 0) {
+            StringBuilder deltaStr = new StringBuilder();
+            for (long delta : partTime) {
+                deltaStr.append(delta).append(" ");
+            }
+            deltaStr.append("/ ").append((endTime - startTime) / 1000);
+            logger.log(Level.DEBUG, "Consumed Time: " + deltaStr + " (ys/t)");
         }
 
         if (hasType(EnergyPipeType.INSTANCE)) {
@@ -206,5 +241,6 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     public void popRecursion() {
         recursionDepth--;
     }
+
 
 }

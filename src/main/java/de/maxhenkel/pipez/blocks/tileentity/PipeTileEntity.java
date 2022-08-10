@@ -189,12 +189,14 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
     @Override
     public void tick() {
+        /*
         if (invalidateCountdown > 0) {
             invalidateCountdown--;
             if (invalidateCountdown <= 0) {
                 connectionCache = null;
             }
         }
+         */
     }
 
     public boolean isExtracting(Direction side) {

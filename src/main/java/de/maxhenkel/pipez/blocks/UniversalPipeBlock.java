@@ -2,7 +2,9 @@ package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.UniversalPipeTileEntity;
+import de.maxhenkel.pipez.capabilities.CapabilityCache;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
+import de.maxhenkel.pipez.events.ServerTickEvents;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.core.BlockPos;
@@ -28,13 +30,17 @@ public class UniversalPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
-        BlockEntity te = world.getBlockEntity(pos.relative(facing));
-        return te != null && (
-                te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
-                        || te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
-                        || te.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).isPresent()
-                        || te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
-        );
+        Level level = (Level) world;
+        if (level == null) {
+            return false;
+        }
+        CapabilityCache capCache = CapabilityCache.getInstance();
+        BlockPos targetPos = pos.relative(facing);
+        Direction targetDirection = facing.getOpposite();
+        return capCache.getItemCapability(level, targetPos, targetDirection).isPresent()
+                || capCache.getFluidCapability(level, targetPos, targetDirection).isPresent()
+                || capCache.getEnergyCapability(level, targetPos, targetDirection).isPresent()
+                || capCache.getGasCapability(level, targetPos, targetDirection).isPresent();
     }
 
     @Override

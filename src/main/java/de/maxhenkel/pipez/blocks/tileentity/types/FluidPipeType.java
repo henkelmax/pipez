@@ -8,20 +8,26 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.capabilities.CapabilityCache;
+import de.maxhenkel.pipez.events.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,8 +74,22 @@ public class FluidPipeType extends PipeType<Fluid> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IFluidHandler fluidHandler = getFluidHandler(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
-            if (fluidHandler == null) {
+            // Check Fluid Extract Part
+            var lazyFluidHandler = CapabilityCache.getInstance().getFluidCapability(
+                    tileEntity.getLevel(), tileEntity.getBlockPos().relative(side), side.getOpposite());
+            if (!lazyFluidHandler.isPresent()) {
+                continue;
+            }
+            var fluidHandler = lazyFluidHandler.resolve().get();
+            // Check Extractable Fluid exists
+            boolean fluidExist = false;
+            for (int i = 0; i < fluidHandler.getTanks(); i += 1) {
+                if (!fluidHandler.getFluidInTank(i).isEmpty()) {
+                    fluidExist = true;
+                    break;
+                }
+            }
+            if (!fluidExist) {
                 continue;
             }
 
@@ -93,7 +113,7 @@ public class FluidPipeType extends PipeType<Fluid> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IFluidHandler destination = getFluidHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IFluidHandler destination = getFluidHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < fluidHandler.getTanks(); j++) {
@@ -127,7 +147,7 @@ public class FluidPipeType extends PipeType<Fluid> {
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            IFluidHandler destination = getFluidHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IFluidHandler destination = getFluidHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             if (destination == null) {
                 continue;
             }
@@ -201,31 +221,28 @@ public class FluidPipeType extends PipeType<Fluid> {
     }
 
     @Nullable
-    private IFluidHandler getFluidHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
-        if (te == null) {
-            return null;
-        }
-        return te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction).orElse(null);
+    private IFluidHandler getFluidHandler(Level level, BlockPos pos, Direction direction) {
+        return ServerTickEvents.capabilityCache.getFluidCapabilityResult(level, pos, direction);
     }
 
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.fluidPipeAmount.get();
+            return ServerTickEvents.fluidPipeAmount;
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.fluidPipeAmountBasic.get();
+                return ServerTickEvents.fluidPipeAmountBasic;
             case IMPROVED:
-                return Main.SERVER_CONFIG.fluidPipeAmountImproved.get();
+                return ServerTickEvents.fluidPipeAmountImproved;
             case ADVANCED:
-                return Main.SERVER_CONFIG.fluidPipeAmountAdvanced.get();
+                return ServerTickEvents.fluidPipeAmountAdvanced;
             case ULTIMATE:
-                return Main.SERVER_CONFIG.fluidPipeAmountUltimate.get();
+                return ServerTickEvents.fluidPipeAmountUltimate;
             case INFINITY:
-            default:
                 return Integer.MAX_VALUE;
+            default:
+                return 1;
         }
     }
 
