@@ -27,6 +27,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,12 +77,11 @@ public class FluidPipeType extends PipeType<Fluid> {
                 continue;
             }
             // Check Fluid Extract Part
-            var lazyFluidHandler = CapabilityCache.getInstance().getFluidCapability(
+            var fluidHandler = CapabilityCache.getInstance().getFluidCapabilityResult(
                     tileEntity.getLevel(), tileEntity.getBlockPos().relative(side), side.getOpposite());
-            if (!lazyFluidHandler.isPresent()) {
+            if (fluidHandler == null) {
                 continue;
             }
-            var fluidHandler = lazyFluidHandler.resolve().get();
             // Check Extractable Fluid exists
             boolean fluidExist = false;
             for (int i = 0; i < fluidHandler.getTanks(); i += 1) {
@@ -93,12 +94,18 @@ public class FluidPipeType extends PipeType<Fluid> {
                 continue;
             }
 
-            List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
+            List<PipeTileEntity.Connection> connections = tileEntity.getConnections(); // tileEntity.getSortedConnections(side, this);
+            var distribution = tileEntity.getDistribution(side, this); // UpgradeTileEntity.Distribution.ROUND_ROBIN...
 
-            if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
+            if (distribution.equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
                 insertEqually(tileEntity, side, connections, fluidHandler);
             } else {
-                insertOrdered(tileEntity, side, connections, fluidHandler);
+                if (distribution.equals(UpgradeTileEntity.Distribution.RANDOM)) {
+                    connections = new ArrayList<>(connections);
+                    Collections.shuffle(connections);
+                }
+                insertOrdered(tileEntity, side, connections, fluidHandler,
+                        distribution.equals(UpgradeTileEntity.Distribution.FURTHEST));
             }
         }
     }
@@ -142,11 +149,12 @@ public class FluidPipeType extends PipeType<Fluid> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler) {
+    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler, boolean inverted) {
         int mbToTransfer = getRate(tileEntity, side);
 
         connectionLoop:
-        for (PipeTileEntity.Connection connection : connections) {
+        for (int k = 0; k < connections.size(); k += 1) {
+            var connection = connections.get(inverted ? (connections.size() - k - 1) : k);
             IFluidHandler destination = getFluidHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             if (destination == null) {
                 continue;
@@ -222,7 +230,7 @@ public class FluidPipeType extends PipeType<Fluid> {
 
     @Nullable
     private IFluidHandler getFluidHandler(Level level, BlockPos pos, Direction direction) {
-        return ServerTickEvents.capabilityCache.getFluidCapabilityResult(level, pos, direction);
+        return CapabilityCache.getInstance().getFluidCapabilityResult(level, pos, direction, true);
     }
 
     @Override

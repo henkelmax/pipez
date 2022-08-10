@@ -136,7 +136,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             queue.remove(blockPosIntegerEntry.getKey());
         }
 
-        connectionCache = connections.entrySet().stream().map(entry -> new Connection(entry.getKey().getPos(), entry.getKey().getDirection(), entry.getValue())).collect(Collectors.toList());
+        connectionCache = connections.entrySet().stream().map(
+                entry -> new Connection(entry.getKey().getPos(), entry.getKey().getDirection(), entry.getValue())
+        ).sorted(
+                Comparator.comparingInt(PipeTileEntity.Connection::getDistance)
+        ).collect(Collectors.toList());
     }
 
     public void addToQueue(Level world, BlockPos position, Map<BlockPos, Integer> queue, List<BlockPos> travelPositions, Map<DirectionalPosition, Integer> insertPositions, int distance) {
@@ -189,14 +193,12 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
     @Override
     public void tick() {
-        /*
         if (invalidateCountdown > 0) {
             invalidateCountdown--;
             if (invalidateCountdown <= 0) {
                 connectionCache = null;
             }
         }
-         */
     }
 
     public boolean isExtracting(Direction side) {

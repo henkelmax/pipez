@@ -49,7 +49,8 @@ public class CapabilityCache {
         tickCount += 1;
     }
 
-    protected <T> LazyOptional<T> getCachedValue(HashMap<Level, HashMap<BlockPos, EnumMap<Direction, LazyOptional<T>>>> cacheMap, Level level, BlockPos blockPos, Direction direction) {
+    protected <T> LazyOptional<T> getCachedValue(HashMap<Level, HashMap<BlockPos, EnumMap<Direction, LazyOptional<T>>>> cacheMap,
+                                                 Level level, BlockPos blockPos, Direction direction) {
         HashMap<BlockPos, EnumMap<Direction, LazyOptional<T>>> cacheLevelMap = cacheMap.get(level);
         if (cacheLevelMap == null) {
             cacheMap.put(level, new HashMap<>());
@@ -105,7 +106,7 @@ public class CapabilityCache {
 
 
     protected <T> LazyOptional<T> getCachedCapability(HashMap<Level, HashMap<BlockPos, EnumMap<Direction, LazyOptional<T>>>> cacheMap, net.minecraftforge.common.capabilities.Capability<T> cap,
-                                     @Nullable Level level, BlockPos blockPos, Direction direction, CapType capType) {
+                                     @Nullable Level level, BlockPos blockPos, Direction direction, CapType capType, boolean onlyCache) {
         // Check level is null
         if (level == null) {
             return LazyOptional.empty();
@@ -115,6 +116,10 @@ public class CapabilityCache {
         LazyOptional<T> capability = getCachedValue(cacheMap, level, blockPos, direction);
         // logger.log(org.apache.logging.log4j.Level.DEBUG, "Cache Hit: " + (capability != null ? "true" : "false"));
         if (capability == null || !capability.isPresent()) {
+            // Check only Cache is return
+            if (onlyCache) {
+                return LazyOptional.empty();
+            }
             // Check updated time
             /*
             long updatedTime = getUpdatedTime(level, blockPos, direction, capType);
@@ -142,8 +147,8 @@ public class CapabilityCache {
 
     @Nullable
     protected <T> T getCachedCapabilityResult(HashMap<Level, HashMap<BlockPos, EnumMap<Direction, LazyOptional<T>>>> cacheMap, net.minecraftforge.common.capabilities.Capability<T> cap,
-                                           @Nullable Level level, BlockPos blockPos, Direction direction, CapType capType) {
-        LazyOptional<T> cache = getCachedCapability(cacheMap, cap, level, blockPos, direction, capType);
+                                           @Nullable Level level, BlockPos blockPos, Direction direction, CapType capType, boolean onlyCache) {
+        LazyOptional<T> cache = getCachedCapability(cacheMap, cap, level, blockPos, direction, capType, onlyCache);
         if (!cache.isPresent()) {
             return null;
         } else {
@@ -157,48 +162,85 @@ public class CapabilityCache {
     }
 
 
-    public LazyOptional<IItemHandler> getItemCapability(@Nullable Level level, BlockPos blockPos, Direction direction) {
+    public LazyOptional<IItemHandler> getItemCapability(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
         return getCachedCapability(itemCache, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
-                level, blockPos, direction, CapType.ITEM);
+                level, blockPos, direction, CapType.ITEM, onlyCache);
+    }
+
+    public LazyOptional<IItemHandler> getItemCapability(@Nullable Level level, BlockPos blockPos, Direction direction) {
+        return getItemCapability(level, blockPos, direction, false);
+    }
+
+
+    @Nullable
+    public IItemHandler getItemCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
+        return getCachedCapabilityResult(itemCache, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+                level, blockPos, direction, CapType.ITEM, onlyCache);
     }
 
     @Nullable
     public IItemHandler getItemCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction) {
-        return getCachedCapabilityResult(itemCache, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
-                level, blockPos, direction, CapType.ITEM);
+        return getItemCapabilityResult(level, blockPos, direction, false);
+    }
+
+    public LazyOptional<IFluidHandler> getFluidCapability(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
+        return getCachedCapability(fluidCache, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
+                level, blockPos, direction, CapType.FLUID, onlyCache);
     }
 
     public LazyOptional<IFluidHandler> getFluidCapability(@Nullable Level level, BlockPos blockPos, Direction direction) {
-        return getCachedCapability(fluidCache, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
-                level, blockPos, direction, CapType.FLUID);
+        return getFluidCapability(level, blockPos, direction, false);
+    }
+
+    @Nullable
+    public IFluidHandler getFluidCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
+        return getCachedCapabilityResult(fluidCache, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
+                level, blockPos, direction, CapType.FLUID, onlyCache);
     }
 
     @Nullable
     public IFluidHandler getFluidCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction) {
-        return getCachedCapabilityResult(fluidCache, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
-                level, blockPos, direction, CapType.FLUID);
+        return getFluidCapabilityResult(level, blockPos, direction, false);
+    }
+
+    public LazyOptional<IEnergyStorage> getEnergyCapability(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
+        return getCachedCapability(energyCache, CapabilityEnergy.ENERGY,
+                level, blockPos, direction, CapType.ENERGY, onlyCache);
     }
 
     public LazyOptional<IEnergyStorage> getEnergyCapability(@Nullable Level level, BlockPos blockPos, Direction direction) {
-        return getCachedCapability(energyCache, CapabilityEnergy.ENERGY,
-                level, blockPos, direction, CapType.ENERGY);
+        return getEnergyCapability(level, blockPos, direction, false);
+    }
+
+    @Nullable
+    public IEnergyStorage getEnergyCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
+        return getCachedCapabilityResult(energyCache, CapabilityEnergy.ENERGY,
+                level, blockPos, direction, CapType.ENERGY, onlyCache);
     }
 
     @Nullable
     public IEnergyStorage getEnergyCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction) {
-        return getCachedCapabilityResult(energyCache, CapabilityEnergy.ENERGY,
-                level, blockPos, direction, CapType.ENERGY);
+        return getEnergyCapabilityResult(level, blockPos, direction, false);
+    }
+
+    public LazyOptional<IGasHandler> getGasCapability(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
+        return getCachedCapability(gasCache, ModCapabilities.GAS_HANDLER_CAPABILITY,
+                level, blockPos, direction, CapType.GAS, onlyCache);
     }
 
     public LazyOptional<IGasHandler> getGasCapability(@Nullable Level level, BlockPos blockPos, Direction direction) {
-        return getCachedCapability(gasCache, ModCapabilities.GAS_HANDLER_CAPABILITY,
-                level, blockPos, direction, CapType.GAS);
+        return getGasCapability(level, blockPos, direction, false);
+    }
+
+    @Nullable
+    public IGasHandler getGasCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction, boolean onlyCache) {
+        return getCachedCapabilityResult(gasCache, ModCapabilities.GAS_HANDLER_CAPABILITY,
+                level, blockPos, direction, CapType.GAS, onlyCache);
     }
 
     @Nullable
     public IGasHandler getGasCapabilityResult(@Nullable Level level, BlockPos blockPos, Direction direction) {
-        return getCachedCapabilityResult(gasCache, ModCapabilities.GAS_HANDLER_CAPABILITY,
-                level, blockPos, direction, CapType.GAS);
+        return getGasCapabilityResult(level, blockPos, direction, false);
     }
 
     enum CapType {

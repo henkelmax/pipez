@@ -26,6 +26,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,12 +84,14 @@ public class ItemPipeType extends PipeType<Item> {
             if (gameTime % getSpeed(tileEntity, side) != 0) {
                 continue;
             }
-            // Check there is an item to send.
-            LazyOptional<IItemHandler> lazyOptionalItemHandler = CapabilityCache.getInstance().getItemCapability(worldLevel, tileEntity.getBlockPos().relative(side), side.getOpposite());
-            if (!lazyOptionalItemHandler.isPresent()) {
+            var itemHandler = CapabilityCache.getInstance().getItemCapabilityResult(
+                    worldLevel,
+                    tileEntity.getBlockPos().relative(side),
+                    side.getOpposite()
+            );
+            if (itemHandler == null) {
                 continue;
             }
-            IItemHandler itemHandler = lazyOptionalItemHandler.resolve().get();
 
             // Check there is any item to put of.
             boolean isEmptyItem = true;
@@ -102,13 +105,19 @@ public class ItemPipeType extends PipeType<Item> {
                 continue;
             }
 
-            // Check there's no connection
-            List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
+            List<PipeTileEntity.Connection> connections = tileEntity.getConnections(); // tileEntity.getSortedConnections(side, this);
+            var distribution = tileEntity.getDistribution(side, this); // UpgradeTileEntity.Distribution.ROUND_ROBIN...
 
-            if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
+            if (distribution.equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
                 insertEqually(tileEntity, side, connections, itemHandler);
+                // insertEquality(tileEntity, side, connections, gasHandler);
             } else {
-                insertOrdered(tileEntity, side, connections, itemHandler);
+                if (distribution.equals(UpgradeTileEntity.Distribution.RANDOM)) {
+                    connections = new ArrayList<>(connections);
+                    Collections.shuffle(connections);
+                }
+                insertOrdered(tileEntity, side, connections, itemHandler,
+                        distribution.equals(UpgradeTileEntity.Distribution.FURTHEST));
             }
         }
     }
@@ -152,13 +161,14 @@ public class ItemPipeType extends PipeType<Item> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
+    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler, boolean inverted) {
         int itemsToTransfer = getRate(tileEntity, side);
 
         ArrayList<ItemStack> nonFittingItems = new ArrayList<>();
 
         connectionLoop:
-        for (PipeTileEntity.Connection connection : connections) {
+        for (int k = 0; k < connections.size(); k += 1) {
+            var connection = connections.get(inverted ? (connections.size() - k - 1) : k);
             nonFittingItems.clear();
             IItemHandler destination = getItemHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             if (destination == null) {
@@ -254,7 +264,7 @@ public class ItemPipeType extends PipeType<Item> {
 
     @Nullable
     private IItemHandler getItemHandler(Level level, BlockPos pos, Direction direction) {
-        return ServerTickEvents.capabilityCache.getItemCapabilityResult(level, pos, direction);
+        return CapabilityCache.getInstance().getItemCapabilityResult(level, pos, direction, true);
     }
 
     public int getSpeed(PipeLogicTileEntity tileEntity, Direction direction) {

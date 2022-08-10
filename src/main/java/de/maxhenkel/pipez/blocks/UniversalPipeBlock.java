@@ -37,10 +37,13 @@ public class UniversalPipeBlock extends PipeBlock {
         CapabilityCache capCache = CapabilityCache.getInstance();
         BlockPos targetPos = pos.relative(facing);
         Direction targetDirection = facing.getOpposite();
-        return capCache.getItemCapability(level, targetPos, targetDirection).isPresent()
-                || capCache.getFluidCapability(level, targetPos, targetDirection).isPresent()
-                || capCache.getEnergyCapability(level, targetPos, targetDirection).isPresent()
-                || capCache.getGasCapability(level, targetPos, targetDirection).isPresent();
+
+        var capability = false;
+        capability |= capCache.getItemCapability(level, targetPos, targetDirection).isPresent();
+        capability |= capCache.getFluidCapability(level, targetPos, targetDirection).isPresent();
+        capability |= capCache.getEnergyCapability(level, targetPos, targetDirection).isPresent();
+        capability |= capCache.getGasCapability(level, targetPos, targetDirection).isPresent();
+        return capability;
     }
 
     @Override

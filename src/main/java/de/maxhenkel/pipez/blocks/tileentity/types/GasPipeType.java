@@ -8,8 +8,10 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.capabilities.CapabilityCache;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.events.ServerTickEvents;
+import de.maxhenkel.pipez.utils.TankInfo;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -21,11 +23,13 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GasPipeType extends PipeType<Gas> {
@@ -66,6 +70,8 @@ public class GasPipeType extends PipeType<Gas> {
 
     @Override
     public void tick(PipeLogicTileEntity tileEntity) {
+        var worldLevel = tileEntity.getLevel();
+
         for (Direction side : Direction.values()) {
             if (!tileEntity.isExtracting(side)) {
                 continue;
@@ -73,18 +79,119 @@ public class GasPipeType extends PipeType<Gas> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IGasHandler gasHandler = getGasHandler(tileEntity.getLevel(), tileEntity.getBlockPos().relative(side), side.getOpposite());
+            // Check there is gas
+            var gasHandler = CapabilityCache.getInstance().getGasCapabilityResult(worldLevel, tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (gasHandler == null) {
                 continue;
             }
 
-            List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
-
-            if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
-                insertEqually(tileEntity, side, connections, gasHandler);
-            } else {
-                insertOrdered(tileEntity, side, connections, gasHandler);
+            // Check there is any item to put of.
+            boolean hasGas = false;
+            for (int i = 0; i < gasHandler.getTanks(); i += 1) {
+                if (!gasHandler.getChemicalInTank(i).isEmpty()) {
+                    hasGas = true;
+                    break;
+                }
             }
+            if (!hasGas) {
+                continue;
+            }
+            // Connections loop
+            List<PipeTileEntity.Connection> connections = tileEntity.getConnections(); // tileEntity.getSortedConnections(side, this);
+            var distribution = tileEntity.getDistribution(side, this); // UpgradeTileEntity.Distribution.ROUND_ROBIN...
+
+            if (distribution.equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
+                insertEqually(tileEntity, side, connections, gasHandler);
+                // insertEquality(tileEntity, side, connections, gasHandler);
+            } else {
+                if (distribution.equals(UpgradeTileEntity.Distribution.RANDOM)) {
+                    connections = new ArrayList<>(connections);
+                    Collections.shuffle(connections);
+                }
+                insertOrdered(tileEntity, side, connections, gasHandler,
+                        distribution.equals(UpgradeTileEntity.Distribution.FURTHEST));
+            }
+        }
+    }
+
+    protected void insertEquality(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IGasHandler gasHandler) {
+        var level = tileEntity.getLevel();
+        // 1. If there isn't any connection, skip.
+        if (connections.isEmpty()) {
+            return;
+        }
+        // 2. Get connections
+        var validDestinations = new ArrayList<IGasHandler>();
+        for (PipeTileEntity.Connection connection : connections) {
+            var cacheConnection = CapabilityCache.getInstance().getGasCapabilityResult(level, connection.getPos(), connection.getDirection());
+            if (cacheConnection != null) {
+                validDestinations.add(cacheConnection);
+            }
+        }
+        // 3. Iterate gases
+        int tanksSize = gasHandler.getTanks();
+        int destSize = validDestinations.size();
+        long maxTransfer = getRate(tileEntity, side);
+        for (int i = 0; i < tanksSize; i += 1) {
+            // Gas type 0~n
+            GasStack gasInTank = gasHandler.getChemicalInTank(i);
+            gasInTank = new GasStack(gasInTank, Math.min(gasInTank.getAmount(), maxTransfer));
+            GasStack testGas = new GasStack(gasInTank, 1L);
+            // check destinations
+            TankInfo tanksInfo[] = new TankInfo[destSize];
+            for (int k = 0; k < validDestinations.size(); k += 1) {
+                var info = new TankInfo();
+                var destHandler = validDestinations.get(i);
+                info.availableSize = 0;
+                info.slot = -1;
+                // Loop tanks
+                for (int tankIndex = 0; tankIndex < destHandler.getTanks(); tankIndex += 1) {
+                    if (destHandler.isValid(tankIndex, testGas)) {
+                        info.availableSize = Math.max(0L, destHandler.getTankCapacity(tankIndex) - destHandler.getChemicalInTank(tankIndex).getAmount());
+                        info.slot = tankIndex;
+                        break;
+                    }
+                }
+                tanksInfo[k] = info;
+            }
+            // Round-robin?
+            var sortedList = Arrays.stream(tanksInfo).sorted(Comparator.comparingLong(TankInfo::getAvailableSize)).toList();
+            var stairValue = 0L;
+            var leftAmount = gasInTank.getAmount();
+            for (int k = 0; k < sortedList.size(); k += 1) {
+                var tankInfo = sortedList.get(k);
+                if (tankInfo.availableSize <= 0) {
+                    continue;
+                }
+                // Check flatten
+                var leftSize = sortedList.size() - k;
+                var flatValue = leftAmount / leftSize + stairValue;
+                // can fill equal
+                if (tankInfo.availableSize >= flatValue) {
+                    for (int j = k; j < sortedList.size(); j += 1) {
+                        sortedList.get(j).fillSize = flatValue;
+                        leftAmount -= flatValue;
+                    }
+                    break;
+                } else {
+                    // cannot fill equal so next iteration
+                    tankInfo.fillSize = tankInfo.availableSize;
+                    stairValue += tankInfo.fillSize;
+                    leftAmount -= leftSize * tankInfo.fillSize;
+                }
+            }
+            // Push
+            var extractedGas = gasHandler.extractChemical(i, maxTransfer - leftAmount, Action.EXECUTE);
+            for (TankInfo info : sortedList) {
+                validDestinations.get(info.index).insertChemical(
+                        info.slot,
+                        new GasStack(extractedGas, info.fillSize),
+                        Action.EXECUTE
+                );
+            }
+            logger.log(org.apache.logging.log4j.Level.DEBUG, "Extract: " + extractedGas.getAmount());
+            // Reduce max transfer
+            maxTransfer = maxTransfer - (gasInTank.getAmount() - leftAmount);
         }
     }
 
@@ -127,11 +234,18 @@ public class GasPipeType extends PipeType<Gas> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IGasHandler gasHandler) {
+    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IGasHandler gasHandler, boolean invert) {
         long mbToTransfer = getRate(tileEntity, side);
 
         connectionLoop:
-        for (PipeTileEntity.Connection connection : connections) {
+        for (int k = 0; k < connections.size(); k += 1) {
+            PipeTileEntity.Connection connection;
+            if (invert) {
+                connection = connections.get(connections.size() - k - 1);
+            } else {
+                connection = connections.get(k);
+            }
+
             IGasHandler destination = getGasHandler(tileEntity.getLevel(), connection.getPos(), connection.getDirection());
             if (destination == null) {
                 continue;
@@ -194,7 +308,7 @@ public class GasPipeType extends PipeType<Gas> {
 
     @Nullable
     private IGasHandler getGasHandler(Level level, BlockPos pos, Direction direction) {
-        return ServerTickEvents.capabilityCache.getGasCapabilityResult(level, pos, direction);
+        return CapabilityCache.getInstance().getGasCapabilityResult(level, pos, direction, true);
     }
 
     @Override
