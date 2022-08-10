@@ -149,15 +149,12 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     public void tick() {
         super.tick();
 
-        if (level.isClientSide) {
+        if (level == null || level.isClientSide) {
             return;
         }
 
         for (PipeType<?> type : getPipeTypes()) {
             type.tick(this);
-            long nowTime = System.nanoTime();
-            partTime.add(nowTime - pTime);
-            pTime = nowTime;
         }
 
         if (hasType(EnergyPipeType.INSTANCE)) {
