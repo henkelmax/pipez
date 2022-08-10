@@ -60,18 +60,18 @@ public class ServerTickEvents {
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
         if (tickCount % LOAD_CONFIG_INTERVAL == 0) {
-            logger.log(Level.DEBUG, "Updating Config");
+            // logger.log(Level.DEBUG, "Updating Config");
             updateConfig();
         }
         tickCount += 1;
-        capabilityCache.addTick();
+        // capabilityCache.addTick();
     }
 
     @SubscribeEvent
     public void onServerStarted(ServerStartedEvent event) {
         capabilityCache = new CapabilityCache();
         tickCount = 0;
-        logger.log(Level.DEBUG, "On server started!");
+        // logger.log(Level.DEBUG, "On server started!");
     }
 
     /**

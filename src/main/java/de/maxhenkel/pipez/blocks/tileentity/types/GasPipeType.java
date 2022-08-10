@@ -115,6 +115,7 @@ public class GasPipeType extends PipeType<Gas> {
     }
 
     protected void insertEquality(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IGasHandler gasHandler) {
+        // Not working and Incomplete code
         var level = tileEntity.getLevel();
         // 1. If there isn't any connection, skip.
         if (connections.isEmpty()) {

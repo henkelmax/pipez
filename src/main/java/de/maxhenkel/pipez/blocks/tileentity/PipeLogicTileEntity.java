@@ -153,26 +153,11 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
             return;
         }
 
-        // print consumed ys
-        ArrayList<Long> partTime = new ArrayList<>();
-        long startTime = System.nanoTime();
-        long pTime = startTime;
-
         for (PipeType<?> type : getPipeTypes()) {
             type.tick(this);
             long nowTime = System.nanoTime();
             partTime.add(nowTime - pTime);
             pTime = nowTime;
-        }
-
-        long endTime = System.nanoTime();
-        if (tickCount++ % 20 == 0) {
-            StringBuilder deltaStr = new StringBuilder();
-            for (long delta : partTime) {
-                deltaStr.append(delta).append(" ");
-            }
-            deltaStr.append("/ ").append((endTime - startTime) / 1000);
-            logger.log(Level.DEBUG, "Consumed Time: " + deltaStr + " (ys/t)");
         }
 
         if (hasType(EnergyPipeType.INSTANCE)) {
