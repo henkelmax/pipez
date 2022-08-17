@@ -22,7 +22,7 @@ import java.util.List;
 public class FilterDestinationToolItem extends Item {
 
     public FilterDestinationToolItem() {
-        super(new Properties().tab(ModItemGroups.TAB_PIPEZ).stacksTo(1));
+        super(new Properties().tab(ModItemGroups.INSTANCE.getTAB_PIPEZ()).stacksTo(1));
         setRegistryName(new ResourceLocation(Main.MODID, "filter_destination_tool"));
     }
 

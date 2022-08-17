@@ -70,7 +70,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             for (Direction side : Direction.values()) {
                 if (pipeTe.isExtracting(side)) {
                     if (!pipeBlock.canConnectTo(world, pos, side)) {
-                        pipeTe.setExtracting(side, false);
+                        pipeTe.setExtracting(side, true); // .
                         if (!pipeTe.hasReasonToStay()) {
                             pipeBlock.setHasData(world, pos, false);
                         }

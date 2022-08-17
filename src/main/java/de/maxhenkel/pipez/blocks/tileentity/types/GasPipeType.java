@@ -3,12 +3,12 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.GasFilter;
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
+import de.maxhenkel.pipez.types.Upgrade;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.events.ServerTickEvents;
 import de.maxhenkel.pipez.utils.TankInfo;
@@ -23,8 +23,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,7 +78,7 @@ public class GasPipeType extends PipeType<Gas> {
                 continue;
             }
             // Check there is gas
-            var gasHandler = CapabilityCache.getInstance().getGasCapabilityResult(worldLevel, tileEntity.getBlockPos().relative(side), side.getOpposite());
+            var gasHandler = CapabilityCacheOld.getInstance().getGasCapabilityResult(worldLevel, tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (gasHandler == null) {
                 continue;
             }
@@ -124,7 +122,7 @@ public class GasPipeType extends PipeType<Gas> {
         // 2. Get connections
         var validDestinations = new ArrayList<IGasHandler>();
         for (PipeTileEntity.Connection connection : connections) {
-            var cacheConnection = CapabilityCache.getInstance().getGasCapabilityResult(level, connection.getPos(), connection.getDirection());
+            var cacheConnection = CapabilityCacheOld.getInstance().getGasCapabilityResult(level, connection.getPos(), connection.getDirection());
             if (cacheConnection != null) {
                 validDestinations.add(cacheConnection);
             }
@@ -309,28 +307,12 @@ public class GasPipeType extends PipeType<Gas> {
 
     @Nullable
     private IGasHandler getGasHandler(Level level, BlockPos pos, Direction direction) {
-        return CapabilityCache.getInstance().getGasCapabilityResult(level, pos, direction, true);
+        return CapabilityCacheOld.getInstance().getGasCapabilityResult(level, pos, direction, true);
     }
 
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
-        if (upgrade == null) {
-            return ServerTickEvents.gasPipeAmount;
-        }
-        switch (upgrade) {
-            case BASIC:
-                return ServerTickEvents.gasPipeAmountBasic;
-            case IMPROVED:
-                return ServerTickEvents.gasPipeAmountImproved;
-            case ADVANCED:
-                return ServerTickEvents.gasPipeAmountAdvanced;
-            case ULTIMATE:
-                return ServerTickEvents.gasPipeAmountUltimate;
-            case INFINITY:
-                return Integer.MAX_VALUE;
-            default:
-                return 1;
-        }
+        return 1;
     }
 
 }

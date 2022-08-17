@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.items;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.ModItemGroups;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.types.Upgrade;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -24,9 +24,9 @@ public class UpgradeItem extends Item {
     private final Upgrade tier;
 
     public UpgradeItem(Upgrade tier) {
-        super(new Properties().tab(ModItemGroups.TAB_PIPEZ));
+        super(new Properties().tab(ModItemGroups.INSTANCE.getTAB_PIPEZ()));
         this.tier = tier;
-        setRegistryName(new ResourceLocation(Main.MODID, tier.getName() + "_upgrade"));
+        setRegistryName(new ResourceLocation(Main.MODID, tier.getUpgradeName() + "_upgrade"));
     }
 
     public Upgrade getTier() {

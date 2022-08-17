@@ -1,7 +1,6 @@
 package de.maxhenkel.pipez.capabilities;
 
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.events.ServerTickEvents;
 import mekanism.api.chemical.gas.IGasHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,13 +22,17 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.LongStream;
 
-public class CapabilityCache {
+public class CapabilityCacheOld {
 
-    private static final long UPDATE_DURATION = 20; // 20 ticks
-
-    public static CapabilityCache getInstance() {
-        return ServerTickEvents.capabilityCache;
+    private static CapabilityCacheOld instance;
+    public static CapabilityCacheOld getInstance() {
+        if (instance == null) {
+            instance = new CapabilityCacheOld();
+        }
+        return instance;
     }
+
+    private static final long UPDATE_DURATION = 200; // 200 ticks
 
     public long tickCount = UPDATE_DURATION * 2;
 
@@ -41,7 +44,7 @@ public class CapabilityCache {
     protected HashMap<Level, HashMap<BlockPos, EnumMap<Direction, LazyOptional<IGasHandler>>>> gasCache = new HashMap<>();
 
     protected HashMap<Level, HashMap<BlockPos, EnumMap<Direction, long[]>>> updatedTimeCache = new HashMap<>();
-    public CapabilityCache() {
+    public CapabilityCacheOld() {
 
     }
 
@@ -118,15 +121,12 @@ public class CapabilityCache {
         if (capability == null || !capability.isPresent()) {
             // Check only Cache is return
             if (onlyCache) {
-                return LazyOptional.empty();
+                // Check updated time
+                long updatedTime = getUpdatedTime(level, blockPos, direction, capType);
+                if (Math.abs(tickCount - updatedTime) < UPDATE_DURATION) {
+                    return LazyOptional.empty();
+                }
             }
-            // Check updated time
-            /*
-            long updatedTime = getUpdatedTime(level, blockPos, direction, capType);
-            if (Math.abs(tickCount - updatedTime) < UPDATE_DURATION) {
-                return LazyOptional.empty();
-            }
-             */
             // Check BlockEntity exists
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity == null) {
@@ -134,12 +134,13 @@ public class CapabilityCache {
             }
             capability = blockEntity.getCapability(cap, direction);
             putCacheValue(cacheMap, level, blockPos, direction, capability);
-            // putUpdatedTime(level, blockPos, direction, capType, tickCount);
+            putUpdatedTime(level, blockPos, direction, capType, 0);
             capability.addListener(self -> {
                 // logger.log(org.apache.logging.log4j.Level.DEBUG, "Remove Cache:" + blockPos.getX() + "," + blockPos.getY() + "," + blockPos.getZ() + ", " + direction.getSerializedName());
                 putCacheValue(cacheMap, level, blockPos, direction, null);
-                // putUpdatedTime(level, blockPos, direction, capType, tickCount);
+                putUpdatedTime(level, blockPos, direction, capType, tickCount);
             });
+            logger.log(org.apache.logging.log4j.Level.DEBUG, "Cache Position: " + blockPos + " side: " + direction.getSerializedName());
             // logger.log(org.apache.logging.log4j.Level.DEBUG, "Cache Miss: " + blockPos.getX() + "," + blockPos.getY() + "," + blockPos.getZ() + ", " + direction.getSerializedName());
         }
         return capability;

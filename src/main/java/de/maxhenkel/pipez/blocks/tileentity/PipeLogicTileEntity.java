@@ -66,7 +66,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
             return super.getCapability(cap, side);
         }
 
-        if (cap == CapabilityEnergy.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
+        if (cap == CapabilityEnergy.ENERGY && hasType(EnergyPipeType.Companion.getINSTANCE())) {
             if (side != null) {
                 return energyCache.get(side).cast();
             }
@@ -153,11 +153,27 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
             return;
         }
 
+        // print consumed ys
+        ArrayList<Long> partTime = new ArrayList<>();
+        long startTime = System.nanoTime();
+
         for (PipeType<?> type : getPipeTypes()) {
+            long pTime = System.nanoTime();
             type.tick(this);
+            partTime.add(System.nanoTime() - pTime);
+        }
+        long endTime = System.nanoTime();
+        if (tickCount++ % 20 == 0) {
+            StringBuilder deltaStr = new StringBuilder();
+            for (long delta : partTime) {
+                deltaStr.append(delta).append(" ");
+            }
+            deltaStr.append("/ ").append((endTime - startTime) / 1000);
+            logger.log(Level.DEBUG, "Consumed Time: " + deltaStr + " (ys/t)");
         }
 
-        if (hasType(EnergyPipeType.INSTANCE)) {
+
+        if (hasType(EnergyPipeType.Companion.getINSTANCE())) {
             for (Direction side : Direction.values()) {
                 if (isExtracting(side)) {
                     energyCache.get(side).ifPresent(PipeEnergyStorage::tick);
@@ -169,7 +185,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     @Override
     public void setExtracting(Direction side, boolean extracting) {
         super.setExtracting(side, extracting);
-        if (hasType(EnergyPipeType.INSTANCE)) {
+        if (hasType(EnergyPipeType.Companion.getINSTANCE())) {
             energyCache.revalidate(side, s -> extracting, (s) -> new PipeEnergyStorage(this, s));
         }
         if (hasType(FluidPipeType.INSTANCE)) {
@@ -183,7 +199,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
-        if (hasType(EnergyPipeType.INSTANCE)) {
+        if (hasType(EnergyPipeType.Companion.getINSTANCE())) {
             energyCache.revalidate(this::isExtracting, (s) -> new PipeEnergyStorage(this, s));
         }
         if (hasType(FluidPipeType.INSTANCE)) {

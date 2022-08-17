@@ -3,7 +3,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 import de.maxhenkel.corelib.inventory.ItemListInventory;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.types.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.configuration.DistributionCache;
 import de.maxhenkel.pipez.blocks.tileentity.configuration.FilterCache;
 import de.maxhenkel.pipez.blocks.tileentity.configuration.FilterModeCache;
@@ -132,13 +132,12 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         ItemUtils.saveInventory(compound, "Upgrades", upgradeInventory);
     }
 
-    @Nullable
     public Upgrade getUpgrade(Direction direction) {
         ItemStack stack = upgradeInventory.get(direction.get3DDataValue());
         if (stack.getItem() instanceof UpgradeItem) {
             return ((UpgradeItem) stack.getItem()).getTier();
         }
-        return null;
+        return Upgrade.NONE;
     }
 
     public List<PipeTileEntity.Connection> getSortedConnections(Direction side, PipeType pipeType) {

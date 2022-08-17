@@ -18,14 +18,14 @@ public class PipeEnergyStorage implements IEnergyStorage {
 
     public void tick() {
         if (pipe.getLevel().getGameTime() - lastReceived > 1) {
-            EnergyPipeType.INSTANCE.pullEnergy(pipe, side);
+            EnergyPipeType.Companion.getINSTANCE().pullEnergy(pipe, side);
         }
     }
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         lastReceived = pipe.getLevel().getGameTime();
-        return EnergyPipeType.INSTANCE.receive(pipe, side, maxReceive, simulate);
+        return EnergyPipeType.Companion.getINSTANCE().receive(pipe, side, maxReceive, simulate);
     }
 
     @Override

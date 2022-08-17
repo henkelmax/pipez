@@ -2,13 +2,12 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.FluidFilter;
-import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
+import de.maxhenkel.pipez.types.Upgrade;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
 import de.maxhenkel.pipez.events.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,13 +22,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,7 +73,7 @@ public class FluidPipeType extends PipeType<Fluid> {
                 continue;
             }
             // Check Fluid Extract Part
-            var fluidHandler = CapabilityCache.getInstance().getFluidCapabilityResult(
+            var fluidHandler = CapabilityCacheOld.getInstance().getFluidCapabilityResult(
                     tileEntity.getLevel(), tileEntity.getBlockPos().relative(side), side.getOpposite());
             if (fluidHandler == null) {
                 continue;
@@ -230,28 +226,12 @@ public class FluidPipeType extends PipeType<Fluid> {
 
     @Nullable
     private IFluidHandler getFluidHandler(Level level, BlockPos pos, Direction direction) {
-        return CapabilityCache.getInstance().getFluidCapabilityResult(level, pos, direction, true);
+        return CapabilityCacheOld.getInstance().getFluidCapabilityResult(level, pos, direction, true);
     }
 
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
-        if (upgrade == null) {
-            return ServerTickEvents.fluidPipeAmount;
-        }
-        switch (upgrade) {
-            case BASIC:
-                return ServerTickEvents.fluidPipeAmountBasic;
-            case IMPROVED:
-                return ServerTickEvents.fluidPipeAmountImproved;
-            case ADVANCED:
-                return ServerTickEvents.fluidPipeAmountAdvanced;
-            case ULTIMATE:
-                return ServerTickEvents.fluidPipeAmountUltimate;
-            case INFINITY:
-                return Integer.MAX_VALUE;
-            default:
-                return 1;
-        }
+        return 1;
     }
 
 }

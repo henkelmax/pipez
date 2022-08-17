@@ -7,6 +7,8 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: 'de.maxhenkel.forge-update', name: 'forge-update', version: '1.0.4'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
+        classpath 'org.jetbrains.kotlin:kotlin-serialization:1.7.0'
     }
 }
 
@@ -19,6 +21,10 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'forge-update'
 apply plugin: 'idea'
+apply plugin: 'kotlin'
+apply plugin: 'kotlinx-serialization'
+// Adds KFF as dependency and Kotlin libs to the runtime classpath
+apply from: 'https://raw.githubusercontent.com/thedarkcolour/KotlinForForge/site/thedarkcolour/kotlinforforge/gradle/kff-3.6.0.gradle'
 
 idea {
     module {

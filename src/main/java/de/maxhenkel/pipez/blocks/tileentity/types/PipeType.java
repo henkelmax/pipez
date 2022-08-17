@@ -3,7 +3,7 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.types.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ public abstract class PipeType<T> {
 
     public abstract void tick(PipeLogicTileEntity tileEntity);
 
-    public abstract int getRate(@Nullable Upgrade upgrade);
+    public abstract int getRate(@NotNull Upgrade upgrade);
 
     public abstract boolean canInsert(BlockEntity tileEntity, Direction direction);
 
@@ -38,7 +39,7 @@ public abstract class PipeType<T> {
 
     public abstract ItemStack getIcon();
 
-    public abstract Component getTransferText(@Nullable Upgrade upgrade);
+    public abstract Component getTransferText(@NotNull Upgrade upgrade);
 
     public boolean hasFilter() {
         return true;

@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.GasPipeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
@@ -28,7 +28,7 @@ public class GasPipeBlock extends PipeBlock {
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
         Level level = (Level) world;
-        return (level != null && CapabilityCache.getInstance().getGasCapability(
+        return (level != null && CapabilityCacheOld.getInstance().getGasCapability(
                 level, pos.relative(facing), facing.getOpposite()).isPresent());
     }
 

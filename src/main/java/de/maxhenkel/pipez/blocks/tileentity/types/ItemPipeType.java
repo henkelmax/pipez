@@ -3,12 +3,12 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.ItemFilter;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
+import de.maxhenkel.pipez.types.Upgrade;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
 import de.maxhenkel.pipez.events.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,7 +19,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -28,7 +27,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ItemPipeType extends PipeType<Item> {
@@ -84,7 +82,7 @@ public class ItemPipeType extends PipeType<Item> {
             if (gameTime % getSpeed(tileEntity, side) != 0) {
                 continue;
             }
-            var itemHandler = CapabilityCache.getInstance().getItemCapabilityResult(
+            var itemHandler = CapabilityCacheOld.getInstance().getItemCapabilityResult(
                     worldLevel,
                     tileEntity.getBlockPos().relative(side),
                     side.getOpposite()
@@ -264,7 +262,7 @@ public class ItemPipeType extends PipeType<Item> {
 
     @Nullable
     private IItemHandler getItemHandler(Level level, BlockPos pos, Direction direction) {
-        return CapabilityCache.getInstance().getItemCapabilityResult(level, pos, direction, true);
+        return CapabilityCacheOld.getInstance().getItemCapabilityResult(level, pos, direction, true);
     }
 
     public int getSpeed(PipeLogicTileEntity tileEntity, Direction direction) {
@@ -272,43 +270,11 @@ public class ItemPipeType extends PipeType<Item> {
     }
 
     public int getSpeed(@Nullable Upgrade upgrade) {
-        if (upgrade == null) {
-            return ServerTickEvents.itemPipeSpeed;
-        }
-        switch (upgrade) {
-            case BASIC:
-                return ServerTickEvents.itemPipeSpeedBasic;
-            case IMPROVED:
-                return ServerTickEvents.itemPipeSpeedImproved;
-            case ADVANCED:
-                return ServerTickEvents.itemPipeSpeedAdvanced;
-            case ULTIMATE:
-                return ServerTickEvents.itemPipeSpeedUltimate;
-            case INFINITY:
-                return 1;
-            default:
-                return 20;
-        }
+        return 2000;
     }
 
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
-        if (upgrade == null) {
-            return ServerTickEvents.itemPipeAmount;
-        }
-        switch (upgrade) {
-            case BASIC:
-                return ServerTickEvents.itemPipeAmountBasic;
-            case IMPROVED:
-                return ServerTickEvents.itemPipeAmountImproved;
-            case ADVANCED:
-                return ServerTickEvents.itemPipeAmountAdvanced;
-            case ULTIMATE:
-                return ServerTickEvents.itemPipeAmountUltimate;
-            case INFINITY:
-                return Integer.MAX_VALUE;
-            default:
-                return 1;
-        }
+        return 1;
     }
 }

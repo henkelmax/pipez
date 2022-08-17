@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.ItemPipeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.core.BlockPos;
@@ -28,7 +28,7 @@ public class ItemPipeBlock extends PipeBlock {
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
         Level level = (Level) world;
 
-        return CapabilityCache.getInstance().getItemCapability(
+        return CapabilityCacheOld.getInstance().getItemCapability(
                 level, pos.relative(facing), facing.getOpposite()).isPresent();
     }
 

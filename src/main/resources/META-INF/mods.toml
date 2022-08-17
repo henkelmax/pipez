@@ -1,5 +1,5 @@
-modLoader="javafml"
-loaderVersion="${mod_loader_version}"
+modLoader="kotlinforforge"
+loaderVersion="[3,)"
 license="All rights reserved"
 issueTrackerURL="https://github.com/henkelmax/pipez/issues"
 [[mods]]

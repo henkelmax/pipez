@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.blocks;
 
+import de.maxhenkel.corelib.Logger;
 import de.maxhenkel.corelib.block.IItemBlock;
 import de.maxhenkel.corelib.block.VoxelUtils;
 import de.maxhenkel.corelib.blockentity.SimpleBlockEntityTicker;
@@ -71,7 +72,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
 
     @Override
     public Item toItem() {
-        return new BlockItem(this, new Item.Properties().tab(ModItemGroups.TAB_PIPEZ)).setRegistryName(getRegistryName());
+        return new BlockItem(this, new Item.Properties().tab(ModItemGroups.INSTANCE.getTAB_PIPEZ())).setRegistryName(getRegistryName());
     }
 
 
@@ -319,6 +320,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         if (!state.getProperties().stream().allMatch(property -> state.getValue(property).equals(newState.getValue(property)))) {
             world.setBlockAndUpdate(pos, newState);
             PipeTileEntity.markPipesDirty(world, pos);
+            Logger.INSTANCE.log(org.apache.logging.log4j.Level.DEBUG, "Block State changed.");
         }
     }
 

@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.UniversalPipeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.events.ServerTickEvents;
 import de.maxhenkel.pipez.gui.ExtractContainer;
@@ -34,7 +34,7 @@ public class UniversalPipeBlock extends PipeBlock {
         if (level == null) {
             return false;
         }
-        CapabilityCache capCache = CapabilityCache.getInstance();
+        CapabilityCacheOld capCache = CapabilityCacheOld.getInstance();
         BlockPos targetPos = pos.relative(facing);
         Direction targetDirection = facing.getOpposite();
 
@@ -44,6 +44,12 @@ public class UniversalPipeBlock extends PipeBlock {
         capability |= capCache.getEnergyCapability(level, targetPos, targetDirection).isPresent();
         capability |= capCache.getGasCapability(level, targetPos, targetDirection).isPresent();
         return capability;
+        /*
+        return capCache.getItemCapability(level, targetPos, targetDirection).isPresent()
+                || capCache.getFluidCapability(level, targetPos, targetDirection).isPresent()
+                || capCache.getEnergyCapability(level, targetPos, targetDirection).isPresent()
+                || capCache.getGasCapability(level, targetPos, targetDirection).isPresent();
+         */
     }
 
     @Override

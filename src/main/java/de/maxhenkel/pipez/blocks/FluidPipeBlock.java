@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.FluidPipeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.core.BlockPos;
@@ -27,7 +27,7 @@ public class FluidPipeBlock extends PipeBlock {
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
         Level level = (Level) world;
-        return (level != null && CapabilityCache.getInstance().getFluidCapability(
+        return (level != null && CapabilityCacheOld.getInstance().getFluidCapability(
                 level, pos.relative(facing), facing.getOpposite()).isPresent());
     }
 

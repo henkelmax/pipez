@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.items;
 
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.types.Upgrade;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 

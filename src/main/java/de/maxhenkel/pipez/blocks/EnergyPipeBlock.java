@@ -2,9 +2,10 @@ package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.EnergyPipeTileEntity;
-import de.maxhenkel.pipez.capabilities.CapabilityCache;
+import de.maxhenkel.pipez.capabilities.CapabilityCacheOld;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
+import de.maxhenkel.pipez.utils.CapabilityCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -27,8 +28,12 @@ public class EnergyPipeBlock extends PipeBlock {
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
         Level level = (Level) world;
-        return (level != null && CapabilityCache.getInstance().getEnergyCapability(
+                        /*
+                        return (level != null && CapabilityCacheOld.getInstance().getEnergyCapability(
                 level, pos.relative(facing), facing.getOpposite()).isPresent());
+                 */
+        return (level != null) && CapabilityCache.Companion.getINSTANCE()
+                .getEnergyCapability(level, pos.relative(facing), facing.getOpposite(), false).isPresent();
     }
 
     @Override
