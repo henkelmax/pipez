@@ -6,11 +6,15 @@ import de.maxhenkel.corelib.block.VoxelUtils;
 import de.maxhenkel.corelib.blockentity.SimpleBlockEntityTicker;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.helpers.Triple;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.ModItemGroups;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.connections.PipeNetworkManager;
+import de.maxhenkel.pipez.connections.PipeNetworkQueue;
 import de.maxhenkel.pipez.items.UpgradeItem;
 import de.maxhenkel.pipez.items.WrenchItem;
+import de.maxhenkel.pipez.utils.BlockStateComparer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
@@ -129,7 +133,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
             }
         }
 
-        PipeTileEntity.markPipesDirty(worldIn, pos);
+        // PipeNetworkManager.updatePipeNetworkAt(worldIn, pos);
+        PipeNetworkQueue.Companion.getINSTANCE().enqueuePipeBlockChanged(worldIn, pos, true);
         return InteractionResult.SUCCESS;
     }
 
@@ -220,7 +225,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
             }
         } else {
             pipe.setExtracting(side, extracting);
-            if (!pipe.hasReasonToStay()) {
+            if (!pipe.getHasReasonToStay()) {
                 setHasData(world, pos, false);
             }
         }
@@ -244,7 +249,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
             }
         } else {
             pipe.setDisconnected(side, disconnected);
-            if (!pipe.hasReasonToStay()) {
+            if (!pipe.getHasReasonToStay()) {
                 setHasData(world, pos, false);
             }
             world.setBlockAndUpdate(pos, world.getBlockState(pos).setValue(getProperty(side), !disconnected));
@@ -266,6 +271,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     private BlockState getState(Level world, BlockPos pos, @Nullable BlockState oldState) {
+        Main.INSTANCE.getLOGGER().debug("PipeBlock getState called");
         FluidState fluidState = world.getFluidState(pos);
         boolean hasData = false;
         if (oldState != null && oldState.getBlock() == this) {
@@ -316,11 +322,13 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     @Override
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos pos1, boolean b) {
         super.neighborChanged(state, world, pos, block, pos1, b);
+        // Queue without verifying difference because Mekanism is broken
+        // PipeNetworkManager.updatePipeNetworkAt(world, pos);
+        PipeNetworkQueue.Companion.getINSTANCE().enqueuePipeBlockChanged(world, pos, false);
         BlockState newState = getState(world, pos, state);
-        if (!state.getProperties().stream().allMatch(property -> state.getValue(property).equals(newState.getValue(property)))) {
+        if (!BlockStateComparer.equalBlockState(state, newState)) {
             world.setBlockAndUpdate(pos, newState);
-            PipeTileEntity.markPipesDirty(world, pos);
-            Logger.INSTANCE.log(org.apache.logging.log4j.Level.DEBUG, "Block State changed.");
+            // PipeNetworkQueue.Companion.getINSTANCE().enqueuePipeBlockChanged(world, pos);
         }
     }
 

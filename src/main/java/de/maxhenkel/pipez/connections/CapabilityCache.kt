@@ -1,8 +1,8 @@
-package de.maxhenkel.pipez.utils
+package de.maxhenkel.pipez.connections
 
 import de.maxhenkel.pipez.Main
-import de.maxhenkel.pipez.capabilities.ModCapabilities
 import de.maxhenkel.pipez.types.AbsoluteDirection
+import de.maxhenkel.pipez.types.CacheMode
 import mekanism.api.chemical.gas.IGasHandler
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -34,19 +34,29 @@ class CapabilityCache {
         }
     }
 
+    fun clear() {
+        itemMap.clear()
+        fluidMap.clear()
+        energyMap.clear()
+        gasMap.clear()
+    }
+
     private val itemMap = hashMapOf<AbsoluteDirection, LazyOptional<IItemHandler>>()
     private val fluidMap = hashMapOf<AbsoluteDirection, LazyOptional<IFluidHandler>>()
     private val energyMap = hashMapOf<AbsoluteDirection, LazyOptional<IEnergyStorage>>()
     private val gasMap = hashMapOf<AbsoluteDirection, LazyOptional<IGasHandler>>()
 
     private fun <T> getCapability(cacheMap: HashMap<AbsoluteDirection, LazyOptional<T>>,
-                               level: Level, direction: AbsoluteDirection, cap: Capability<T>, onlyCache:Boolean = false): LazyOptional<T> {
-        val cacheDirection = cacheMap[direction]
-        if (cacheDirection?.isPresent == true) {
-            return cacheDirection
-        }
-        if (onlyCache) {
-            return LazyOptional.empty()
+                               level: Level, direction: AbsoluteDirection, cap: Capability<T>,
+                                  cacheMode: CacheMode): LazyOptional<T> {
+        if (cacheMode != CacheMode.REFRESH) {
+            val cacheDirection = cacheMap[direction]
+            if (cacheDirection?.isPresent == true) {
+                return cacheDirection
+            }
+            if (cacheMode == CacheMode.ONLY_CACHE) {
+                return LazyOptional.empty()
+            }
         }
         val blockEntity = level.getBlockEntity(direction.position.toBlockPos()) ?: return LazyOptional.empty()
         val capability = blockEntity.getCapability(cap, direction.direction)
@@ -57,36 +67,35 @@ class CapabilityCache {
         return capability
     }
 
-    fun getItemCapability(level: Level, blockPos: BlockPos, direction: Direction, onlyCache: Boolean = false): LazyOptional<IItemHandler> {
+    fun getItemCapability(level: Level, blockPos: BlockPos, direction: Direction, cacheMode: CacheMode = CacheMode.PREFER_CACHE): LazyOptional<IItemHandler> {
         return getCapability(
             itemMap, level, AbsoluteDirection.from(level, blockPos, direction),
             cap = CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
-            onlyCache = onlyCache,
+            cacheMode,
         )
     }
 
-    fun getFluidCapability(level: Level, blockPos: BlockPos, direction: Direction, onlyCache: Boolean = false): LazyOptional<IFluidHandler> {
+    fun getFluidCapability(level: Level, blockPos: BlockPos, direction: Direction, cacheMode: CacheMode = CacheMode.PREFER_CACHE): LazyOptional<IFluidHandler> {
         return getCapability(
             fluidMap, level, AbsoluteDirection.from(level, blockPos, direction),
             cap = CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
-            onlyCache = onlyCache,
+            cacheMode,
         )
     }
 
-    fun getEnergyCapability(level: Level, blockPos: BlockPos, direction: Direction, onlyCache: Boolean = false): LazyOptional<IEnergyStorage> {
-        val output = getCapability(
+    fun getEnergyCapability(level: Level, blockPos: BlockPos, direction: Direction, cacheMode: CacheMode = CacheMode.PREFER_CACHE): LazyOptional<IEnergyStorage> {
+        return getCapability(
             energyMap, level, AbsoluteDirection.from(level, blockPos, direction),
             cap = CapabilityEnergy.ENERGY,
-            onlyCache = onlyCache,
+            cacheMode,
         )
-        return output
     }
 
-    fun getGasCapability(level: Level, blockPos: BlockPos, direction: Direction, onlyCache: Boolean = false): LazyOptional<IGasHandler> {
+    fun getGasCapability(level: Level, blockPos: BlockPos, direction: Direction, cacheMode: CacheMode = CacheMode.PREFER_CACHE): LazyOptional<IGasHandler> {
         return getCapability(
             gasMap, level, AbsoluteDirection.from(level, blockPos, direction),
             cap = ModCapabilities.GAS_HANDLER_CAPABILITY,
-            onlyCache = onlyCache,
+            cacheMode = cacheMode,
         )
     }
 }

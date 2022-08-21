@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.pipez.types.DirectionalPosition;
 import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.gas.Gas;
@@ -54,8 +55,7 @@ public class GasFilter extends Filter<Gas> {
         exactMetadata = false;
 
         if (compound.contains("Destination", Tag.TAG_COMPOUND)) {
-            destination = new DirectionalPosition();
-            destination.deserializeNBT(compound.getCompound("Destination"));
+            destination = DirectionalPosition.Companion.fromNBT(compound.getCompound("Destination"));
         } else {
             destination = null;
         }

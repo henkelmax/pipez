@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.events;
 
-import de.maxhenkel.pipez.DirectionalPosition;
+import de.maxhenkel.pipez.types.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import net.minecraft.core.Direction;

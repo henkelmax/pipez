@@ -2,6 +2,7 @@ package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.TagUtils;
+import de.maxhenkel.pipez.types.DirectionalPosition;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -68,8 +69,7 @@ public class FluidFilter extends Filter<Fluid> {
         }
 
         if (compound.contains("Destination", Tag.TAG_COMPOUND)) {
-            destination = new DirectionalPosition();
-            destination.deserializeNBT(compound.getCompound("Destination"));
+            destination = DirectionalPosition.Companion.fromNBT(compound.getCompound("Destination"));
         } else {
             destination = null;
         }

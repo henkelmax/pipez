@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.utils;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
-import de.maxhenkel.pipez.capabilities.ModCapabilities;
+import de.maxhenkel.pipez.connections.ModCapabilities;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.gas.Gas;
@@ -70,7 +70,7 @@ public class GasUtils {
 
     @Nullable
     public static GasStack getGasContained(ItemStack stack) {
-        LazyOptional<IGasHandler> c = stack.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY);
+        LazyOptional<IGasHandler> c = stack.getCapability(ModCapabilities.getGAS_HANDLER_CAPABILITY());
         IGasHandler handler = c.orElse(null);
         if (handler == null) {
             return null;

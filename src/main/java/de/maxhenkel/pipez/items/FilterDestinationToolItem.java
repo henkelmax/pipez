@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.items;
 
-import de.maxhenkel.pipez.DirectionalPosition;
+import de.maxhenkel.pipez.types.DirectionalPosition;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.ModItemGroups;
 import net.minecraft.ChatFormatting;
@@ -49,8 +49,7 @@ public class FilterDestinationToolItem extends Item {
         if (!tag.contains("Destination", Tag.TAG_COMPOUND)) {
             return null;
         }
-        DirectionalPosition dest = new DirectionalPosition();
-        dest.deserializeNBT(tag.getCompound("Destination"));
+        DirectionalPosition dest = DirectionalPosition.Companion.fromNBT(tag.getCompound("Destination"));
         return dest;
     }
 

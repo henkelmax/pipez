@@ -2,6 +2,7 @@ package de.maxhenkel.pipez
 
 import de.maxhenkel.corelib.tag.SingleElementTag
 import de.maxhenkel.corelib.tag.TagUtils
+import de.maxhenkel.pipez.types.DirectionalPosition
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceLocation
@@ -61,9 +62,7 @@ class ItemFilter : Filter<Item>() {
         }
 
         destination = if (compound.contains("Destination", Tag.TAG_COMPOUND.toInt())) {
-            DirectionalPosition().apply {
-                deserializeNBT(compound.getCompound("Destination"))
-            }
+            DirectionalPosition.fromNBT(compound.getCompound("Destination"))
         } else {
             null
         }

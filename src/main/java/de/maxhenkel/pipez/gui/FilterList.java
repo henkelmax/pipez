@@ -10,7 +10,7 @@ import de.maxhenkel.corelib.helpers.WrappedItemStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
-import de.maxhenkel.pipez.DirectionalPosition;
+import de.maxhenkel.pipez.types.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.utils.WrappedGasStack;

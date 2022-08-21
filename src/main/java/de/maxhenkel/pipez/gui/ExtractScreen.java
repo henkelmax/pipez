@@ -166,7 +166,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
     private void checkButtons() {
         Upgrade upgrade = getMenu().getPipe().getUpgrade(getMenu().getSide());
-        if (upgrade == null) {
+        if (upgrade.equals(Upgrade.NONE)) {
             redstoneButton.active = false;
             sortButton.active = false;
             filterButton.active = false;

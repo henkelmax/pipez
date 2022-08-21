@@ -3,6 +3,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 import de.maxhenkel.corelib.inventory.ItemListInventory;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
+import de.maxhenkel.pipez.types.Connection;
 import de.maxhenkel.pipez.types.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.configuration.DistributionCache;
 import de.maxhenkel.pipez.blocks.tileentity.configuration.FilterCache;
@@ -138,22 +139,6 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
             return ((UpgradeItem) stack.getItem()).getTier();
         }
         return Upgrade.NONE;
-    }
-
-    public List<PipeTileEntity.Connection> getSortedConnections(Direction side, PipeType pipeType) {
-        UpgradeTileEntity.Distribution distribution = getDistribution(side, pipeType);
-        switch (distribution) {
-            case FURTHEST:
-                return getConnections().stream().sorted((o1, o2) -> Integer.compare(o2.getDistance(), o1.getDistance())).collect(Collectors.toList());
-            case RANDOM:
-                ArrayList<PipeTileEntity.Connection> shuffle = new ArrayList<>(getConnections());
-                Collections.shuffle(shuffle);
-                return shuffle;
-            case NEAREST:
-            case ROUND_ROBIN:
-            default:
-                return getConnections().stream().sorted(Comparator.comparingInt(PipeTileEntity.Connection::getDistance)).collect(Collectors.toList());
-        }
     }
 
     public enum Distribution implements ICyclable<Distribution> {

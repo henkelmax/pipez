@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.Tag;
+import de.maxhenkel.pipez.types.DirectionalPosition;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
 

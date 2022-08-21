@@ -1,7 +1,12 @@
 package de.maxhenkel.pipez.events
 
 import de.maxhenkel.pipez.Main
-import de.maxhenkel.pipez.utils.CapabilityCache
+import de.maxhenkel.pipez.blocks.PipeBlock
+import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity
+import de.maxhenkel.pipez.connections.CapabilityCache
+import de.maxhenkel.pipez.connections.PipeNetworkManager
+import de.maxhenkel.pipez.connections.PipeNetworkQueue
+import net.minecraft.core.Direction
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.TickEvent
@@ -11,29 +16,17 @@ import net.minecraftforge.eventbus.api.SubscribeEvent
 
 class ServerTickEvents {
 
-    companion object {
-        var capabilityCache = CapabilityCache()
-    }
-
-    private var tickCount = 0
 
     @SubscribeEvent
     fun onServerTick(event: TickEvent.ServerTickEvent) {
-        tickCount += 1
         // capabilityCache.addTick()
+        PipeNetworkQueue.INSTANCE.taskTick()
     }
 
     @SubscribeEvent
     fun onServerStarted(event: ServerStartedEvent) {
-        capabilityCache = CapabilityCache()
-        tickCount = 0
-        // logger.log(Level.DEBUG, "On server started!");
-    }
-
-    @SubscribeEvent
-    fun onAttachingCapabilities(event: AttachCapabilitiesEvent<BlockEntity>) {
-        val entity = event.getObject()
-        Main.logDebug("Entity Position: " + entity.blockPos)
+        CapabilityCache.INSTANCE.clear()
+        PipeNetworkQueue.INSTANCE.clear()
     }
 
 }
