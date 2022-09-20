@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.lwjgl.glfw.GLFW;
@@ -268,20 +269,38 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                 nbt.setValue("");
             }
         } else if (filter instanceof FluidFilter) {
-            FluidUtil.getFluidContained(stack).ifPresent(s -> {
-                item.setValue(ForgeRegistries.FLUIDS.getKey(s.getFluid()).toString());
-                if (s.hasTag()) {
-                    nbt.setValue(s.getTag().toString());
-                } else {
-                    nbt.setValue("");
-                }
-            });
+            FluidUtil.getFluidContained(stack).ifPresent(this::onInsertStack);
         } else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
-                item.setValue(gas.getType().getRegistryName().toString());
+                onInsertStack(gas);
+            }
+        }
+    }
+
+    public void onInsertStack(FluidStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+
+        if (filter instanceof FluidFilter) {
+            item.setValue(ForgeRegistries.FLUIDS.getKey(s.getFluid()).toString());
+            if (s.hasTag()) {
+                nbt.setValue(s.getTag().toString());
+            } else {
                 nbt.setValue("");
             }
+        }
+    }
+
+    public void onInsertStack(GasStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+
+        if (filter instanceof GasFilter) {
+            item.setValue(stack.getType().getRegistryName().toString());
+            nbt.setValue("");
         }
     }
 
