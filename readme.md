@@ -126,9 +126,11 @@ You can choose which pipe type you want to configure with the tabs on the left o
 Comparison between Pipez' item pipes and Mekanism's logistical transporters with about 4200 pipes.
 
 ![](https://i.imgur.com/t6iJe4H.png)
+*Minecraft 1.16.5, Mekanism 10.0.19.446*
 
 
-Comparison between Pipez' item pipes and Mekanism's logistical transporters with about 7200 pipes.
-Since Mekanism calculates its pipe connections with a recursive algorithm it just crashes, due to a stack overflow.
+Comparison between Pipez' item pipes and Mekanism's logistical transporters with about 12500 pipes.
+With this amount of pipes **Mekanism completely stops working** and doesn't transport any items anymore!
 
-![](https://i.imgur.com/QTzFnqz.png)
+![](https://i.imgur.com/IU8FbRe.png)
+*Minecraft 1.19.2, Mekanism 10.3.4.471*
