@@ -37,7 +37,7 @@
   "tooltip.pipez.filter.inverted": "Invertido",
   "tooltip.pipez.filter_destination_tool": "Clique em um bloco para definir o destino",
   "tooltip.pipez.filter_destination_tool.destination": "Destino: X=%s, Y=%s, Z=%s, %s",
-  "tooltip.pipez.filter.destination.description": "Use a ferramenta de filtro de destino para definir o destino",
+  "tooltip.pipez.filter.destination.description": "Use a ferramenta de destino do filtro para definir o destino",
   "tooltip.pipez.filter.destination.click_to_remove": "Clique para remover",
   "tooltip.pipez.filter.unknown_block": "BLOCO DESCONHECIDO",
   "tooltip.pipez.filter.destination_location": "X=%s, Y=%s, Z=%s",
