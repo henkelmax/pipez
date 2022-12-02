@@ -75,7 +75,7 @@
   "message.pipez.filter.edit": "Modifica",
   "message.pipez.filter.remove": "Rimuovi",
   "message.pipez.filter.cancel": "Cancella",
-  "message.pipez.filter.submit": "Inoltra",
+  "message.pipez.filter.submit": "Conferma",
   "message.pipez.filter.item_tag": "Oggetto/Tag",
   "message.pipez.filter.nbt_string": "Dati NBT",
   "message.pipez.filter.destination": "Destinazione",
