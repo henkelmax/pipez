@@ -70,7 +70,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
 
     @Override
     public Item toItem() {
-        return new BlockItem(this, new Item.Properties()/*.tab(ModItemGroups.TAB_PIPEZ)*/); // TODO Fix creative tab
+        return new BlockItem(this, new Item.Properties());
     }
 
     @Nullable

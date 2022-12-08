@@ -20,7 +20,7 @@ public class UpgradeItem extends Item {
     private final Upgrade tier;
 
     public UpgradeItem(Upgrade tier) {
-        super(new Properties()/*.tab(ModItemGroups.TAB_PIPEZ)*/); // TODO Fix creative tab
+        super(new Properties());
         this.tier = tier;
     }
 

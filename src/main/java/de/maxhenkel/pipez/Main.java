@@ -4,6 +4,7 @@ import de.maxhenkel.corelib.CommonRegistry;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
+import de.maxhenkel.pipez.events.CreativeTabEvents;
 import de.maxhenkel.pipez.gui.Containers;
 import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
@@ -38,6 +39,7 @@ public class Main {
     public Main() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(CreativeTabEvents::onCreativeModeTabRegister);
 
         SERVER_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.SERVER, ServerConfig.class);
         CLIENT_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.CLIENT, ClientConfig.class);

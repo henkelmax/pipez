@@ -17,7 +17,7 @@ import java.util.List;
 public class FilterDestinationToolItem extends Item {
 
     public FilterDestinationToolItem() {
-        super(new Properties()/*.tab(ModItemGroups.TAB_PIPEZ)*/.stacksTo(1)); // TODO Fix creative tab
+        super(new Properties().stacksTo(1));
     }
 
     @Override
