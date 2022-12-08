@@ -15,9 +15,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nullable;
@@ -35,7 +35,7 @@ public class FluidPipeType extends PipeType<Fluid> {
 
     @Override
     public boolean canInsert(BlockEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction).isPresent();
+        return tileEntity.getCapability(ForgeCapabilities.FLUID_HANDLER, direction).isPresent();
     }
 
     @Override
@@ -205,7 +205,7 @@ public class FluidPipeType extends PipeType<Fluid> {
         if (te == null) {
             return null;
         }
-        return te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction).orElse(null);
+        return te.getCapability(ForgeCapabilities.FLUID_HANDLER, direction).orElse(null);
     }
 
     @Override

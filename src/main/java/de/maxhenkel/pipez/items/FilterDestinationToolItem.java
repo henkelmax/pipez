@@ -1,7 +1,6 @@
 package de.maxhenkel.pipez.items;
 
 import de.maxhenkel.pipez.DirectionalPosition;
-import de.maxhenkel.pipez.ModItemGroups;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -18,7 +17,7 @@ import java.util.List;
 public class FilterDestinationToolItem extends Item {
 
     public FilterDestinationToolItem() {
-        super(new Properties().tab(ModItemGroups.TAB_PIPEZ).stacksTo(1));
+        super(new Properties()/*.tab(ModItemGroups.TAB_PIPEZ)*/.stacksTo(1)); // TODO Fix creative tab
     }
 
     @Override

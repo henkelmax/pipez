@@ -1,7 +1,6 @@
 package de.maxhenkel.pipez.items;
 
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.ModItemGroups;
 import de.maxhenkel.pipez.tags.ModItemTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -18,7 +17,7 @@ import java.util.List;
 public class WrenchItem extends Item {
 
     public WrenchItem() {
-        super(new Properties().tab(ModItemGroups.TAB_PIPEZ).stacksTo(1));
+        super(new Properties()/*.tab(ModItemGroups.TAB_PIPEZ)*/.stacksTo(1)); // TODO Fix creative tab
     }
 
     @Override

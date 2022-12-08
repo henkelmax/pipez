@@ -14,7 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
@@ -32,7 +32,7 @@ public class EnergyPipeType extends PipeType<Void> {
 
     @Override
     public boolean canInsert(BlockEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(CapabilityEnergy.ENERGY, direction).isPresent();
+        return tileEntity.getCapability(ForgeCapabilities.ENERGY, direction).isPresent();
     }
 
     @Override
@@ -248,7 +248,7 @@ public class EnergyPipeType extends PipeType<Void> {
         if (te == null) {
             return null;
         }
-        return te.getCapability(CapabilityEnergy.ENERGY, direction).orElse(null);
+        return te.getCapability(ForgeCapabilities.ENERGY, direction).orElse(null);
     }
 
     @Override

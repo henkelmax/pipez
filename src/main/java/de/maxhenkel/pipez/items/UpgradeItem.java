@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.items;
 
-import de.maxhenkel.pipez.ModItemGroups;
 import de.maxhenkel.pipez.Upgrade;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -21,7 +20,7 @@ public class UpgradeItem extends Item {
     private final Upgrade tier;
 
     public UpgradeItem(Upgrade tier) {
-        super(new Properties().tab(ModItemGroups.TAB_PIPEZ));
+        super(new Properties()/*.tab(ModItemGroups.TAB_PIPEZ)*/); // TODO Fix creative tab
         this.tier = tier;
     }
 

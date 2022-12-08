@@ -3,9 +3,6 @@ package de.maxhenkel.pipez;
 import de.maxhenkel.corelib.CachedValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.ModelEvent;
 
@@ -23,11 +20,7 @@ public class ModelRegistry {
 
         Model(String name) {
             resource = new ResourceLocation(Main.MODID, name);
-            cachedModel = new CachedValue<>(() -> {
-                ModelBakery modelBakery = Minecraft.getInstance().getModelManager().getModelBakery();
-                UnbakedModel modelOrMissing = modelBakery.getModel(resource);
-                return modelOrMissing.bake(modelBakery, modelBakery.getAtlasSet()::getSprite, BlockModelRotation.X0_Y0, resource);
-            });
+            cachedModel = new CachedValue<>(() -> Minecraft.getInstance().getModelManager().getModel(resource));
         }
 
         public ResourceLocation getResourceLocation() {
@@ -42,7 +35,6 @@ public class ModelRegistry {
     public static void onModelRegister(ModelEvent.RegisterAdditional event) {
         for (Model model : Model.values()) {
             event.register(model.getResourceLocation());
-//            ModelBakery.instance().addSpecialModel(model.getResourceLocation());
         }
     }
 

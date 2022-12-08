@@ -10,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -26,7 +27,7 @@ public class CopyNbtRecipe extends CustomRecipe {
     private final List<String> tags;
 
     public CopyNbtRecipe(ResourceLocation recipeID, Ingredient sourceIngredient, Ingredient targetIngredient, List<String> tags) {
-        super(recipeID);
+        super(recipeID, CraftingBookCategory.MISC);
         this.sourceIngredient = sourceIngredient;
         this.targetIngredient = targetIngredient;
         this.tags = tags;

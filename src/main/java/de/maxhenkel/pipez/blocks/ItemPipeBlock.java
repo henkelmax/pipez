@@ -13,7 +13,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 public class ItemPipeBlock extends PipeBlock {
 
@@ -23,7 +23,7 @@ public class ItemPipeBlock extends PipeBlock {
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
         BlockEntity te = world.getBlockEntity(pos.relative(facing));
-        return (te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).isPresent());
+        return (te != null && te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).isPresent());
     }
 
     @Override

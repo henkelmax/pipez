@@ -5,7 +5,6 @@ import de.maxhenkel.corelib.block.VoxelUtils;
 import de.maxhenkel.corelib.blockentity.SimpleBlockEntityTicker;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.helpers.Triple;
-import de.maxhenkel.pipez.ModItemGroups;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.items.UpgradeItem;
@@ -71,9 +70,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
 
     @Override
     public Item toItem() {
-        return new BlockItem(this, new Item.Properties().tab(ModItemGroups.TAB_PIPEZ));
+        return new BlockItem(this, new Item.Properties()/*.tab(ModItemGroups.TAB_PIPEZ)*/); // TODO Fix creative tab
     }
-
 
     @Nullable
     @Override

@@ -2,11 +2,10 @@ package de.maxhenkel.pipez.blocks.tileentity.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import de.maxhenkel.corelib.CachedValue;
-import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.ModelRegistry.Model;
+import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -16,6 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraftforge.client.model.data.ModelData;
+import org.joml.Quaternionf;
 
 import java.util.List;
 
@@ -57,26 +57,26 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
         matrixStack.popPose();
     }
 
-    private Quaternion getRotation(Direction direction) {
-        Quaternion q = Quaternion.ONE.copy();
+    private Quaternionf getRotation(Direction direction) {
+        Quaternionf q = new Quaternionf();
         switch (direction) {
             case NORTH:
                 return q;
             case SOUTH:
-                q.mul(Vector3f.YP.rotationDegrees(180F));
+                q.mul(Axis.YP.rotationDegrees(180F));
                 return q;
             case WEST:
-                q.mul(Vector3f.YP.rotationDegrees(90F));
+                q.mul(Axis.YP.rotationDegrees(90F));
                 return q;
             case EAST:
-                q.mul(Vector3f.YP.rotationDegrees(270F));
+                q.mul(Axis.YP.rotationDegrees(270F));
                 return q;
             case UP:
-                q.mul(Vector3f.XP.rotationDegrees(90F));
+                q.mul(Axis.XP.rotationDegrees(90F));
                 return q;
             case DOWN:
             default:
-                q.mul(Vector3f.XP.rotationDegrees(270F));
+                q.mul(Axis.XP.rotationDegrees(270F));
                 return q;
         }
     }

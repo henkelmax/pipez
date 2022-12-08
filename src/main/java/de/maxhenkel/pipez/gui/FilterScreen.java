@@ -69,7 +69,6 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         super.init();
         hoverAreas.clear();
         clearWidgets();
-        minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
         List<CycleIconButton.Icon> nbtIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 16), new CycleIconButton.Icon(BACKGROUND, 192, 16));
         nbtButton = new CycleIconButton(leftPos + 125, topPos + 81, nbtIcons, () -> filter.isExactMetadata() ? 1 : 0, button -> {
@@ -82,14 +81,14 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         });
         addRenderableWidget(invertButton);
 
-        cancelButton = new Button(leftPos + 25, topPos + 105, 60, 20, Component.translatable("message.pipez.filter.cancel"), button -> {
+        cancelButton = Button.builder(Component.translatable("message.pipez.filter.cancel"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage(getMenu().getIndex()));
-        });
+        }).bounds(leftPos + 25, topPos + 105, 60, 20).build();
         addRenderableWidget(cancelButton);
 
-        submitButton = new Button(leftPos + 91, topPos + 105, 60, 20, Component.translatable("message.pipez.filter.submit"), button -> {
+        submitButton = Button.builder(Component.translatable("message.pipez.filter.submit"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, menu.getIndex()));
-        });
+        }).bounds(leftPos + 91, topPos + 105, 60, 20).build();
         addRenderableWidget(submitButton);
 
         item = new EditBox(font, leftPos + 30, topPos + 18, 138, 16, Component.empty());
@@ -343,12 +342,6 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         this.fillGradient(matrixStack, posX, posY, posX + 16, posY + 16, slotColor, -2130706433);
         RenderSystem.colorMask(true, true, true, true);
         RenderSystem.enableDepthTest();
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-        minecraft.keyboardHandler.setSendRepeatsToGui(false);
     }
 
     @Override

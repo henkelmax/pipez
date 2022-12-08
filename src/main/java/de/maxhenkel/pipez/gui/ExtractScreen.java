@@ -10,7 +10,7 @@ import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -95,19 +95,19 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         filterButton = new CycleIconButton(leftPos + 7, topPos + 55, filterModeIcons, filterModeIndex, button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new CycleFilterModeMessage(currentindex));
         });
-        addFilterButton = new Button(leftPos + 31, topPos + 79, 40, 20, Component.translatable("message.pipez.filter.add"), button -> {
+        addFilterButton = Button.builder(Component.translatable("message.pipez.filter.add"), button -> {
             Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
-        });
-        editFilterButton = new Button(leftPos + 80, topPos + 79, 40, 20, Component.translatable("message.pipez.filter.edit"), button -> {
+        }).bounds(leftPos + 31, topPos + 79, 40, 20).build();
+        editFilterButton = Button.builder(Component.translatable("message.pipez.filter.edit"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
             }
-        });
-        removeFilterButton = new Button(leftPos + 129, topPos + 79, 40, 20, Component.translatable("message.pipez.filter.remove"), button -> {
+        }).bounds(leftPos + 80, topPos + 79, 40, 20).build();
+        removeFilterButton = Button.builder(Component.translatable("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {
                 Main.SIMPLE_CHANNEL.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
             }
-        });
+        }).bounds(leftPos + 129, topPos + 79, 40, 20).build();
 
         addRenderableWidget(redstoneButton);
         addRenderableWidget(sortButton);
@@ -337,8 +337,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    public <T extends GuiEventListener & Widget & NarratableEntry> T addRenderableWidget(T p_169406_) {
-        return super.addRenderableWidget(p_169406_);
+    public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
+        return super.addRenderableWidget(widget);
     }
 
     public void addHoverArea(HoverArea hoverArea) {

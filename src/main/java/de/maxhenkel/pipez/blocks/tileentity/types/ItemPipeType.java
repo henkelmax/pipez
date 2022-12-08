@@ -16,7 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -36,7 +36,7 @@ public class ItemPipeType extends PipeType<Item> {
 
     @Override
     public boolean canInsert(BlockEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent();
+        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).isPresent();
     }
 
     @Override
@@ -236,7 +236,7 @@ public class ItemPipeType extends PipeType<Item> {
         if (te == null) {
             return null;
         }
-        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).orElse(null);
+        return te.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).orElse(null);
     }
 
     public int getSpeed(PipeLogicTileEntity tileEntity, Direction direction) {

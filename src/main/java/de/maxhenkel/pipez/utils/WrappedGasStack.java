@@ -45,7 +45,7 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int chemicalTint = stack.getChemicalTint();
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), RenderUtils.getAlphaFloat(chemicalTint));
-        RenderSystem.setShaderTexture(0, texture.atlas().location());
+        RenderSystem.setShaderTexture(0, texture.atlasLocation());
         WrappedFluidStack.fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getType().getTint());
     }
 
