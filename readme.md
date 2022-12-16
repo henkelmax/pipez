@@ -5,7 +5,6 @@
 ## Links
 
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/pipez)
-- [ModRepo](https://modrepo.de/minecraft/pipez/overview)
 - [GitHub](https://github.com/henkelmax/pipez)
 - [FAQ](https://modrepo.de/minecraft/pipez/faq)
 - [Credits](https://modrepo.de/minecraft/pipez/credits)
