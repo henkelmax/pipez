@@ -6,7 +6,6 @@
 
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/pipez)
 - [GitHub](https://github.com/henkelmax/pipez)
-- [FAQ](https://modrepo.de/minecraft/pipez/faq)
 - [Credits](https://modrepo.de/minecraft/pipez/credits)
 
 ---
