@@ -26,8 +26,8 @@ public class CycleIconButton extends AbstractButton {
     }
 
     @Override
-    public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+    public void renderWidget(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
         Icon icon = icons.get(index.get());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);

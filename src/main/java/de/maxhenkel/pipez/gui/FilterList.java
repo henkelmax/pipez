@@ -192,8 +192,8 @@ public class FilterList extends WidgetBase {
 
             if (filter.getDestination() != null) {
                 Pair<BlockState, ItemStack> dstPair = getBlockAt(filter.getDestination());
-                mc.getItemRenderer().renderAndDecorateItem(mc.player, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, 0);
-                mc.getItemRenderer().renderGuiItemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
+                mc.getItemRenderer().renderAndDecorateItem(matrixStack, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, 0);
+                mc.getItemRenderer().renderGuiItemDecorations(matrixStack, mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
             }
         }
 

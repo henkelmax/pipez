@@ -221,9 +221,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             }
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4, 0);
+                    itemRenderer.renderAndDecorateItem(matrixStack, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4, 0);
                 } else {
-                    itemRenderer.renderAndDecorateItem(minecraft.player, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4, 0);
+                    itemRenderer.renderAndDecorateItem(matrixStack, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4, 0);
                 }
             }
         }

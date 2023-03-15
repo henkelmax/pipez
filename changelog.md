@@ -1,1 +1,1 @@
-- Added Italian translation
+- Updated to 1.19.4

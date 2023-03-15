@@ -19,7 +19,7 @@ public class CreativeTabEvents {
         TAB_PIPEZ = event.registerCreativeModeTab(new ResourceLocation(Main.MODID, "pipez"), builder -> {
             builder
                     .icon(() -> new ItemStack(ModBlocks.ITEM_PIPE.get()))
-                    .displayItems((features, output, hasPermissions) -> {
+                    .displayItems((features, output) -> {
                         output.accept(new ItemStack(ModBlocks.ITEM_PIPE.get()));
                         output.accept(new ItemStack(ModBlocks.FLUID_PIPE.get()));
                         output.accept(new ItemStack(ModBlocks.ENERGY_PIPE.get()));
