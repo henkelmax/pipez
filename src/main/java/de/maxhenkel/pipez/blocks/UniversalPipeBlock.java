@@ -14,9 +14,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 public class UniversalPipeBlock extends PipeBlock {
 
@@ -27,9 +25,9 @@ public class UniversalPipeBlock extends PipeBlock {
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
         BlockEntity te = world.getBlockEntity(pos.relative(facing));
         return te != null && (
-                te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
-                        || te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
-                        || te.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).isPresent()
+                te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).isPresent()
+                        || te.getCapability(ForgeCapabilities.FLUID_HANDLER, facing.getOpposite()).isPresent()
+                        || te.getCapability(ForgeCapabilities.ENERGY, facing.getOpposite()).isPresent()
                         || te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
         );
     }
