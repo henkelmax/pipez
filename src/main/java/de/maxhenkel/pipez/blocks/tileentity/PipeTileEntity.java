@@ -41,6 +41,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     protected boolean[] extractingSides;
     protected boolean[] disconnectedSides;
 
+    /**
+     * Invalidating the cache five ticks after load, because Mekanism is broken!
+     */
+    private int invalidateCountdown;
+
     public PipeTileEntity(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
         super(tileEntityTypeIn, pos, state);
         extractingSides = new boolean[Direction.values().length];
@@ -217,7 +222,12 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
     @Override
     public void tick() {
-
+        if (invalidateCountdown >= 0) {
+            invalidateCountdown--;
+            if (invalidateCountdown <= 0) {
+                connectionCache = null;
+            }
+        }
     }
 
     public boolean isExtracting(Direction side) {
@@ -279,6 +289,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                 disconnectedSides[i] = b.getAsByte() != 0;
             }
         }
+        invalidateCountdown = 10;
     }
 
     @Override
