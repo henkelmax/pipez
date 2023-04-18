@@ -13,11 +13,10 @@ import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -33,8 +32,8 @@ public class GasPipeType extends PipeType<Gas> {
     }
 
     @Override
-    public boolean canInsert(BlockEntity tileEntity, Direction direction) {
-        return tileEntity.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, direction).isPresent();
+    public Capability<?> getCapability() {
+        return ModCapabilities.GAS_HANDLER_CAPABILITY;
     }
 
     @Override
@@ -66,7 +65,11 @@ public class GasPipeType extends PipeType<Gas> {
             if (!tileEntity.shouldWork(side, this)) {
                 continue;
             }
-            IGasHandler gasHandler = getGasHandler(tileEntity, tileEntity.getBlockPos().relative(side), side.getOpposite());
+            PipeTileEntity.Connection extractingConnection = tileEntity.getExtractingConnection(side);
+            if (extractingConnection == null) {
+                continue;
+            }
+            IGasHandler gasHandler = extractingConnection.getGasHandler(tileEntity.getLevel()).orElse(null);
             if (gasHandler == null) {
                 continue;
             }
@@ -91,7 +94,7 @@ public class GasPipeType extends PipeType<Gas> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IGasHandler destination = getGasHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IGasHandler destination = connection.getGasHandler(tileEntity.getLevel()).orElse(null);
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < gasHandler.getTanks(); j++) {
@@ -125,7 +128,7 @@ public class GasPipeType extends PipeType<Gas> {
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            IGasHandler destination = getGasHandler(tileEntity, connection.getPos(), connection.getDirection());
+            IGasHandler destination = connection.getGasHandler(tileEntity.getLevel()).orElse(null);
             if (destination == null) {
                 continue;
             }
@@ -183,15 +186,6 @@ public class GasPipeType extends PipeType<Gas> {
             }
         }
         return false;
-    }
-
-    @Nullable
-    private IGasHandler getGasHandler(PipeLogicTileEntity tileEntity, BlockPos pos, Direction direction) {
-        BlockEntity te = tileEntity.getLevel().getBlockEntity(pos);
-        if (te == null) {
-            return null;
-        }
-        return te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, direction).orElse(null);
     }
 
     @Override
