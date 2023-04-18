@@ -1,1 +1,4 @@
-- Added Brazilian Portuguese translation
+- Improved pipe performance
+- Add draggable JEI support for filters
+- Fixed issues with Mekanism multiblocks
+- Minor improvements and bugfixes
