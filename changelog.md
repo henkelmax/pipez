@@ -1,1 +1,4 @@
-- Updated to 1.19.4
+- Improved pipe performance
+- Add draggable JEI support for filters
+- Fixed issues with Mekanism multiblocks
+- Minor improvements and bugfixes
