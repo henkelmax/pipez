@@ -11,14 +11,12 @@ import de.maxhenkel.pipez.utils.PipeEnergyStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,15 +47,15 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
             return super.getCapability(cap, side);
         }
 
-        if (cap == CapabilityEnergy.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
+        if (cap == ForgeCapabilities.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
             if (side != null) {
                 return energyCache.get(side).cast();
             }
-        } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && hasType(FluidPipeType.INSTANCE)) {
+        } else if (cap == ForgeCapabilities.FLUID_HANDLER && hasType(FluidPipeType.INSTANCE)) {
             if (side != null) {
                 return fluidCache.get(side).cast();
             }
-        } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && hasType(ItemPipeType.INSTANCE)) {
+        } else if (cap == ForgeCapabilities.ITEM_HANDLER && hasType(ItemPipeType.INSTANCE)) {
             if (side != null) {
                 return itemCache.get(side).cast();
             }
@@ -186,9 +184,10 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     }
 
     @Override
-    public boolean canInsert(BlockEntity tileEntity, Direction direction) {
+    public boolean canInsert(Level level, Connection connection) {
         for (PipeType<?> type : types) {
-            if (type.canInsert(tileEntity, direction)) {
+            LazyOptional<?> capability = connection.getCapability(level, type.getCapability());
+            if (capability.isPresent()) {
                 return true;
             }
         }
