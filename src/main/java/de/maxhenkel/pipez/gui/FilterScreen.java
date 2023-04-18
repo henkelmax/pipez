@@ -283,9 +283,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (filter instanceof FluidFilter) {
-            item.setValue(ForgeRegistries.FLUIDS.getKey(s.getFluid()).toString());
-            if (s.hasTag()) {
-                nbt.setValue(s.getTag().toString());
+            item.setValue(ForgeRegistries.FLUIDS.getKey(stack.getFluid()).toString());
+            if (stack.hasTag()) {
+                nbt.setValue(stack.getTag().toString());
             } else {
                 nbt.setValue("");
             }
