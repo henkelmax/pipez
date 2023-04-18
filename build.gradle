@@ -103,17 +103,21 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-    compileOnly fg.deobf("curse.maven:jei-238222:${jei_id}")
+    implementation fg.deobf("curse.maven:jei-238222:${jei_id}")
+    runtimeOnly fg.deobf("curse.maven:spark-361579:4029757")
+    runtimeOnly fg.deobf("curse.maven:sophisticated-storage-619320:4489822")
+    runtimeOnly fg.deobf("curse.maven:sophisticated-core-618298:4489804")
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 
-    compileOnly fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
+    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
 
-    compileOnly fg.deobf("curse.maven:jade-324717:${jade_id}")
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+    runtimeOnly fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
