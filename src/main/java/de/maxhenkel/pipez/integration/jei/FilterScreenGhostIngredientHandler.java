@@ -11,6 +11,7 @@ import de.maxhenkel.pipez.gui.FilterScreen;
 import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.gas.GasStack;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
+import mezz.jei.api.ingredients.ITypedIngredient;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
@@ -19,17 +20,17 @@ import net.minecraftforge.fluids.FluidUtil;
 public class FilterScreenGhostIngredientHandler implements IGhostIngredientHandler<FilterScreen> {
 
     @Override
-    public <I> List<Target<I>> getTargets(FilterScreen gui, I ingredient, boolean doStart) {
+    public <I> List<Target<I>> getTargetsTyped(FilterScreen gui, ITypedIngredient<I> ingredient, boolean doStart) {
         Filter<?> filter = gui.getMenu().getFilter();
         List<Target<I>> list = new ArrayList<>();
 
-        if (ingredient instanceof ItemStack stack) {
+        if (ingredient.getIngredient() instanceof ItemStack stack) {
             if (testItemStack(filter, stack)) {
                 list.add(this.getItemHoverAreaTarget(gui, i -> gui.onInsertStack(stack)));
             }
-        } else if (filter instanceof FluidFilter && ingredient instanceof FluidStack stack) {
+        } else if (filter instanceof FluidFilter && ingredient.getIngredient() instanceof FluidStack stack) {
             list.add(this.getItemHoverAreaTarget(gui, i -> gui.onInsertStack(stack)));
-        } else if (filter instanceof GasFilter && ingredient instanceof GasStack stack) {
+        } else if (filter instanceof GasFilter && ingredient.getIngredient() instanceof GasStack stack) {
             list.add(this.getItemHoverAreaTarget(gui, i -> gui.onInsertStack(stack)));
         }
 
