@@ -141,10 +141,12 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
             return onWrenchClicked(state, world, pos, player, hand, hit, side);
         } else if (heldItem.getItem() instanceof UpgradeItem && player.isShiftKeyDown() && side != null) {
             BlockEntity te = world.getBlockEntity(pos);
-            if (!(te instanceof UpgradeTileEntity)) {
+            if (!(te instanceof UpgradeTileEntity upgradeTe)) {
                 return InteractionResult.PASS;
             }
-            UpgradeTileEntity upgradeTe = (UpgradeTileEntity) te;
+            if (!upgradeTe.isExtracting(side)) {
+                return InteractionResult.PASS;
+            }
             ItemStack oldUpgrade;
             if (player.getAbilities().instabuild) {
                 oldUpgrade = upgradeTe.setUpgradeItem(side, heldItem.copy().split(1));
