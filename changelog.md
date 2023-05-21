@@ -1,4 +1,1 @@
-- Improved pipe performance
-- Add draggable JEI support for filters
-- Fixed issues with Mekanism multiblocks
-- Minor improvements and bugfixes
+- Fixed filter destination tool not showing up in creative tab
