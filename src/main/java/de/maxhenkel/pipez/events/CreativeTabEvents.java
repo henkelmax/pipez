@@ -33,6 +33,7 @@ public class CreativeTabEvents {
                         output.accept(new ItemStack(ModItems.INFINITY_UPGRADE.get()));
 
                         output.accept(new ItemStack(ModItems.WRENCH.get()));
+                        output.accept(new ItemStack(ModItems.FILTER_DESTINATION_TOOL.get()));
                     })
                     .title(Component.translatable("itemGroup.pipez"))
                     .build();
