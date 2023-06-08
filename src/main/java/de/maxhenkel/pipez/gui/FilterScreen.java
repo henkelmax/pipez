@@ -16,6 +16,7 @@ import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.TagParser;
@@ -129,7 +130,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
 
             AbstractStack<?> stack = FilterList.getStack(filter);
             if (stack != null) {
-                tooltip = stack.getTooltip(this);
+                tooltip = stack.getTooltip();
                 if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                     tooltip.add(Component.translatable("tooltip.pipez.filter.accepts_tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                 }
@@ -313,41 +314,41 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        super.renderLabels(matrixStack, mouseX, mouseY);
-        font.draw(matrixStack, Component.translatable("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR);
-        font.draw(matrixStack, Component.translatable("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR);
-        font.draw(matrixStack, Component.translatable("message.pipez.filter.destination"), 8, 71, FONT_COLOR);
-        font.draw(matrixStack, playerInventoryTitle, 8, (float) (imageHeight - 96 + 3), FONT_COLOR);
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.renderLabels(guiGraphics, mouseX, mouseY);
+        guiGraphics.drawString(font, Component.translatable("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR, false);
+        guiGraphics.drawString(font, Component.translatable("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR, false);
+        guiGraphics.drawString(font, Component.translatable("message.pipez.filter.destination"), 8, 71, FONT_COLOR, false);
+        guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), 8, (float) (imageHeight - 96 + 3), FONT_COLOR, false);
 
-        drawHoverAreas(matrixStack, mouseX, mouseY);
+        drawHoverAreas(guiGraphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        super.renderBg(matrixStack, partialTicks, mouseX, mouseY);
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
 
         AbstractStack<?> stack = FilterList.getStack(filter);
         if (stack != null) {
-            stack.render(matrixStack, leftPos + 8, topPos + 18);
+            stack.render(guiGraphics, leftPos + 8, topPos + 18);
         }
 
-        matrixStack.pushPose();
-        matrixStack.translate(leftPos + 31, topPos + 89, 0D);
-        matrixStack.scale(0.5F, 0.5F, 1F);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(leftPos + 31, topPos + 89, 0D);
+        guiGraphics.pose().scale(0.5F, 0.5F, 1F);
         if (filter.getDestination() != null) {
             DirectionalPosition dst = filter.getDestination();
-            font.draw(matrixStack, Component.translatable("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.literal(String.valueOf(dst.getDirection().name().charAt(0))).withStyle(ChatFormatting.DARK_GREEN)), 0, 0, 0xFFFFFF);
+            guiGraphics.drawString(font, Component.translatable("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.literal(String.valueOf(dst.getDirection().name().charAt(0))).withStyle(ChatFormatting.DARK_GREEN)), 0, 0, 0xFFFFFF, false);
         } else {
-            font.draw(matrixStack, Component.translatable("message.pipez.filter_destination_tool.destination.any"), 0, 0, 0xFFFFFF);
+            guiGraphics.drawString(font, Component.translatable("message.pipez.filter_destination_tool.destination.any"), 0, 0, 0xFFFFFF, false);
         }
-        matrixStack.popPose();
+        guiGraphics.pose().popPose();
 
         if (itemHoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
-            drawHoverSlot(matrixStack, leftPos + 8, topPos + 18);
+            drawHoverSlot(guiGraphics, leftPos + 8, topPos + 18);
         }
         if (destinationHoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
-            drawHoverSlot(matrixStack, leftPos + 8, topPos + 83);
+            drawHoverSlot(guiGraphics, leftPos + 8, topPos + 83);
         }
     }
 
@@ -355,10 +356,10 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         return Component.literal(String.valueOf(num)).withStyle(ChatFormatting.DARK_GREEN);
     }
 
-    private void drawHoverSlot(PoseStack matrixStack, int posX, int posY) {
+    private void drawHoverSlot(GuiGraphics guiGraphics, int posX, int posY) {
         RenderSystem.disableDepthTest();
         RenderSystem.colorMask(true, true, true, false);
-        this.fillGradient(matrixStack, posX, posY, posX + 16, posY + 16, slotColor, -2130706433);
+        guiGraphics.fillGradient(posX, posY, posX + 16, posY + 16, slotColor, -2130706433);
         RenderSystem.colorMask(true, true, true, true);
         RenderSystem.enableDepthTest();
     }

@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
@@ -26,13 +26,12 @@ public class CycleIconButton extends AbstractButton {
     }
 
     @Override
-    public void renderWidget(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         Icon icon = icons.get(index.get());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShaderTexture(0, icon.texture);
-        blit(matrixStack, getX() + 2, getY() + 2, icon.offsetX, icon.offsetY, 16, 16);
+        guiGraphics.blit(icon.texture, getX() + 2, getY() + 2, icon.offsetX, icon.offsetY, 16, 16);
     }
 
     @Override

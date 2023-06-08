@@ -4,13 +4,11 @@ import de.maxhenkel.corelib.CommonRegistry;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
-import de.maxhenkel.pipez.events.CreativeTabEvents;
 import de.maxhenkel.pipez.gui.Containers;
 import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
-import de.maxhenkel.pipez.tags.ModItemTags;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -39,7 +37,6 @@ public class Main {
     public Main() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(CreativeTabEvents::onCreativeModeTabRegister);
 
         SERVER_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.SERVER, ServerConfig.class);
         CLIENT_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.CLIENT, ClientConfig.class);
@@ -55,6 +52,7 @@ public class Main {
         ModRecipes.init();
         Containers.init();
         ModTileEntities.init();
+        ModCreativeTabs.init();
     }
 
     public void commonSetup(FMLCommonSetupEvent event) {

@@ -9,6 +9,7 @@ import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.gas.GasStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -197,33 +198,35 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        super.renderLabels(matrixStack, mouseX, mouseY);
-        font.draw(matrixStack, playerInventoryTitle, 8F, (float) (imageHeight - 96 + 3), FONT_COLOR);
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.renderLabels(guiGraphics, mouseX, mouseY);
+        guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), 8F, (float) (imageHeight - 96 + 3), FONT_COLOR, false);
 
-        filterList.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
+        filterList.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
 
-        drawHoverAreas(matrixStack, mouseX, mouseY);
+        drawHoverAreas(guiGraphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        super.renderBg(matrixStack, partialTicks, mouseX, mouseY);
-        filterList.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+        filterList.drawGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
         if (hasTabs()) {
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    blit(matrixStack, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 48, 26, 24);
+                    guiGraphics.blit(BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 48, 26, 24);
                 } else {
-                    blit(matrixStack, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 72, 26, 24);
+                    guiGraphics.blit(BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 72, 26, 24);
                 }
             }
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    itemRenderer.renderAndDecorateItem(matrixStack, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4, 0);
+                    guiGraphics.renderItem(pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4, 0);
+                    guiGraphics.renderItemDecorations(font, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4);
                 } else {
-                    itemRenderer.renderAndDecorateItem(matrixStack, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4, 0);
+                    guiGraphics.renderItem(pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4, 0);
+                    guiGraphics.renderItemDecorations(font, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4);
                 }
             }
         }

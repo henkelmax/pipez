@@ -18,7 +18,7 @@ public class PipeContainerFactory<T extends AbstractContainerMenu, U extends Upg
 
     @Override
     public T create(int windowId, Inventory inv, FriendlyByteBuf data) {
-        BlockEntity te = inv.player.level.getBlockEntity(data.readBlockPos());
+        BlockEntity te = inv.player.level().getBlockEntity(data.readBlockPos());
         Direction direction = data.readEnum(Direction.class);
         int index = data.readInt();
         try {

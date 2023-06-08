@@ -37,6 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.ForgeMod;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -54,7 +55,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     protected PipeBlock() {
-        super(Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL));
+        super(Properties.of().mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK));
 
         registerDefaultState(stateDefinition.any()
                 .setValue(UP, false)
@@ -77,11 +78,6 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return new SimpleBlockEntityTicker<>();
-    }
-
-    @Override
-    public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
     }
 
     @Override
@@ -397,7 +393,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         if (context instanceof EntityCollisionContext) {
             EntityCollisionContext ctx = (EntityCollisionContext) context;
             if (ctx.getEntity() instanceof Player player) {
-                if (player.level.isClientSide) {
+                if (player.level().isClientSide) {
                     return getSelectionShape(state, worldIn, pos, player);
                 }
             }
@@ -481,7 +477,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     public float getBlockReachDistance(Player player) {
-        float distance = (float) player.getAttribute(net.minecraftforge.common.ForgeMod.REACH_DISTANCE.get()).getValue();
+        float distance = (float) player.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue();
         return player.isCreative() ? distance : distance - 0.5F;
     }
 

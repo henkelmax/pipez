@@ -16,7 +16,7 @@ import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
@@ -71,8 +71,8 @@ public class FilterList extends WidgetBase {
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(PoseStack matrixStack, int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
+    protected void drawGuiContainerForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
         List<Filter<?>> f = filters.get();
         for (int i = 0; i < hoverAreas.length; i++) {
             if (getOffset() + i >= f.size()) {
@@ -82,14 +82,14 @@ public class FilterList extends WidgetBase {
             if (itemHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 AbstractStack<?> stack = getStack(filter);
                 if (stack != null && !stack.isEmpty()) {
-                    List<Component> tooltip = stack.getTooltip(screen);
+                    List<Component> tooltip = stack.getTooltip();
                     if (filter.isInvert()) {
                         tooltip.set(0, Component.translatable("tooltip.pipez.filter.not").withStyle(ChatFormatting.DARK_RED).append(" ").append(tooltip.get(0)));
                     }
                     if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                         tooltip.add(Component.translatable("tooltip.pipez.filter.accepts_tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                     }
-                    screen.renderTooltip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
+                    guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
                 }
             } else if (blockHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 if (filter.getDestination() != null) {
@@ -104,7 +104,7 @@ public class FilterList extends WidgetBase {
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_side", Component.translatable("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
-                    screen.renderTooltip(matrixStack, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop(), mc.font);
+                    guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
                 }
             }
         }
@@ -147,35 +147,34 @@ public class FilterList extends WidgetBase {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+    protected void drawGuiContainerBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        super.drawGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
         List<Filter<?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            RenderSystem.setShaderTexture(0, BACKGROUND);
             int pos = i - getOffset();
             int startY = guiTop + pos * columnHeight;
             Filter<?> filter = f.get(i);
             if (i == getSelected()) {
-                GuiComponent.blit(matrixStack, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
+                guiGraphics.blit(BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
             } else {
-                GuiComponent.blit(matrixStack, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
+                guiGraphics.blit(BACKGROUND, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
             }
 
             AbstractStack<?> stack = getStack(filter);
             if (stack != null && !stack.isEmpty()) {
-                stack.render(matrixStack, guiLeft + 3, startY + 3);
+                stack.render(guiGraphics, guiLeft + 3, startY + 3);
                 if (filter.getTag() != null) {
                     if (filter.getTag() instanceof SingleElementTag) {
-                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.item", Component.translatable(stack.getDisplayName().getString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
+                        drawStringSmall(guiGraphics, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.item", Component.translatable(stack.getDisplayName().getString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
                     } else {
-                        drawStringSmall(matrixStack, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
+                        drawStringSmall(guiGraphics, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.WHITE));
                     }
                 }
             } else {
-                drawStringSmall(matrixStack, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.any_item").withStyle(ChatFormatting.WHITE));
+                drawStringSmall(guiGraphics, guiLeft + 22, startY + 5, Component.translatable("message.pipez.filter.any_item").withStyle(ChatFormatting.WHITE));
             }
             if (filter.getMetadata() != null && filter.getMetadata().size() > 0) {
                 MutableComponent tags = Component.translatable("message.pipez.filter.nbt.tag" + (filter.getMetadata().size() != 1 ? "s" : ""), filter.getMetadata().size()).withStyle(ChatFormatting.DARK_PURPLE);
@@ -183,31 +182,30 @@ public class FilterList extends WidgetBase {
                 if (filter.isExactMetadata()) {
                     nbtStr.append(" ").append(Component.translatable("message.pipez.filter.nbt.exact"));
                 }
-                drawStringSmall(matrixStack, guiLeft + 22, startY + 10, nbtStr);
+                drawStringSmall(guiGraphics, guiLeft + 22, startY + 10, nbtStr);
             }
 
             if (filter.isInvert()) {
-                drawStringSmall(matrixStack, guiLeft + 22, startY + 15, Component.translatable("message.pipez.filter.inverted").withStyle(ChatFormatting.DARK_RED));
+                drawStringSmall(guiGraphics, guiLeft + 22, startY + 15, Component.translatable("message.pipez.filter.inverted").withStyle(ChatFormatting.DARK_RED));
             }
 
             if (filter.getDestination() != null) {
                 Pair<BlockState, ItemStack> dstPair = getBlockAt(filter.getDestination());
-                mc.getItemRenderer().renderAndDecorateItem(matrixStack, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, 0);
-                mc.getItemRenderer().renderGuiItemDecorations(matrixStack, mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
+                guiGraphics.renderItem(dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, 0);
+                guiGraphics.renderItemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
             }
         }
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShaderTexture(0, BACKGROUND);
 
         if (f.size() > columnCount) {
             float h = 66 - 17;
             float perc = (float) getOffset() / (float) (f.size() - columnCount);
             int posY = guiTop + (int) (h * perc);
-            GuiComponent.blit(matrixStack, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
+            guiGraphics.blit(BACKGROUND, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
         } else {
-            GuiComponent.blit(matrixStack, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
+            guiGraphics.blit(BACKGROUND, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
         }
     }
 
@@ -249,12 +247,12 @@ public class FilterList extends WidgetBase {
         return selected;
     }
 
-    private void drawStringSmall(PoseStack matrixStack, int x, int y, Component text) {
-        matrixStack.pushPose();
-        matrixStack.translate(x, y, 0);
-        matrixStack.scale(0.5F, 0.5F, 1F);
-        mc.font.draw(matrixStack, text, 0, 0, 0);
-        matrixStack.popPose();
+    private void drawStringSmall(GuiGraphics guiGraphics, int x, int y, Component text) {
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(x, y, 0);
+        guiGraphics.pose().scale(0.5F, 0.5F, 1F);
+        guiGraphics.drawString(mc.font, text, 0, 0, 0, false);
+        guiGraphics.pose().popPose();
     }
 
     public static <T> T get(Tag<T> tag) {

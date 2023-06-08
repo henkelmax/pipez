@@ -79,8 +79,8 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-    implementation fg.deobf("curse.maven:jei-238222:${jei_id}")
-    runtimeOnly fg.deobf('curse.maven:spark-361579:4443553')
+    compileOnly fg.deobf("curse.maven:jei-238222:${jei_id}")
+    // runtimeOnly fg.deobf('curse.maven:spark-361579:4443553')
     // runtimeOnly fg.deobf('curse.maven:sophisticated-storage-619320:4489822')
     // runtimeOnly fg.deobf('curse.maven:sophisticated-core-618298:4489804')
 
@@ -90,7 +90,7 @@ dependencies {
     // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
     // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 
-    implementation fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
+    compileOnly fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
 
     compileOnly fg.deobf("curse.maven:jade-324717:${jade_id}")
 

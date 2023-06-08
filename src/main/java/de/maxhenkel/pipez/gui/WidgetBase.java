@@ -1,8 +1,8 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 
 public abstract class WidgetBase {
@@ -29,11 +29,11 @@ public abstract class WidgetBase {
 
     }
 
-    protected void drawGuiContainerForegroundLayer(PoseStack matrixStack, int mouseX, int mouseY) {
+    protected void drawGuiContainerForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 
     }
 
-    protected void drawGuiContainerBackgroundLayer(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 
     }
 

@@ -20,7 +20,7 @@ public class FilterContainerFactory<T extends AbstractContainerMenu, U extends P
     @Override
     public T create(int windowId, Inventory inv, FriendlyByteBuf data) {
         try {
-            U pipe = (U) inv.player.level.getBlockEntity(data.readBlockPos());
+            U pipe = (U) inv.player.level().getBlockEntity(data.readBlockPos());
             Direction direction = data.readEnum(Direction.class);
             int index = data.readInt();
             Filter<?> filter = pipe.getPipeTypes()[index].createFilter();

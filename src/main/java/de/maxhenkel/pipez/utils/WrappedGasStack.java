@@ -1,7 +1,6 @@
 package de.maxhenkel.pipez.utils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.client.RenderUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.WrappedFluidStack;
@@ -10,7 +9,7 @@ import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
@@ -40,18 +39,18 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(PoseStack matrixStack, int x, int y) {
+    public void render(GuiGraphics guiGraphics, int x, int y) {
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getType().getIcon());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int chemicalTint = stack.getChemicalTint();
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), RenderUtils.getAlphaFloat(chemicalTint));
         RenderSystem.setShaderTexture(0, texture.atlasLocation());
-        WrappedFluidStack.fluidBlit(matrixStack, x, y, 16, 16, texture, stack.getType().getTint());
+        WrappedFluidStack.fluidBlit(guiGraphics, x, y, 16, 16, texture, stack.getType().getTint());
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public List<Component> getTooltip(Screen screen) {
+    public List<Component> getTooltip() {
         List<Component> tooltip = new ArrayList<>();
 
         tooltip.add(getDisplayName());
