@@ -1,1 +1,2 @@
+- Added Ukrainian translation
 - Fixed filter destination tool not showing up in creative tab
