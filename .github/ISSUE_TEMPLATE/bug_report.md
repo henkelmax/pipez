@@ -2,12 +2,10 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: bug
+labels: triage
 assignees: henkelmax
 
 ---
-
-**Please read the [FAQ](https://modrepo.de/minecraft/pipez/faq) before submitting a bug report!**
 
 **Bug description**
 A clear and concise description of what the bug is.
