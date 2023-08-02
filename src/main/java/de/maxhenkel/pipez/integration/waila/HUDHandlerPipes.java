@@ -12,9 +12,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -25,7 +23,7 @@ import snownee.jade.api.config.IPluginConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProvider<BlockEntity> {
+public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
 
     static final HUDHandlerPipes INSTANCE = new HUDHandlerPipes();
 
@@ -41,10 +39,11 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
     }
 
     @Override
-    public void appendServerData(CompoundTag compound, ServerPlayer player, Level world, BlockEntity te, boolean b) {
-        if (te.getBlockState().getBlock() instanceof PipeBlock) {
-            PipeBlock pipe = (PipeBlock) te.getBlockState().getBlock();
-            Direction selectedSide = pipe.getSelection(te.getBlockState(), world, te.getBlockPos(), player).getKey();
+    public void appendServerData(CompoundTag compound, BlockAccessor blockAccessor) {
+        if (blockAccessor.getBlockState().getBlock() instanceof PipeBlock) {
+            BlockEntity te = blockAccessor.getBlockEntity();
+            PipeBlock pipe = (PipeBlock) blockAccessor.getBlockState().getBlock();
+            Direction selectedSide = pipe.getSelection(te.getBlockState(), blockAccessor.getLevel(), te.getBlockPos(), blockAccessor.getPlayer()).getKey();
             if (selectedSide == null) {
                 return;
             }

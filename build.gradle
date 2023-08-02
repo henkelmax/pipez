@@ -4,6 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'com.modrinth.minotaur' version '2.+'
     id 'mod-update' version '2.0.0'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
 }
 
 apply plugin: 'idea'
@@ -68,9 +69,9 @@ repositories {
     maven { url = 'https://maven.maxhenkel.de/repository/public' }
     maven { url 'https://maven.tterrag.com/' }
     maven {
-        url 'https://www.cursemaven.com'
+        url = 'https://api.modrinth.com/maven'
         content {
-            includeGroup 'curse.maven'
+            includeGroup "maven.modrinth"
         }
     }
     mavenLocal()
@@ -79,20 +80,15 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mod_minecraft_version}-${forge_version}"
 
-    compileOnly fg.deobf("curse.maven:jei-238222:${jei_id}")
-    // runtimeOnly fg.deobf('curse.maven:spark-361579:4443553')
-    // runtimeOnly fg.deobf('curse.maven:sophisticated-storage-619320:4489822')
-    // runtimeOnly fg.deobf('curse.maven:sophisticated-core-618298:4489804')
+    implementation fg.deobf("maven.modrinth:jei:${jei_version}")
+    implementation fg.deobf("maven.modrinth:the-one-probe:${theoneprobe_version}")
+    implementation fg.deobf("maven.modrinth:jade:${jade_version}")
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
     // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
     // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
     // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
     // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
-
-    compileOnly fg.deobf("curse.maven:the-one-probe-245211:${theoneprobe_id}")
-
-    compileOnly fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
@@ -122,8 +118,7 @@ processResources {
                 'mod_forge_version': mod_forge_version,
                 'mod_loader_version': mod_loader_version,
                 'mod_minecraft_version': mod_minecraft_version,
-                'mod_mekanism_version_range': mod_mekanism_version_range,
-                'jei_version_range': jei_version_range
+                'mekanism_version_range': mekanism_version_range
     }
 }
 
