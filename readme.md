@@ -1,11 +1,11 @@
 <!-- modrinth_exclude.start -->
 
-# Pipez ![](http://cf.way2muchnoise.eu/full_443900_downloads.svg) ![](http://cf.way2muchnoise.eu/versions/443900.svg)
+# Pipez
 
 ## Links
 
+- [Modrinth](https://modrinth.com/mod/pipez)
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/pipez)
-- [GitHub](https://github.com/henkelmax/pipez)
 - [Credits](https://modrepo.de/minecraft/pipez/credits)
 
 ---
