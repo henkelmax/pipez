@@ -22,6 +22,9 @@ public class ItemPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
+        if (!super.canConnectTo(world, pos, facing)) {
+            return false;
+        }
         BlockEntity te = world.getBlockEntity(pos.relative(facing));
         return (te != null && te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).isPresent());
     }

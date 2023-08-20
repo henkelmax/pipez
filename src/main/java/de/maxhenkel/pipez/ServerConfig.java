@@ -3,8 +3,11 @@ package de.maxhenkel.pipez;
 import de.maxhenkel.corelib.config.ConfigBase;
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class ServerConfig extends ConfigBase {
+import java.util.ArrayList;
+import java.util.List;
 
+public class ServerConfig extends ConfigBase {
+    public final ForgeConfigSpec.ConfigValue<List<String>> allPipesBlockEntityBlacklist;
     public final ForgeConfigSpec.IntValue itemPipeSpeed;
     public final ForgeConfigSpec.IntValue itemPipeAmount;
     public final ForgeConfigSpec.IntValue itemPipeSpeedBasic;
@@ -36,6 +39,10 @@ public class ServerConfig extends ConfigBase {
 
     public ServerConfig(ForgeConfigSpec.Builder builder) {
         super(builder);
+        allPipesBlockEntityBlacklist = builder
+                .comment("The list of blockEntity that are not able to connect to pipes. Can be useful if a connection causes crash or lags.")
+                .define("all_pipes.blockEntity.blacklist", new ArrayList<>());  // Defaults to an empty list if not provided
+
         itemPipeSpeed = builder
                 .comment("The speed at which items are transferred", "A value of 1 means every tick")
                 .defineInRange("item_pipe.speed.no_upgrade", 20, 1, Integer.MAX_VALUE);

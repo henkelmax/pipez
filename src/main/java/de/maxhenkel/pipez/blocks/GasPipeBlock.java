@@ -23,6 +23,9 @@ public class GasPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
+        if (!super.canConnectTo(world, pos, facing)) {
+            return false;
+        }
         BlockEntity te = world.getBlockEntity(pos.relative(facing));
         return (te != null && te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent());
     }

@@ -5,12 +5,14 @@ import de.maxhenkel.corelib.block.VoxelUtils;
 import de.maxhenkel.corelib.blockentity.SimpleBlockEntityTicker;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.helpers.Triple;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.items.UpgradeItem;
 import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -38,6 +40,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -53,6 +56,35 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public static final BooleanProperty EAST = BooleanProperty.create("east");
     public static final BooleanProperty HAS_DATA = BooleanProperty.create("has_data");
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final VoxelShape SHAPE_NORTH = Block.box(5D, 5D, 0D, 11D, 11D, 5D);
+    public static final VoxelShape SHAPE_SOUTH = Block.box(5D, 5D, 11D, 11D, 11D, 16D);
+    public static final VoxelShape SHAPE_EAST = Block.box(11D, 5D, 5D, 16D, 11D, 11D);
+    public static final VoxelShape SHAPE_WEST = Block.box(0D, 5D, 5D, 5D, 11D, 11D);
+    public static final VoxelShape SHAPE_UP = Block.box(5D, 11D, 5D, 11D, 16D, 11D);
+    public static final VoxelShape SHAPE_DOWN = Block.box(5D, 0D, 5D, 11D, 5D, 11D);
+    public static final VoxelShape SHAPE_CORE = Block.box(5D, 5D, 5D, 11D, 11D, 11D);
+    public static final VoxelShape SHAPE_EXTRACT_NORTH = VoxelUtils.combine(SHAPE_NORTH, Block.box(4D, 4D, 0D, 12D, 12D, 1D));
+    public static final VoxelShape SHAPE_EXTRACT_SOUTH = VoxelUtils.combine(SHAPE_SOUTH, Block.box(4D, 4D, 15D, 12D, 12D, 16D));
+    public static final VoxelShape SHAPE_EXTRACT_EAST = VoxelUtils.combine(SHAPE_EAST, Block.box(15D, 4D, 4D, 16D, 12D, 12D));
+    public static final VoxelShape SHAPE_EXTRACT_WEST = VoxelUtils.combine(SHAPE_WEST, Block.box(0D, 4D, 4D, 1D, 12D, 12D));
+    public static final VoxelShape SHAPE_EXTRACT_UP = VoxelUtils.combine(SHAPE_UP, Block.box(4D, 15D, 4D, 12D, 16D, 12D));
+    public static final VoxelShape SHAPE_EXTRACT_DOWN = VoxelUtils.combine(SHAPE_DOWN, Block.box(4D, 0D, 4D, 12D, 1D, 12D));
+    private static final List<Pair<VoxelShape, Direction>> EXTRACT_SHAPES = Arrays.asList(
+            new Pair<>(SHAPE_EXTRACT_NORTH, Direction.NORTH),
+            new Pair<>(SHAPE_EXTRACT_SOUTH, Direction.SOUTH),
+            new Pair<>(SHAPE_EXTRACT_WEST, Direction.WEST),
+            new Pair<>(SHAPE_EXTRACT_EAST, Direction.EAST),
+            new Pair<>(SHAPE_EXTRACT_UP, Direction.UP),
+            new Pair<>(SHAPE_EXTRACT_DOWN, Direction.DOWN)
+    );
+    private static final List<Triple<VoxelShape, BooleanProperty, Direction>> SHAPES = Arrays.asList(
+            new Triple<>(SHAPE_NORTH, NORTH, Direction.NORTH),
+            new Triple<>(SHAPE_SOUTH, SOUTH, Direction.SOUTH),
+            new Triple<>(SHAPE_WEST, WEST, Direction.WEST),
+            new Triple<>(SHAPE_EAST, EAST, Direction.EAST),
+            new Triple<>(SHAPE_UP, UP, Direction.UP),
+            new Triple<>(SHAPE_DOWN, DOWN, Direction.DOWN)
+    );
 
     protected PipeBlock() {
         super(Properties.of().mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK));
@@ -295,7 +327,14 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         return isPipe(world, pos, facing) || canConnectTo(world, pos, facing);
     }
 
-    public abstract boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing);
+    public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
+        BlockEntity te = world.getBlockEntity(pos.relative(facing));
+        if (te == null) return false;
+        ResourceLocation blockRegistryName = ForgeRegistries.BLOCKS.getKey(te.getBlockState().getBlock());
+        if (blockRegistryName == null) return false;
+        List<String> blacklistedEntities = Main.SERVER_CONFIG.allPipesBlockEntityBlacklist.get();
+        return !blacklistedEntities.contains(blockRegistryName.toString());
+    }
 
     public abstract boolean isPipe(LevelAccessor world, BlockPos pos, Direction facing);
 
@@ -321,20 +360,6 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, HAS_DATA, WATERLOGGED);
     }
-
-    public static final VoxelShape SHAPE_NORTH = Block.box(5D, 5D, 0D, 11D, 11D, 5D);
-    public static final VoxelShape SHAPE_SOUTH = Block.box(5D, 5D, 11D, 11D, 11D, 16D);
-    public static final VoxelShape SHAPE_EAST = Block.box(11D, 5D, 5D, 16D, 11D, 11D);
-    public static final VoxelShape SHAPE_WEST = Block.box(0D, 5D, 5D, 5D, 11D, 11D);
-    public static final VoxelShape SHAPE_UP = Block.box(5D, 11D, 5D, 11D, 16D, 11D);
-    public static final VoxelShape SHAPE_DOWN = Block.box(5D, 0D, 5D, 11D, 5D, 11D);
-    public static final VoxelShape SHAPE_CORE = Block.box(5D, 5D, 5D, 11D, 11D, 11D);
-    public static final VoxelShape SHAPE_EXTRACT_NORTH = VoxelUtils.combine(SHAPE_NORTH, Block.box(4D, 4D, 0D, 12D, 12D, 1D));
-    public static final VoxelShape SHAPE_EXTRACT_SOUTH = VoxelUtils.combine(SHAPE_SOUTH, Block.box(4D, 4D, 15D, 12D, 12D, 16D));
-    public static final VoxelShape SHAPE_EXTRACT_EAST = VoxelUtils.combine(SHAPE_EAST, Block.box(15D, 4D, 4D, 16D, 12D, 12D));
-    public static final VoxelShape SHAPE_EXTRACT_WEST = VoxelUtils.combine(SHAPE_WEST, Block.box(0D, 4D, 4D, 1D, 12D, 12D));
-    public static final VoxelShape SHAPE_EXTRACT_UP = VoxelUtils.combine(SHAPE_UP, Block.box(4D, 15D, 4D, 12D, 16D, 12D));
-    public static final VoxelShape SHAPE_EXTRACT_DOWN = VoxelUtils.combine(SHAPE_DOWN, Block.box(4D, 0D, 4D, 12D, 1D, 12D));
 
     public VoxelShape getShape(BlockGetter blockReader, BlockPos pos, BlockState state, boolean advanced) {
         PipeTileEntity pipe = null;
@@ -416,24 +441,6 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
 
         return selection.getValue();
     }
-
-    private static final List<Triple<VoxelShape, BooleanProperty, Direction>> SHAPES = Arrays.asList(
-            new Triple<>(SHAPE_NORTH, NORTH, Direction.NORTH),
-            new Triple<>(SHAPE_SOUTH, SOUTH, Direction.SOUTH),
-            new Triple<>(SHAPE_WEST, WEST, Direction.WEST),
-            new Triple<>(SHAPE_EAST, EAST, Direction.EAST),
-            new Triple<>(SHAPE_UP, UP, Direction.UP),
-            new Triple<>(SHAPE_DOWN, DOWN, Direction.DOWN)
-    );
-
-    private static final List<Pair<VoxelShape, Direction>> EXTRACT_SHAPES = Arrays.asList(
-            new Pair<>(SHAPE_EXTRACT_NORTH, Direction.NORTH),
-            new Pair<>(SHAPE_EXTRACT_SOUTH, Direction.SOUTH),
-            new Pair<>(SHAPE_EXTRACT_WEST, Direction.WEST),
-            new Pair<>(SHAPE_EXTRACT_EAST, Direction.EAST),
-            new Pair<>(SHAPE_EXTRACT_UP, Direction.UP),
-            new Pair<>(SHAPE_EXTRACT_DOWN, Direction.DOWN)
-    );
 
     public Pair<Direction, VoxelShape> getSelection(BlockState state, BlockGetter blockReader, BlockPos pos, Player player) {
         Vec3 start = player.getEyePosition(1F);
