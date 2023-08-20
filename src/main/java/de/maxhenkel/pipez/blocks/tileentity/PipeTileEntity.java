@@ -257,6 +257,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
     public void setExtracting(Direction side, boolean extracting) {
         extractingSides[side.get3DDataValue()] = extracting;
+        extractingConnectionCache = null;
         setChanged();
     }
 
