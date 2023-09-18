@@ -4,6 +4,7 @@ import de.maxhenkel.pipez.blocks.tileentity.UniversalPipeTileEntity;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
+import de.maxhenkel.pipez.utils.GasUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -28,7 +29,7 @@ public class UniversalPipeBlock extends PipeBlock {
                 te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).isPresent()
                         || te.getCapability(ForgeCapabilities.FLUID_HANDLER, facing.getOpposite()).isPresent()
                         || te.getCapability(ForgeCapabilities.ENERGY, facing.getOpposite()).isPresent()
-                        || te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent()
+                        || GasUtils.hasChemicalCapability(te, facing.getOpposite())
         );
     }
 
