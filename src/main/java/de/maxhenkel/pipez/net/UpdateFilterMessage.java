@@ -10,7 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +35,7 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
     }
 
     @Override
-    public void executeServerSide(NetworkEvent.Context context) {
+    public void executeServerSide(CustomPayloadEvent.Context context) {
         AbstractContainerMenu container = context.getSender().containerMenu;
 
         if (container instanceof IPipeContainer) {

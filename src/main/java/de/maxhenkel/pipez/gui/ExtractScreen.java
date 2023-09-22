@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
+import de.maxhenkel.corelib.net.NetUtils;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
@@ -84,29 +84,29 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
         List<CycleIconButton.Icon> redstoneModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 16), new CycleIconButton.Icon(BACKGROUND, 192, 16), new CycleIconButton.Icon(BACKGROUND, 208, 16), new CycleIconButton.Icon(BACKGROUND, 224, 16));
         redstoneButton = new CycleIconButton(leftPos + 7, topPos + 7, redstoneModeIcons, redstoneModeIndex, button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new CycleRedstoneModeMessage(currentindex));
+            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new CycleRedstoneModeMessage(currentindex));
         });
         Supplier<Integer> distributionIndex = () -> pipe.getDistribution(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
         List<CycleIconButton.Icon> distributionIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 0), new CycleIconButton.Icon(BACKGROUND, 192, 0), new CycleIconButton.Icon(BACKGROUND, 208, 0), new CycleIconButton.Icon(BACKGROUND, 224, 0));
         sortButton = new CycleIconButton(leftPos + 7, topPos + 31, distributionIcons, distributionIndex, button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new CycleDistributionMessage(currentindex));
+            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new CycleDistributionMessage(currentindex));
         });
         Supplier<Integer> filterModeIndex = () -> pipeTypes[currentindex].hasFilter() ? pipe.getFilterMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal() : 0;
         List<CycleIconButton.Icon> filterModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 32), new CycleIconButton.Icon(BACKGROUND, 192, 32));
         filterButton = new CycleIconButton(leftPos + 7, topPos + 55, filterModeIcons, filterModeIndex, button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new CycleFilterModeMessage(currentindex));
+            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new CycleFilterModeMessage(currentindex));
         });
         addFilterButton = Button.builder(Component.translatable("message.pipez.filter.add"), button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
+            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
         }).bounds(leftPos + 31, topPos + 79, 40, 20).build();
         editFilterButton = Button.builder(Component.translatable("message.pipez.filter.edit"), button -> {
             if (filterList.getSelected() >= 0) {
-                Main.SIMPLE_CHANNEL.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
+                NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
             }
         }).bounds(leftPos + 80, topPos + 79, 40, 20).build();
         removeFilterButton = Button.builder(Component.translatable("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {
-                Main.SIMPLE_CHANNEL.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
+                NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
             }
         }).bounds(leftPos + 129, topPos + 79, 40, 20).build();
 
@@ -302,7 +302,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             } else {
                 filter.setMetadata(null);
             }
-            Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
+            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new UpdateFilterMessage(filter, currentindex));
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
                 filter.setTag(new SingleElementTag(ForgeRegistries.FLUIDS.getKey(s.getFluid()), s.getFluid()));
@@ -311,14 +311,14 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 } else {
                     filter.setMetadata(null);
                 }
-                Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
+                NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new UpdateFilterMessage(filter, currentindex));
             });
         } else if (filter instanceof GasFilter) {
             GasStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 filter.setTag(new SingleElementTag(gas.getType().getRegistryName(), gas.getType()));
                 filter.setMetadata(null);
-                Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, currentindex));
+                NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new UpdateFilterMessage(filter, currentindex));
             }
         }
     }
@@ -332,8 +332,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        if (filterList.mouseScrolled(mouseX, mouseY, delta)) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
+        if (filterList.mouseScrolled(mouseX, mouseY, deltaX, deltaY)) {
             return true;
         }
         return false;

@@ -262,17 +262,17 @@ public class FilterList extends WidgetBase {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
         List<Filter<?>> f = filters.get();
         if (f.size() > columnCount) {
-            if (delta < 0D) {
+            if (deltaY < 0D) {
                 offset = Math.min(getOffset() + 1, f.size() - columnCount);
             } else {
                 offset = Math.max(getOffset() - 1, 0);
             }
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, delta);
+        return super.mouseScrolled(mouseX, mouseY, deltaX, deltaY);
     }
 
     @Override

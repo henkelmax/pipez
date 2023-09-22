@@ -1,1 +1,1 @@
-- Fixed extracting pipes not working in some cases
+- Updated to 1.20.2

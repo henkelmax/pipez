@@ -1,14 +1,13 @@
 package de.maxhenkel.pipez.recipes;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.maxhenkel.corelib.helpers.Pair;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -27,8 +26,8 @@ public class CopyNbtRecipe extends CustomRecipe {
     private final Ingredient targetIngredient;
     private final List<String> tags;
 
-    public CopyNbtRecipe(ResourceLocation recipeID, Ingredient sourceIngredient, Ingredient targetIngredient, List<String> tags) {
-        super(recipeID, CraftingBookCategory.MISC);
+    public CopyNbtRecipe(Ingredient sourceIngredient, Ingredient targetIngredient, List<String> tags) {
+        super(CraftingBookCategory.MISC);
         this.sourceIngredient = sourceIngredient;
         this.targetIngredient = targetIngredient;
         this.tags = tags;
@@ -178,26 +177,36 @@ public class CopyNbtRecipe extends CustomRecipe {
 
     public static class Serializer implements RecipeSerializer<CopyNbtRecipe> {
 
-        @Override
-        public CopyNbtRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-            List<String> tags = new ArrayList<>();
-            if (json.has("tags")) {
-                JsonArray tagArray = json.get("tags").getAsJsonArray();
-                for (int i = 0; i < tagArray.size(); i++) {
-                    tags.add(tagArray.get(i).getAsString());
-                }
-            }
-            return new CopyNbtRecipe(recipeId, Ingredient.fromJson(json.get("source")), Ingredient.fromJson(json.get("target")), tags);
+        private final Codec<CopyNbtRecipe> codec;
+
+        public Serializer() {
+            codec = RecordCodecBuilder.create((builder) -> builder
+                    .group(
+                            Ingredient.CODEC_NONEMPTY
+                                    .fieldOf("source")
+                                    .forGetter((recipe) -> recipe.sourceIngredient),
+                            Ingredient.CODEC_NONEMPTY
+                                    .fieldOf("target")
+                                    .forGetter((recipe) -> recipe.targetIngredient),
+                            Codec.list(Codec.STRING)
+                                    .fieldOf("tags")
+                                    .forGetter((recipe) -> recipe.tags)
+                    ).apply(builder, CopyNbtRecipe::new));
         }
 
         @Override
-        public CopyNbtRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+        public Codec<CopyNbtRecipe> codec() {
+            return codec;
+        }
+
+        @Override
+        public @Nullable CopyNbtRecipe fromNetwork(FriendlyByteBuf buffer) {
             ArrayList<String> tags = new ArrayList<>();
             int tagSize = buffer.readVarInt();
             for (int i = 0; i < tagSize; i++) {
                 tags.add(buffer.readUtf());
             }
-            return new CopyNbtRecipe(recipeId, Ingredient.fromNetwork(buffer), Ingredient.fromNetwork(buffer), tags);
+            return new CopyNbtRecipe(Ingredient.fromNetwork(buffer), Ingredient.fromNetwork(buffer), tags);
         }
 
         @Override

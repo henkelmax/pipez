@@ -1,10 +1,10 @@
 package de.maxhenkel.pipez.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
+import de.maxhenkel.corelib.net.NetUtils;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.corelib.tag.TagUtils;
@@ -84,12 +84,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         addRenderableWidget(invertButton);
 
         cancelButton = Button.builder(Component.translatable("message.pipez.filter.cancel"), button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new OpenExtractMessage(getMenu().getIndex()));
+            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new OpenExtractMessage(getMenu().getIndex()));
         }).bounds(leftPos + 25, topPos + 105, 60, 20).build();
         addRenderableWidget(cancelButton);
 
         submitButton = Button.builder(Component.translatable("message.pipez.filter.submit"), button -> {
-            Main.SIMPLE_CHANNEL.sendToServer(new UpdateFilterMessage(filter, menu.getIndex()));
+            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new UpdateFilterMessage(filter, menu.getIndex()));
         }).bounds(leftPos + 91, topPos + 105, 60, 20).build();
         addRenderableWidget(submitButton);
 

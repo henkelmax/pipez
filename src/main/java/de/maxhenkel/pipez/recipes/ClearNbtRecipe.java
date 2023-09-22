@@ -1,9 +1,9 @@
 package de.maxhenkel.pipez.recipes;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -18,8 +18,8 @@ public class ClearNbtRecipe extends CustomRecipe {
 
     private Ingredient ingredient;
 
-    public ClearNbtRecipe(ResourceLocation recipeID, Ingredient ingredient) {
-        super(recipeID, CraftingBookCategory.MISC);
+    public ClearNbtRecipe(Ingredient ingredient) {
+        super(CraftingBookCategory.MISC);
         this.ingredient = ingredient;
     }
 
@@ -76,14 +76,25 @@ public class ClearNbtRecipe extends CustomRecipe {
 
     public static class Serializer implements RecipeSerializer<ClearNbtRecipe> {
 
-        @Override
-        public ClearNbtRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-            return new ClearNbtRecipe(recipeId, Ingredient.fromJson(json.get("item")));
+        private final Codec<ClearNbtRecipe> codec;
+
+        public Serializer() {
+            codec = RecordCodecBuilder.create((builder) -> builder
+                    .group(
+                            Ingredient.CODEC_NONEMPTY
+                                    .fieldOf("item")
+                                    .forGetter((recipe) -> recipe.ingredient)
+                    ).apply(builder, ClearNbtRecipe::new));
         }
 
         @Override
-        public ClearNbtRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-            return new ClearNbtRecipe(recipeId, Ingredient.fromNetwork(buffer));
+        public Codec<ClearNbtRecipe> codec() {
+            return codec;
+        }
+
+        @Override
+        public @Nullable ClearNbtRecipe fromNetwork(FriendlyByteBuf buffer) {
+            return new ClearNbtRecipe(Ingredient.fromNetwork(buffer));
         }
 
         @Override
