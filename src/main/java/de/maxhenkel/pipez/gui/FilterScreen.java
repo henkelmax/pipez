@@ -13,7 +13,9 @@ import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
 import de.maxhenkel.pipez.utils.GasUtils;
-import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.chemical.Chemical;
+import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.ChemicalType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -33,6 +35,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FilterScreen extends ScreenBase<FilterContainer> {
@@ -227,8 +230,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                 item.setTextColor(ChatFormatting.WHITE.getColor());
             }
         } else if (filter instanceof GasFilter) {
-            Tag tag = GasUtils.getGas(text, true);
-            filter.setTag(tag);
+            Map.Entry<ChemicalType, Tag<? extends Chemical>> entry = GasUtils.getGas(text, true);
+            filter.setTag((Tag)entry.getValue());
+            ((GasFilter)filter).setChemicalType(entry.getKey());
             if (filter.getTag() == null) {
                 item.setTextColor(ChatFormatting.DARK_RED.getColor());
             } else {
@@ -270,7 +274,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(this::onInsertStack);
         } else if (filter instanceof GasFilter) {
-            GasStack gas = GasUtils.getGasContained(stack);
+            ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 onInsertStack(gas);
             }
@@ -292,7 +296,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
     }
 
-    public void onInsertStack(GasStack stack) {
+    public void onInsertStack(ChemicalStack stack) {
         if (stack == null || stack.isEmpty()) {
             return;
         }

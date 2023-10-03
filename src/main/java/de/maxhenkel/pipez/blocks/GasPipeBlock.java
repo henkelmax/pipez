@@ -4,6 +4,7 @@ import de.maxhenkel.pipez.blocks.tileentity.GasPipeTileEntity;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
+import de.maxhenkel.pipez.utils.GasUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -24,7 +25,7 @@ public class GasPipeBlock extends PipeBlock {
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
         BlockEntity te = world.getBlockEntity(pos.relative(facing));
-        return (te != null && te.getCapability(ModCapabilities.GAS_HANDLER_CAPABILITY, facing.getOpposite()).isPresent());
+        return (te != null && GasUtils.hasChemicalCapability(te, facing.getOpposite()));
     }
 
     @Override
