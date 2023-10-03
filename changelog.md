@@ -1,1 +1,1 @@
-- Updated to 1.20.2
+- Added pigment, slurry and infuse support to gas pipes (Thanks Smileycorp)
