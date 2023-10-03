@@ -1,1 +1,1 @@
-- Fixed extracting pipes not working in some cases
+- Added pigment, slurry and infuse support to gas pipes (Thanks Smileycorp)
