@@ -146,4 +146,8 @@ public abstract class PipeType<T> {
         return count;
     }
 
+    public Capability<?>[] getCapabilities() {
+        return new Capability[]{getCapability()};
+    }
+
 }
