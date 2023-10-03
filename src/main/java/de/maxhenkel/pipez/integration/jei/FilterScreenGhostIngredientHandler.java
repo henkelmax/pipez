@@ -9,7 +9,7 @@ import de.maxhenkel.pipez.FluidFilter;
 import de.maxhenkel.pipez.GasFilter;
 import de.maxhenkel.pipez.gui.FilterScreen;
 import de.maxhenkel.pipez.utils.GasUtils;
-import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.chemical.ChemicalStack;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,7 @@ public class FilterScreenGhostIngredientHandler implements IGhostIngredientHandl
             }
         } else if (filter instanceof FluidFilter && ingredient instanceof FluidStack stack) {
             list.add(this.getItemHoverAreaTarget(gui, i -> gui.onInsertStack(stack)));
-        } else if (filter instanceof GasFilter && ingredient instanceof GasStack stack) {
+        } else if (filter instanceof GasFilter && ingredient instanceof ChemicalStack stack) {
             list.add(this.getItemHoverAreaTarget(gui, i -> gui.onInsertStack(stack)));
         }
 
