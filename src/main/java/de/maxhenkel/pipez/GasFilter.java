@@ -1,28 +1,36 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.pipez.utils.GasTag;
 import de.maxhenkel.pipez.utils.GasUtils;
-import mekanism.api.MekanismAPI;
-import mekanism.api.chemical.gas.Gas;
+import mekanism.api.chemical.Chemical;
+import mekanism.api.chemical.ChemicalType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class GasFilter extends Filter<Gas> {
+public class GasFilter extends Filter<Chemical> {
+
+    private ChemicalType type = ChemicalType.GAS;
 
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag compound = new CompoundTag();
         if (tag != null) {
             if (tag instanceof SingleElementTag) {
-                ResourceLocation key = MekanismAPI.gasRegistry().getKey(((SingleElementTag<Gas>) tag).getElement());
+                Chemical element = ((SingleElementTag<Chemical>) tag).getElement();
+                ChemicalType type = element == null ? ChemicalType.GAS : ChemicalType.getTypeFor(element);
+                ResourceLocation key = GasUtils.getResourceLocation(element);
                 if (key != null) {
                     compound.putString("Gas", key.toString());
+                    compound.putString("Type", type.getSerializedName());
                 }
             } else {
                 compound.putString("Tag", tag.getName().toString());
+                compound.putString("Type", type.getSerializedName());
             }
         }
         if (destination != null) {
@@ -39,15 +47,16 @@ public class GasFilter extends Filter<Gas> {
     @Override
     public void deserializeNBT(CompoundTag compound) {
         tag = null;
+        type = compound.contains("Type", Tag.TAG_STRING) ? ChemicalType.fromString(compound.getString("Type")) : ChemicalType.GAS;
         if (compound.contains("Gas", Tag.TAG_STRING)) {
             ResourceLocation rl = new ResourceLocation(compound.getString("Gas"));
-            Gas gas = MekanismAPI.gasRegistry().getValue(rl);
+            Chemical gas = GasUtils.getRegistry(type).getValue(rl);
             if (gas != null) {
                 this.tag = new SingleElementTag<>(rl, gas);
             }
         }
         if (compound.contains("Tag", Tag.TAG_STRING)) {
-            tag = GasUtils.getGasTag(compound.getString("Tag"), false);
+            tag = GasUtils.getGasTag(compound.getString("Tag"), false, type);
         }
 
         metadata = null;
@@ -71,6 +80,21 @@ public class GasFilter extends Filter<Gas> {
         } else {
             id = UUID.randomUUID();
         }
+    }
+
+    @Override
+    public void setTag(@Nullable de.maxhenkel.corelib.tag.Tag<Chemical> tag) {
+        super.setTag(tag);
+        if (tag instanceof SingleElementTag) {
+            Chemical element = ((SingleElementTag<Chemical>) tag).getElement();
+            type = element == null ? ChemicalType.GAS : ChemicalType.getTypeFor(element);
+        } else if (tag instanceof GasTag) {
+            type = ((GasTag) tag).getChemicalType();
+        }
+    }
+
+    public void setChemicalType(ChemicalType type) {
+        this.type = type;
     }
 
 }

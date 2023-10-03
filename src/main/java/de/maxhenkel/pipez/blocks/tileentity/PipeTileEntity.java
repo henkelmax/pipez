@@ -4,7 +4,12 @@ import de.maxhenkel.corelib.blockentity.ITickableBlockEntity;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
+import mekanism.api.chemical.ChemicalType;
+import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.chemical.gas.IGasHandler;
+import mekanism.api.chemical.infuse.IInfusionHandler;
+import mekanism.api.chemical.pigment.IPigmentHandler;
+import mekanism.api.chemical.slurry.ISlurryHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.ByteTag;
@@ -342,6 +347,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         private LazyOptional<IEnergyStorage> energyHandler;
         private LazyOptional<IFluidHandler> fluidHandler;
         private LazyOptional<IGasHandler> gasHandler;
+        private LazyOptional<IInfusionHandler> infusionHandler;
+        private LazyOptional<IPigmentHandler> pigmentHandler;
+        private LazyOptional<ISlurryHandler> slurryHandler;
 
         public Connection(BlockPos pos, Direction direction, int distance) {
             this.pos = pos;
@@ -351,6 +359,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             this.energyHandler = LazyOptional.empty();
             this.fluidHandler = LazyOptional.empty();
             this.gasHandler = LazyOptional.empty();
+            this.infusionHandler = LazyOptional.empty();
+            this.pigmentHandler = LazyOptional.empty();
+            this.slurryHandler = LazyOptional.empty();
         }
 
         public BlockPos getPos() {
@@ -402,6 +413,45 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             return gasHandler;
         }
 
+        public LazyOptional<IInfusionHandler> getInfusionHandler(Level level) {
+            if (!infusionHandler.isPresent()) {
+                infusionHandler = getCapabilityRaw(level, ModCapabilities.INFUSION_HANDLER_CAPABILITY);
+            }
+            return infusionHandler;
+        }
+
+        public LazyOptional<IPigmentHandler> getPigmentHandler(Level level) {
+            if (!pigmentHandler.isPresent()) {
+                pigmentHandler = getCapabilityRaw(level, ModCapabilities.PIGMENT_HANDLER_CAPABILITY);
+            }
+            return pigmentHandler;
+        }
+
+        public LazyOptional<ISlurryHandler> getSlurryHandler(Level level) {
+            if (!slurryHandler.isPresent()) {
+                slurryHandler = getCapabilityRaw(level, ModCapabilities.SLURRY_HANDLER_CAPABILITY);
+            }
+            return slurryHandler;
+        }
+
+        public LazyOptional<? extends IChemicalHandler> getChemicalHandler(ChemicalType type, Level level) {
+            switch (type) {
+                case GAS -> {
+                    return getGasHandler(level);
+                }
+                case INFUSION -> {
+                    return getInfusionHandler(level);
+                }
+                case PIGMENT -> {
+                    return getPigmentHandler(level);
+                }
+                case SLURRY -> {
+                    return getSlurryHandler(level);
+                }
+            }
+            return null;
+        }
+
         public <T> LazyOptional<T> getCapability(Level level, Capability<T> capability) {
             if (capability == ForgeCapabilities.ITEM_HANDLER) {
                 return getItemHandler(level).cast();
@@ -411,6 +461,12 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                 return getFluidHandler(level).cast();
             } else if (capability == ModCapabilities.GAS_HANDLER_CAPABILITY) {
                 return getGasHandler(level).cast();
+            } else if (capability == ModCapabilities.INFUSION_HANDLER_CAPABILITY) {
+                return getInfusionHandler(level).cast();
+            } else if (capability == ModCapabilities.PIGMENT_HANDLER_CAPABILITY) {
+                return getPigmentHandler(level).cast();
+            } else if (capability == ModCapabilities.SLURRY_HANDLER_CAPABILITY) {
+                return getSlurryHandler(level).cast();
             }
             return LazyOptional.empty();
         }

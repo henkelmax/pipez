@@ -5,8 +5,8 @@ import de.maxhenkel.corelib.client.RenderUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.WrappedFluidStack;
 import mekanism.api.MekanismAPI;
-import mekanism.api.chemical.gas.Gas;
-import mekanism.api.chemical.gas.GasStack;
+import mekanism.api.chemical.Chemical;
+import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,16 +22,16 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WrappedGasStack extends AbstractStack<GasStack> {
+public class WrappedGasStack extends AbstractStack<ChemicalStack> {
 
-    public WrappedGasStack(GasStack stack) {
+    public WrappedGasStack(ChemicalStack stack) {
         super(stack);
     }
 
     @Nullable
     public static WrappedGasStack dummyStack(Object o) {
-        if (o instanceof Gas) {
-            GasStack stack = new GasStack((Gas) o, 1000);
+        if (o instanceof Chemical<?>) {
+            ChemicalStack stack = GasUtils.createChemicalStack((Chemical) o, 1000);
             return new WrappedGasStack(stack);
         }
         return null;
@@ -43,7 +43,7 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getType().getIcon());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int chemicalTint = stack.getChemicalTint();
-        RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), RenderUtils.getAlphaFloat(chemicalTint));
+        RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), 1);
         RenderSystem.setShaderTexture(0, texture.atlasLocation());
         WrappedFluidStack.fluidBlit(guiGraphics, x, y, 16, 16, texture, stack.getType().getTint());
     }
@@ -56,7 +56,7 @@ public class WrappedGasStack extends AbstractStack<GasStack> {
         tooltip.add(getDisplayName());
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
-            ResourceLocation registryName = MekanismAPI.gasRegistry().getKey(stack.getType());
+            ResourceLocation registryName = GasUtils.getResourceLocation(stack.getType());
             if (registryName != null) {
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }

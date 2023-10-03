@@ -186,9 +186,11 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     @Override
     public boolean canInsert(Level level, Connection connection) {
         for (PipeType<?> type : types) {
-            LazyOptional<?> capability = connection.getCapability(level, type.getCapability());
-            if (capability.isPresent()) {
-                return true;
+            for (Capability<?> provider : type.getCapabilities()) {
+                LazyOptional<?> capability = connection.getCapability(level, provider);
+                if (capability.isPresent()) {
+                    return true;
+                }
             }
         }
         return false;
