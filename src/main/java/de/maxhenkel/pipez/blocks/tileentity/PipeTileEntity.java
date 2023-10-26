@@ -4,6 +4,7 @@ import de.maxhenkel.corelib.blockentity.ITickableBlockEntity;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
+import de.maxhenkel.pipez.utils.MekanismUtils;
 import mekanism.api.chemical.ChemicalType;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.chemical.gas.IGasHandler;
@@ -435,6 +436,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         }
 
         public LazyOptional<? extends IChemicalHandler> getChemicalHandler(ChemicalType type, Level level) {
+            if (!MekanismUtils.isMekanismInstalled()) {
+                return LazyOptional.empty();
+            }
             switch (type) {
                 case GAS -> {
                     return getGasHandler(level);
@@ -449,7 +453,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                     return getSlurryHandler(level);
                 }
             }
-            return null;
+            return LazyOptional.empty();
         }
 
         public <T> LazyOptional<T> getCapability(Level level, Capability<T> capability) {
@@ -459,7 +463,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                 return getEnergyHandler(level).cast();
             } else if (capability == ForgeCapabilities.FLUID_HANDLER) {
                 return getFluidHandler(level).cast();
-            } else if (capability == ModCapabilities.GAS_HANDLER_CAPABILITY) {
+            }
+            if (!MekanismUtils.isMekanismInstalled()) {
+                return LazyOptional.empty();
+            }
+            if (capability == ModCapabilities.GAS_HANDLER_CAPABILITY) {
                 return getGasHandler(level).cast();
             } else if (capability == ModCapabilities.INFUSION_HANDLER_CAPABILITY) {
                 return getInfusionHandler(level).cast();

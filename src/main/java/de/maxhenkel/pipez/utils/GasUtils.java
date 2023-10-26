@@ -77,7 +77,7 @@ public class GasUtils {
                 tagKey = ChemicalTags.INFUSE_TYPE.tag(id);
                 tags = MekanismAPI.infuseTypeRegistry().tags();
             }
-            case PIGMENT-> {
+            case PIGMENT -> {
                 tagKey = ChemicalTags.PIGMENT.tag(id);
                 tags = MekanismAPI.pigmentRegistry().tags();
             }
@@ -93,7 +93,7 @@ public class GasUtils {
         if (tags == null) {
             return nullIfNotExists ? null : getEmptyStack(type);
         }
-        ITag<? extends Chemical> tag = tags.getTag((TagKey)tagKey);
+        ITag<? extends Chemical> tag = tags.getTag((TagKey) tagKey);
         if (tag.isEmpty()) {
             return nullIfNotExists ? null : getEmptyStack(type);
         } else {
@@ -172,7 +172,7 @@ public class GasUtils {
                 return MekanismAPI.slurryRegistry().getKey((Slurry) chemical);
             }
             default -> {
-                return MekanismAPI.gasRegistry().getKey((Gas)chemical);
+                return MekanismAPI.gasRegistry().getKey((Gas) chemical);
             }
         }
     }
@@ -180,16 +180,16 @@ public class GasUtils {
     public static ChemicalStack createChemicalStack(Chemical chemical, long amount) {
         switch (ChemicalType.getTypeFor(chemical)) {
             case GAS -> {
-                return new GasStack((Gas)chemical, amount);
+                return new GasStack((Gas) chemical, amount);
             }
             case INFUSION -> {
                 return new InfusionStack((InfuseType) chemical, amount);
             }
             case PIGMENT -> {
-                return new PigmentStack((Pigment)chemical, amount);
+                return new PigmentStack((Pigment) chemical, amount);
             }
             case SLURRY -> {
-                return new SlurryStack((Slurry)chemical, amount);
+                return new SlurryStack((Slurry) chemical, amount);
             }
             default -> {
                 return GasStack.EMPTY;
@@ -197,12 +197,12 @@ public class GasUtils {
         }
     }
 
-    public static Capability<? extends IChemicalHandler> [] getChemicalCapabilities() {
+    public static Capability<? extends IChemicalHandler>[] getChemicalCapabilities() {
         return new Capability[]{
-            ModCapabilities.GAS_HANDLER_CAPABILITY,
-            ModCapabilities.INFUSION_HANDLER_CAPABILITY,
-            ModCapabilities.PIGMENT_HANDLER_CAPABILITY,
-            ModCapabilities.SLURRY_HANDLER_CAPABILITY
+                ModCapabilities.GAS_HANDLER_CAPABILITY,
+                ModCapabilities.INFUSION_HANDLER_CAPABILITY,
+                ModCapabilities.PIGMENT_HANDLER_CAPABILITY,
+                ModCapabilities.SLURRY_HANDLER_CAPABILITY
         };
     }
 

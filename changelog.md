@@ -1,1 +1,1 @@
-- Added pigment, slurry and infuse support to gas pipes (Thanks Smileycorp)
+- Fixed crashes when Mekanism isn't installed
