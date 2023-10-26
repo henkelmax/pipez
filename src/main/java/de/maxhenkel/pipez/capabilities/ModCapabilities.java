@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.capabilities;
 
-import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.chemical.gas.IGasHandler;
 import mekanism.api.chemical.infuse.IInfusionHandler;
 import mekanism.api.chemical.pigment.IPigmentHandler;
