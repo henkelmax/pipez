@@ -10,6 +10,7 @@ import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.utils.GasUtils;
+import de.maxhenkel.pipez.utils.MekanismUtils;
 import mekanism.api.Action;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -40,6 +41,9 @@ public class GasPipeType extends PipeType<Chemical> {
 
     @Override
     public Capability<?>[] getCapabilities() {
+        if (!MekanismUtils.isMekanismInstalled()) {
+            return new Capability[0];
+        }
         return GasUtils.getChemicalCapabilities();
     }
 
@@ -65,6 +69,9 @@ public class GasPipeType extends PipeType<Chemical> {
 
     @Override
     public void tick(PipeLogicTileEntity tileEntity) {
+        if (!MekanismUtils.isMekanismInstalled()) {
+            return;
+        }
         for (Direction side : Direction.values()) {
             if (!tileEntity.isExtracting(side)) {
                 continue;

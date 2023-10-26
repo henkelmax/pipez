@@ -1,10 +1,10 @@
 package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.blocks.tileentity.GasPipeTileEntity;
-import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import de.maxhenkel.pipez.utils.GasUtils;
+import de.maxhenkel.pipez.utils.MekanismUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -15,7 +15,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.fml.ModList;
 
 public class GasPipeBlock extends PipeBlock {
 
@@ -24,6 +23,9 @@ public class GasPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
+        if (!MekanismUtils.isMekanismInstalled()) {
+            return false;
+        }
         BlockEntity te = world.getBlockEntity(pos.relative(facing));
         return (te != null && GasUtils.hasChemicalCapability(te, facing.getOpposite()));
     }
@@ -36,7 +38,7 @@ public class GasPipeBlock extends PipeBlock {
 
     @Override
     BlockEntity createTileEntity(BlockPos pos, BlockState state) {
-        if (!ModList.get().isLoaded("mekanism")) {
+        if (!MekanismUtils.isMekanismInstalled()) {
             return null;
         }
         return new GasPipeTileEntity(pos, state);
