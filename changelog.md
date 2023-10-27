@@ -1,1 +1,1 @@
-- Fixed crashes when Mekanism isn't installed
+- Added French translation
