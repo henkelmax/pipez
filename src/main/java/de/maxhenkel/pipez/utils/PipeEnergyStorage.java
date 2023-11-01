@@ -3,7 +3,7 @@ package de.maxhenkel.pipez.utils;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import net.minecraft.core.Direction;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public class PipeEnergyStorage implements IEnergyStorage {
 

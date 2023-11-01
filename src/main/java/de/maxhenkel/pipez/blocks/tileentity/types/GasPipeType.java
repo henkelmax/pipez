@@ -19,8 +19,7 @@ import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-
+import net.neoforged.neoforge.common.capabilities.Capability;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;

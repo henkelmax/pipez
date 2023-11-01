@@ -3,7 +3,7 @@ package de.maxhenkel.pipez;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
 public class DirectionalPosition implements INBTSerializable<CompoundTag> {
 

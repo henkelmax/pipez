@@ -37,8 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ForgeMod;
-
+import net.neoforged.neoforge.common.NeoForgeMod;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
@@ -477,7 +476,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     public float getBlockReachDistance(Player player) {
-        float distance = (float) player.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue();
+        float distance = (float) player.getAttribute(NeoForgeMod.BLOCK_REACH.get()).getValue();
         return player.isCreative() ? distance : distance - 0.5F;
     }
 

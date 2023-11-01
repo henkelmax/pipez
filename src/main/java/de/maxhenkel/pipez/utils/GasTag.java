@@ -4,8 +4,7 @@ import de.maxhenkel.corelib.tag.Tag;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.tags.ITag;
-
+import net.neoforged.neoforge.registries.tags.ITag;
 import java.util.List;
 import java.util.stream.Collectors;
 

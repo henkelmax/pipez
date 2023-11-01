@@ -28,13 +28,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
-
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -388,21 +387,21 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
         public LazyOptional<IItemHandler> getItemHandler(Level level) {
             if (!itemHandler.isPresent()) {
-                itemHandler = getCapabilityRaw(level, ForgeCapabilities.ITEM_HANDLER);
+                itemHandler = getCapabilityRaw(level, Capabilities.ITEM_HANDLER);
             }
             return itemHandler;
         }
 
         public LazyOptional<IEnergyStorage> getEnergyHandler(Level level) {
             if (!energyHandler.isPresent()) {
-                energyHandler = getCapabilityRaw(level, ForgeCapabilities.ENERGY);
+                energyHandler = getCapabilityRaw(level, Capabilities.ENERGY);
             }
             return energyHandler;
         }
 
         public LazyOptional<IFluidHandler> getFluidHandler(Level level) {
             if (!fluidHandler.isPresent()) {
-                fluidHandler = getCapabilityRaw(level, ForgeCapabilities.FLUID_HANDLER);
+                fluidHandler = getCapabilityRaw(level, Capabilities.FLUID_HANDLER);
             }
             return fluidHandler;
         }
@@ -457,11 +456,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         }
 
         public <T> LazyOptional<T> getCapability(Level level, Capability<T> capability) {
-            if (capability == ForgeCapabilities.ITEM_HANDLER) {
+            if (capability == Capabilities.ITEM_HANDLER) {
                 return getItemHandler(level).cast();
-            } else if (capability == ForgeCapabilities.ENERGY) {
+            } else if (capability == Capabilities.ENERGY) {
                 return getEnergyHandler(level).cast();
-            } else if (capability == ForgeCapabilities.FLUID_HANDLER) {
+            } else if (capability == Capabilities.FLUID_HANDLER) {
                 return getFluidHandler(level).cast();
             }
             if (!MekanismUtils.isMekanismInstalled()) {

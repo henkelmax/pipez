@@ -12,10 +12,9 @@ import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.energy.IEnergyStorage;
-
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,7 @@ public class EnergyPipeType extends PipeType<Void> {
 
     @Override
     public Capability<?> getCapability() {
-        return ForgeCapabilities.ENERGY;
+        return Capabilities.ENERGY;
     }
 
     @Override

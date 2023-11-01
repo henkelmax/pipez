@@ -1,9 +1,8 @@
 package de.maxhenkel.pipez.utils;
 
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-
 import javax.annotation.Nonnull;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 public class DummyFluidHandler implements IFluidHandler {
 

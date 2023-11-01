@@ -12,8 +12,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-
+import net.neoforged.neoforge.common.capabilities.Capability;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;

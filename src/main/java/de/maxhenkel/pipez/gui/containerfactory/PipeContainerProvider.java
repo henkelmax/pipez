@@ -8,6 +8,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.neoforged.neoforge.network.NetworkHooks;
 
 public class PipeContainerProvider implements MenuProvider {
 
@@ -26,7 +27,7 @@ public class PipeContainerProvider implements MenuProvider {
 
     public static void openGui(Player player, UpgradeTileEntity tileEntity, Direction direction, int index, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.openMenu(new PipeContainerProvider(containerCreator, tileEntity), packetBuffer -> {
+            NetworkHooks.openScreen(serverPlayer, new PipeContainerProvider(containerCreator, tileEntity), packetBuffer -> {
                 packetBuffer.writeBlockPos(tileEntity.getBlockPos());
                 packetBuffer.writeEnum(direction);
                 packetBuffer.writeInt(index);

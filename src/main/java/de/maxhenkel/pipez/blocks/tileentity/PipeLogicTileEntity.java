@@ -14,10 +14,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.util.LazyOptional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -47,15 +46,15 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
             return super.getCapability(cap, side);
         }
 
-        if (cap == ForgeCapabilities.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
+        if (cap == Capabilities.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
             if (side != null) {
                 return energyCache.get(side).cast();
             }
-        } else if (cap == ForgeCapabilities.FLUID_HANDLER && hasType(FluidPipeType.INSTANCE)) {
+        } else if (cap == Capabilities.FLUID_HANDLER && hasType(FluidPipeType.INSTANCE)) {
             if (side != null) {
                 return fluidCache.get(side).cast();
             }
-        } else if (cap == ForgeCapabilities.ITEM_HANDLER && hasType(ItemPipeType.INSTANCE)) {
+        } else if (cap == Capabilities.ITEM_HANDLER && hasType(ItemPipeType.INSTANCE)) {
             if (side != null) {
                 return itemCache.get(side).cast();
             }

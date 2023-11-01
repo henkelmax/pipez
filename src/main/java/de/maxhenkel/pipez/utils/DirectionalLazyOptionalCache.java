@@ -1,8 +1,7 @@
 package de.maxhenkel.pipez.utils;
 
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.util.LazyOptional;
-
+import net.neoforged.neoforge.common.util.LazyOptional;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;

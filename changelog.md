@@ -1,1 +1,1 @@
-- Added French translation
+- Ported to NeoForge

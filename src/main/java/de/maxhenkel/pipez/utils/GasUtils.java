@@ -17,12 +17,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.tags.ITag;
-import net.minecraftforge.registries.tags.ITagManager;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.registries.tags.ITag;
+import net.neoforged.neoforge.registries.tags.ITagManager;
 
 import javax.annotation.Nullable;
 import java.util.AbstractMap;
@@ -75,19 +75,23 @@ public class GasUtils {
         switch (type) {
             case INFUSION -> {
                 tagKey = ChemicalTags.INFUSE_TYPE.tag(id);
-                tags = MekanismAPI.infuseTypeRegistry().tags();
+                // TODO Re add when Mekanism is updated
+                // tags = MekanismAPI.infuseTypeRegistry().tags();
             }
             case PIGMENT -> {
                 tagKey = ChemicalTags.PIGMENT.tag(id);
-                tags = MekanismAPI.pigmentRegistry().tags();
+                // TODO Re add when Mekanism is updated
+                // tags = MekanismAPI.pigmentRegistry().tags();
             }
             case SLURRY -> {
                 tagKey = ChemicalTags.SLURRY.tag(id);
-                tags = MekanismAPI.slurryRegistry().tags();
+                // TODO Re add when Mekanism is updated
+                // tags = MekanismAPI.slurryRegistry().tags();
             }
             default -> {
                 tagKey = ChemicalTags.GAS.tag(id);
-                tags = MekanismAPI.gasRegistry().tags();
+                // TODO Re add when Mekanism is updated
+                // tags = MekanismAPI.gasRegistry().tags();
             }
         }
         if (tags == null) {
@@ -144,7 +148,8 @@ public class GasUtils {
     }
 
     public static IForgeRegistry<? extends Chemical> getRegistry(ChemicalType type) {
-        switch (type) {
+        // TODO Re add when Mekanism is updated
+        /*switch (type) {
             case INFUSION -> {
                 return MekanismAPI.infuseTypeRegistry();
             }
@@ -157,11 +162,12 @@ public class GasUtils {
             default -> {
                 return MekanismAPI.gasRegistry();
             }
-        }
+        }*/
+        return null;
     }
 
     public static ResourceLocation getResourceLocation(Chemical chemical) {
-        switch (ChemicalType.getTypeFor(chemical)) {
+        /*switch (ChemicalType.getTypeFor(chemical)) {
             case INFUSION -> {
                 return MekanismAPI.infuseTypeRegistry().getKey((InfuseType) chemical);
             }
@@ -174,7 +180,8 @@ public class GasUtils {
             default -> {
                 return MekanismAPI.gasRegistry().getKey((Gas) chemical);
             }
-        }
+        }*/
+        return null;
     }
 
     public static ChemicalStack createChemicalStack(Chemical chemical, long amount) {

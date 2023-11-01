@@ -2,8 +2,7 @@ package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.Tag;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.util.INBTSerializable;
-
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import javax.annotation.Nullable;
 import java.util.UUID;
 

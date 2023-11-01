@@ -1,40 +1,40 @@
 package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.config.ConfigBase;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ServerConfig extends ConfigBase {
 
-    public final ForgeConfigSpec.IntValue itemPipeSpeed;
-    public final ForgeConfigSpec.IntValue itemPipeAmount;
-    public final ForgeConfigSpec.IntValue itemPipeSpeedBasic;
-    public final ForgeConfigSpec.IntValue itemPipeAmountBasic;
-    public final ForgeConfigSpec.IntValue itemPipeSpeedImproved;
-    public final ForgeConfigSpec.IntValue itemPipeAmountImproved;
-    public final ForgeConfigSpec.IntValue itemPipeSpeedAdvanced;
-    public final ForgeConfigSpec.IntValue itemPipeAmountAdvanced;
-    public final ForgeConfigSpec.IntValue itemPipeSpeedUltimate;
-    public final ForgeConfigSpec.IntValue itemPipeAmountUltimate;
+    public final ModConfigSpec.IntValue itemPipeSpeed;
+    public final ModConfigSpec.IntValue itemPipeAmount;
+    public final ModConfigSpec.IntValue itemPipeSpeedBasic;
+    public final ModConfigSpec.IntValue itemPipeAmountBasic;
+    public final ModConfigSpec.IntValue itemPipeSpeedImproved;
+    public final ModConfigSpec.IntValue itemPipeAmountImproved;
+    public final ModConfigSpec.IntValue itemPipeSpeedAdvanced;
+    public final ModConfigSpec.IntValue itemPipeAmountAdvanced;
+    public final ModConfigSpec.IntValue itemPipeSpeedUltimate;
+    public final ModConfigSpec.IntValue itemPipeAmountUltimate;
 
-    public final ForgeConfigSpec.IntValue fluidPipeAmount;
-    public final ForgeConfigSpec.IntValue fluidPipeAmountBasic;
-    public final ForgeConfigSpec.IntValue fluidPipeAmountImproved;
-    public final ForgeConfigSpec.IntValue fluidPipeAmountAdvanced;
-    public final ForgeConfigSpec.IntValue fluidPipeAmountUltimate;
+    public final ModConfigSpec.IntValue fluidPipeAmount;
+    public final ModConfigSpec.IntValue fluidPipeAmountBasic;
+    public final ModConfigSpec.IntValue fluidPipeAmountImproved;
+    public final ModConfigSpec.IntValue fluidPipeAmountAdvanced;
+    public final ModConfigSpec.IntValue fluidPipeAmountUltimate;
 
-    public final ForgeConfigSpec.IntValue energyPipeAmount;
-    public final ForgeConfigSpec.IntValue energyPipeAmountBasic;
-    public final ForgeConfigSpec.IntValue energyPipeAmountImproved;
-    public final ForgeConfigSpec.IntValue energyPipeAmountAdvanced;
-    public final ForgeConfigSpec.IntValue energyPipeAmountUltimate;
+    public final ModConfigSpec.IntValue energyPipeAmount;
+    public final ModConfigSpec.IntValue energyPipeAmountBasic;
+    public final ModConfigSpec.IntValue energyPipeAmountImproved;
+    public final ModConfigSpec.IntValue energyPipeAmountAdvanced;
+    public final ModConfigSpec.IntValue energyPipeAmountUltimate;
 
-    public final ForgeConfigSpec.IntValue gasPipeAmount;
-    public final ForgeConfigSpec.IntValue gasPipeAmountBasic;
-    public final ForgeConfigSpec.IntValue gasPipeAmountImproved;
-    public final ForgeConfigSpec.IntValue gasPipeAmountAdvanced;
-    public final ForgeConfigSpec.IntValue gasPipeAmountUltimate;
+    public final ModConfigSpec.IntValue gasPipeAmount;
+    public final ModConfigSpec.IntValue gasPipeAmountBasic;
+    public final ModConfigSpec.IntValue gasPipeAmountImproved;
+    public final ModConfigSpec.IntValue gasPipeAmountAdvanced;
+    public final ModConfigSpec.IntValue gasPipeAmountUltimate;
 
-    public ServerConfig(ForgeConfigSpec.Builder builder) {
+    public ServerConfig(ModConfigSpec.Builder builder) {
         super(builder);
         itemPipeSpeed = builder
                 .comment("The speed at which items are transferred", "A value of 1 means every tick")
