@@ -3,18 +3,19 @@ package de.maxhenkel.pipez.utils;
 import de.maxhenkel.corelib.tag.Tag;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalType;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.registries.tags.ITag;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GasTag implements Tag<Chemical> {
 
-    private final ITag<Chemical> tag;
+    private final HolderSet.Named<Chemical> tag;
     private final ResourceLocation id;
     private final ChemicalType type;
 
-    public GasTag(ITag<Chemical> tag, ResourceLocation id, ChemicalType type) {
+    public GasTag(HolderSet.Named<Chemical> tag, ResourceLocation id, ChemicalType type) {
         this.tag = tag;
         this.id = id;
         this.type = type;
@@ -27,12 +28,12 @@ public class GasTag implements Tag<Chemical> {
 
     @Override
     public boolean contains(Chemical gas) {
-        return gas.is(tag.getKey());
+        return gas.is(tag.key());
     }
 
     @Override
     public List<Chemical> getAll() {
-        return tag.stream().collect(Collectors.toList());
+        return tag.stream().map(Holder::value).toList();
     }
 
     public ChemicalType getChemicalType() {

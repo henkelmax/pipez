@@ -15,6 +15,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -38,6 +39,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.common.NeoForgeMod;
+
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
@@ -476,7 +478,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     public float getBlockReachDistance(Player player) {
-        float distance = (float) player.getAttribute(NeoForgeMod.BLOCK_REACH.get()).getValue();
+        AttributeInstance attribute = player.getAttribute(NeoForgeMod.BLOCK_REACH.value());
+        if (attribute == null) {
+            return (float) NeoForgeMod.BLOCK_REACH.value().getDefaultValue();
+        }
+        float distance = (float) attribute.getValue();
         return player.isCreative() ? distance : distance - 0.5F;
     }
 

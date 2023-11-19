@@ -2,11 +2,12 @@ package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.TagUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.registries.ForgeRegistries;
+
 import java.util.UUID;
 
 public class FluidFilter extends Filter<Fluid> {
@@ -16,8 +17,9 @@ public class FluidFilter extends Filter<Fluid> {
         CompoundTag compound = new CompoundTag();
         if (tag != null) {
             if (tag instanceof SingleElementTag) {
-                ResourceLocation key = ForgeRegistries.FLUIDS.getKey(((SingleElementTag<Fluid>) tag).getElement());
-                if (key != null) {
+                Fluid element = ((SingleElementTag<Fluid>) tag).getElement();
+                if (BuiltInRegistries.FLUID.containsValue(element)) {
+                    ResourceLocation key = BuiltInRegistries.FLUID.getKey(element);
                     compound.putString("Fluid", key.toString());
                 }
             } else {
@@ -45,9 +47,10 @@ public class FluidFilter extends Filter<Fluid> {
     public void deserializeNBT(CompoundTag compound) {
         tag = null;
         if (compound.contains("Fluid", Tag.TAG_STRING)) {
-            Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(compound.getString("Fluid")));
-            if (fluid != null) {
-                tag = new SingleElementTag<>(ForgeRegistries.FLUIDS.getKey(fluid), fluid);
+            ResourceLocation fluidLocation = new ResourceLocation(compound.getString("Fluid"));
+            if (BuiltInRegistries.FLUID.containsKey(fluidLocation)) {
+                Fluid fluid = BuiltInRegistries.FLUID.get(fluidLocation);
+                tag = new SingleElementTag<>(BuiltInRegistries.FLUID.getKey(fluid), fluid);
             }
         }
         if (compound.contains("Tag", Tag.TAG_STRING)) {

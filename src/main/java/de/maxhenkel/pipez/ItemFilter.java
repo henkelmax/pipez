@@ -2,11 +2,12 @@ package de.maxhenkel.pipez;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.TagUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.registries.ForgeRegistries;
+
 import java.util.UUID;
 
 public class ItemFilter extends Filter<Item> {
@@ -16,8 +17,9 @@ public class ItemFilter extends Filter<Item> {
         CompoundTag compound = new CompoundTag();
         if (tag != null) {
             if (tag instanceof SingleElementTag) {
-                ResourceLocation key = ForgeRegistries.ITEMS.getKey(((SingleElementTag<Item>) tag).getElement());
-                if (key != null) {
+                Item element = ((SingleElementTag<Item>) tag).getElement();
+                if (BuiltInRegistries.ITEM.containsValue(element)) {
+                    ResourceLocation key = BuiltInRegistries.ITEM.getKey(element);
                     compound.putString("Item", key.toString());
                 }
             } else {
@@ -45,9 +47,10 @@ public class ItemFilter extends Filter<Item> {
     public void deserializeNBT(CompoundTag compound) {
         tag = null;
         if (compound.contains("Item", Tag.TAG_STRING)) {
-            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("Item")));
-            if (item != null) {
-                tag = new SingleElementTag<>(ForgeRegistries.ITEMS.getKey(item), item);
+            ResourceLocation itemLocation = new ResourceLocation(compound.getString("Item"));
+            if (BuiltInRegistries.ITEM.containsKey(itemLocation)) {
+                Item item = BuiltInRegistries.ITEM.get(itemLocation);
+                tag = new SingleElementTag<>(itemLocation, item);
             }
         }
         if (compound.contains("Tag", Tag.TAG_STRING)) {

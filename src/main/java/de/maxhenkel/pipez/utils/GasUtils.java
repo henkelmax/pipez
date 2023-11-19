@@ -14,19 +14,19 @@ import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.common.util.LazyOptional;
-import net.neoforged.neoforge.registries.IForgeRegistry;
-import net.neoforged.neoforge.registries.tags.ITag;
-import net.neoforged.neoforge.registries.tags.ITagManager;
 
 import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class GasUtils {
 
@@ -52,17 +52,12 @@ public class GasUtils {
         if (name.startsWith("#")) {
             return getGasTag(name.substring(1), nullIfNotExists, type);
         } else {
-            IForgeRegistry<? extends Chemical> registry = getRegistry(type);
+            Registry<? extends Chemical> registry = getRegistry(type);
             id = new ResourceLocation(name);
             if (!registry.containsKey(id)) {
                 return nullIfNotExists ? null : getEmptyStack(type);
             } else {
-                Chemical gas = registry.getValue(new ResourceLocation(name));
-                if (gas == null) {
-                    return nullIfNotExists ? null : getEmptyStack(type);
-                } else {
-                    return new SingleElementTag<>(id, gas);
-                }
+                return new SingleElementTag<>(id, registry.get(id));
             }
         }
     }
@@ -71,37 +66,37 @@ public class GasUtils {
     public static Tag<Chemical> getGasTag(String name, boolean nullIfNotExists, ChemicalType type) {
         ResourceLocation id = new ResourceLocation(name);
         TagKey<? extends Chemical> tagKey = null;
-        ITagManager<? extends Chemical> tags = null;
+        Registry<? extends Chemical> registry = null;
         switch (type) {
             case INFUSION -> {
                 tagKey = ChemicalTags.INFUSE_TYPE.tag(id);
                 // TODO Re add when Mekanism is updated
-                // tags = MekanismAPI.infuseTypeRegistry().tags();
+                // registry = MekanismAPI.infuseTypeRegistry();
             }
             case PIGMENT -> {
                 tagKey = ChemicalTags.PIGMENT.tag(id);
                 // TODO Re add when Mekanism is updated
-                // tags = MekanismAPI.pigmentRegistry().tags();
+                // registry = MekanismAPI.pigmentRegistry();
             }
             case SLURRY -> {
                 tagKey = ChemicalTags.SLURRY.tag(id);
                 // TODO Re add when Mekanism is updated
-                // tags = MekanismAPI.slurryRegistry().tags();
+                // registry = MekanismAPI.slurryRegistry();
             }
             default -> {
                 tagKey = ChemicalTags.GAS.tag(id);
                 // TODO Re add when Mekanism is updated
-                // tags = MekanismAPI.gasRegistry().tags();
+                // registry = MekanismAPI.gasRegistry();
             }
         }
-        if (tags == null) {
+        if (registry == null) {
             return nullIfNotExists ? null : getEmptyStack(type);
         }
-        ITag<? extends Chemical> tag = tags.getTag((TagKey) tagKey);
+        Optional<HolderSet.Named<Chemical>> tag = registry.getTag((TagKey) tagKey);
         if (tag.isEmpty()) {
             return nullIfNotExists ? null : getEmptyStack(type);
         } else {
-            return new GasTag((ITag<Chemical>) tag, id, type);
+            return new GasTag(tag.get(), id, type);
         }
     }
 
@@ -147,7 +142,7 @@ public class GasUtils {
         }
     }
 
-    public static IForgeRegistry<? extends Chemical> getRegistry(ChemicalType type) {
+    public static Registry<? extends Chemical> getRegistry(ChemicalType type) {
         // TODO Re add when Mekanism is updated
         /*switch (type) {
             case INFUSION -> {

@@ -16,6 +16,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -24,7 +25,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -295,7 +295,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         filter.setExactMetadata(true);
 
         if (filter instanceof ItemFilter) {
-            filter.setTag(new SingleElementTag(ForgeRegistries.ITEMS.getKey(stack.getItem()), stack.getItem()));
+            filter.setTag(new SingleElementTag(BuiltInRegistries.ITEM.getKey(stack.getItem()), stack.getItem()));
             if (stack.hasTag()) {
                 filter.setMetadata(stack.getTag().copy());
             } else {
@@ -304,7 +304,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new UpdateFilterMessage(filter, currentindex));
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
-                filter.setTag(new SingleElementTag(ForgeRegistries.FLUIDS.getKey(s.getFluid()), s.getFluid()));
+                filter.setTag(new SingleElementTag(BuiltInRegistries.FLUID.getKey(s.getFluid()), s.getFluid()));
                 if (s.hasTag()) {
                     filter.setMetadata(s.getTag().copy());
                 } else {

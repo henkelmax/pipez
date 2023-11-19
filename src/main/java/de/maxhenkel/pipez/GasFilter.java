@@ -5,6 +5,7 @@ import de.maxhenkel.pipez.utils.GasTag;
 import de.maxhenkel.pipez.utils.GasUtils;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalType;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -50,9 +51,9 @@ public class GasFilter extends Filter<Chemical> {
         type = compound.contains("Type", Tag.TAG_STRING) ? ChemicalType.fromString(compound.getString("Type")) : ChemicalType.GAS;
         if (compound.contains("Gas", Tag.TAG_STRING)) {
             ResourceLocation rl = new ResourceLocation(compound.getString("Gas"));
-            Chemical gas = GasUtils.getRegistry(type).getValue(rl);
-            if (gas != null) {
-                this.tag = new SingleElementTag<>(rl, gas);
+            Registry<? extends Chemical> registry = GasUtils.getRegistry(type);
+            if (registry.containsKey(rl)) {
+                this.tag = new SingleElementTag<>(rl, registry.get(rl));
             }
         }
         if (compound.contains("Tag", Tag.TAG_STRING)) {

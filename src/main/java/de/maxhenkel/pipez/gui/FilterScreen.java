@@ -21,6 +21,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -30,7 +31,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -232,8 +232,8 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             }
         } else if (filter instanceof GasFilter) {
             Map.Entry<ChemicalType, Tag<? extends Chemical>> entry = GasUtils.getGas(text, true);
-            filter.setTag((Tag)entry.getValue());
-            ((GasFilter)filter).setChemicalType(entry.getKey());
+            filter.setTag((Tag) entry.getValue());
+            ((GasFilter) filter).setChemicalType(entry.getKey());
             if (filter.getTag() == null) {
                 item.setTextColor(ChatFormatting.DARK_RED.getColor());
             } else {
@@ -266,7 +266,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (filter instanceof ItemFilter) {
-            item.setValue(ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+            item.setValue(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
             if (stack.hasTag()) {
                 nbt.setValue(stack.getTag().toString());
             } else {
@@ -288,7 +288,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (filter instanceof FluidFilter) {
-            item.setValue(ForgeRegistries.FLUIDS.getKey(stack.getFluid()).toString());
+            item.setValue(BuiltInRegistries.FLUID.getKey(stack.getFluid()).toString());
             if (stack.hasTag()) {
                 nbt.setValue(stack.getTag().toString());
             } else {
