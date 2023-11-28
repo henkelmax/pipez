@@ -1,1 +1,1 @@
-- Added French translation
+- Fixed wrench handheld model
