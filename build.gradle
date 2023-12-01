@@ -125,7 +125,6 @@ curseforge {
         releaseType = release_type
         addGameVersion mod_minecraft_version
         addGameVersion 'Forge'
-        addGameVersion 'NeoForge'
         addGameVersion "Java ${java_version}"
         mainArtifact(jar) {
             displayName = "[${mod_minecraft_version}] ${mod_name} ${mod_version}"
@@ -154,7 +153,7 @@ modrinth {
     versionType = release_type.toUpperCase()
     changelog = file('changelog.md').text
     gameVersions = [mod_minecraft_version]
-    loaders = ['forge', 'neoforge']
+    loaders = ['forge']
     dependencies {
         optional.project 'jei'
         optional.project 'the-one-probe'
