@@ -12,9 +12,10 @@ import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,8 @@ public class EnergyPipeType extends PipeType<Void> {
     }
 
     @Override
-    public Capability<?> getCapability() {
-        return Capabilities.ENERGY;
+    public BlockCapability<?, Direction> getCapability() {
+        return Capabilities.EnergyStorage.BLOCK;
     }
 
     @Override
@@ -75,7 +76,7 @@ public class EnergyPipeType extends PipeType<Void> {
         if (extractingConnection == null) {
             return;
         }
-        IEnergyStorage energyStorage = extractingConnection.getEnergyHandler(tileEntity.getLevel()).orElse(null);
+        IEnergyStorage energyStorage = extractingConnection.getEnergyHandler();
         if (energyStorage == null || !energyStorage.canExtract()) {
             return;
         }
@@ -122,7 +123,7 @@ public class EnergyPipeType extends PipeType<Void> {
             int index = (i + p) % connections.size();
 
             PipeTileEntity.Connection connection = connections.get(index);
-            IEnergyStorage destination = connection.getEnergyHandler(tileEntity.getLevel()).orElse(null);
+            IEnergyStorage destination = connection.getEnergyHandler();
             if (destination != null && destination.canReceive() && destination.receiveEnergy(1, true) >= 1) {
                 destinations.add(destination);
             }
@@ -163,7 +164,7 @@ public class EnergyPipeType extends PipeType<Void> {
             int index = (i + p) % connections.size();
 
             PipeTileEntity.Connection connection = connections.get(index);
-            IEnergyStorage destination = connection.getEnergyHandler(tileEntity.getLevel()).orElse(null);
+            IEnergyStorage destination = connection.getEnergyHandler();
             if (destination != null && destination.canReceive() && destination.receiveEnergy(1, true) >= 1) {
                 destinations.add(new Pair<>(destination, index));
             }
@@ -198,7 +199,7 @@ public class EnergyPipeType extends PipeType<Void> {
             if (energyToTransfer <= 0) {
                 break;
             }
-            IEnergyStorage destination = connection.getEnergyHandler(tileEntity.getLevel()).orElse(null);
+            IEnergyStorage destination = connection.getEnergyHandler();
             if (destination == null || !destination.canReceive()) {
                 continue;
             }
@@ -222,7 +223,7 @@ public class EnergyPipeType extends PipeType<Void> {
             if (energyToTransfer <= 0) {
                 break;
             }
-            IEnergyStorage destination = connection.getEnergyHandler(tileEntity.getLevel()).orElse(null);
+            IEnergyStorage destination = connection.getEnergyHandler();
             if (destination == null || !destination.canReceive()) {
                 continue;
             }

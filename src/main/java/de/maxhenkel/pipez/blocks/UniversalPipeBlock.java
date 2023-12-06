@@ -15,7 +15,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 
 public class UniversalPipeBlock extends PipeBlock {
 
@@ -23,14 +23,11 @@ public class UniversalPipeBlock extends PipeBlock {
     }
 
     @Override
-    public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
-        BlockEntity te = world.getBlockEntity(pos.relative(facing));
-        return te != null && (
-                te.getCapability(Capabilities.ITEM_HANDLER, facing.getOpposite()).isPresent()
-                        || te.getCapability(Capabilities.FLUID_HANDLER, facing.getOpposite()).isPresent()
-                        || te.getCapability(Capabilities.ENERGY, facing.getOpposite()).isPresent()
-                        || (MekanismUtils.isMekanismInstalled() && GasUtils.hasChemicalCapability(te, facing.getOpposite()))
-        );
+    public boolean canConnectTo(Level world, BlockPos pos, Direction facing) {
+        return world.getCapability(Capabilities.ItemHandler.BLOCK, pos.relative(facing), facing.getOpposite()) != null
+                || world.getCapability(Capabilities.FluidHandler.BLOCK, pos.relative(facing), facing.getOpposite()) != null
+                || world.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(facing), facing.getOpposite()) != null
+                || (MekanismUtils.isMekanismInstalled() && GasUtils.hasChemicalCapability(world, pos.relative(facing), facing.getOpposite()));
     }
 
     @Override

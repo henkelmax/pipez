@@ -8,7 +8,6 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.MekanismUtils;
 import mekanism.api.Action;
@@ -19,7 +18,8 @@ import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,16 +34,17 @@ public class GasPipeType extends PipeType<Chemical> {
     }
 
     @Override
-    public Capability<?> getCapability() {
-        return ModCapabilities.GAS_HANDLER_CAPABILITY;
+    public BlockCapability<?, Direction> getCapability() {
+        // TODO Re add when Mekanism is updated
+        return null;// ModCapabilities.GAS_HANDLER_CAPABILITY;
     }
 
     @Override
-    public Capability<?>[] getCapabilities() {
+    public BlockCapability<?, Direction>[] getCapabilities() {
         if (!MekanismUtils.isMekanismInstalled()) {
-            return new Capability[0];
+            return new BlockCapability[0];
         }
-        return GasUtils.getChemicalCapabilities();
+        return GasUtils.getChemicalBlockCapabilities();
     }
 
     @Override
@@ -83,7 +84,7 @@ public class GasPipeType extends PipeType<Chemical> {
                 continue;
             }
             for (ChemicalType type : ChemicalType.values()) {
-                IChemicalHandler gasHandler = extractingConnection.getChemicalHandler(type, tileEntity.getLevel()).orElse(null);
+                IChemicalHandler gasHandler = extractingConnection.getChemicalHandler(type);
                 if (gasHandler == null) {
                     continue;
                 }
@@ -111,7 +112,7 @@ public class GasPipeType extends PipeType<Chemical> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IChemicalHandler destination = connection.getChemicalHandler(type, tileEntity.getLevel()).orElse(null);
+            IChemicalHandler destination = connection.getChemicalHandler(type);
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < gasHandler.getTanks(); j++) {
@@ -145,7 +146,7 @@ public class GasPipeType extends PipeType<Chemical> {
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            IChemicalHandler destination = connection.getChemicalHandler(type, tileEntity.getLevel()).orElse(null);
+            IChemicalHandler destination = connection.getChemicalHandler(type);
             if (destination == null) {
                 continue;
             }

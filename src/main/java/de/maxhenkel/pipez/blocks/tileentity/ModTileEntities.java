@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -34,6 +36,7 @@ public class ModTileEntities {
 
     public static void init() {
         BLOCK_ENTITY_REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModTileEntities::onRegisterCapabilities);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -43,6 +46,20 @@ public class ModTileEntities {
         BlockEntityRenderers.register(ENERGY_PIPE.get(), EnergyPipeRenderer::new);
         BlockEntityRenderers.register(GAS_PIPE.get(), GasPipeRenderer::new);
         BlockEntityRenderers.register(UNIVERSAL_PIPE.get(), UniversalPipeRenderer::new);
+    }
+
+    public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+        onRegisterPipeCapabilities(event, ITEM_PIPE);
+        onRegisterPipeCapabilities(event, FLUID_PIPE);
+        onRegisterPipeCapabilities(event, ENERGY_PIPE);
+        onRegisterPipeCapabilities(event, GAS_PIPE);
+        onRegisterPipeCapabilities(event, UNIVERSAL_PIPE);
+    }
+
+    public static <U extends PipeLogicTileEntity, T extends BlockEntityType<U>> void onRegisterPipeCapabilities(RegisterCapabilitiesEvent event, DeferredHolder<BlockEntityType<?>, T> holder) {
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.ItemHandler.BLOCK, context));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.EnergyStorage.BLOCK, context));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.FluidHandler.BLOCK, context));
     }
 
 }

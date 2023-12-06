@@ -14,10 +14,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +34,8 @@ public class ItemPipeType extends PipeType<Item> {
     }
 
     @Override
-    public Capability<?> getCapability() {
-        return Capabilities.ITEM_HANDLER;
+    public BlockCapability<?, Direction> getCapability() {
+        return Capabilities.ItemHandler.BLOCK;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class ItemPipeType extends PipeType<Item> {
             if (extractingConnection == null) {
                 continue;
             }
-            IItemHandler itemHandler = extractingConnection.getItemHandler(tileEntity.getLevel()).orElse(null);
+            IItemHandler itemHandler = extractingConnection.getItemHandler();
             if (itemHandler == null) {
                 continue;
             }
@@ -102,7 +103,7 @@ public class ItemPipeType extends PipeType<Item> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (itemsToTransfer > 0 && hasNotInserted(inventoriesFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IItemHandler destination = connection.getItemHandler(tileEntity.getLevel()).orElse(null);
+            IItemHandler destination = connection.getItemHandler();
             boolean hasInserted = false;
             if (destination != null && !inventoriesFull[p] && !isFull(destination)) {
                 for (int j = 0; j < itemHandler.getSlots(); j++) {
@@ -140,7 +141,7 @@ public class ItemPipeType extends PipeType<Item> {
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
             nonFittingItems.clear();
-            IItemHandler destination = connection.getItemHandler(tileEntity.getLevel()).orElse(null);
+            IItemHandler destination = connection.getItemHandler();
             if (destination == null) {
                 continue;
             }

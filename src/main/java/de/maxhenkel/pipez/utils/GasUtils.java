@@ -2,8 +2,6 @@ package de.maxhenkel.pipez.utils;
 
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
-import de.maxhenkel.pipez.capabilities.ModCapabilities;
-import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.*;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -13,15 +11,16 @@ import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.ItemCapability;
 
 import javax.annotation.Nullable;
 import java.util.AbstractMap;
@@ -102,7 +101,7 @@ public class GasUtils {
 
     @Nullable
     public static ChemicalStack getGasContained(ItemStack stack) {
-        for (Capability<? extends IChemicalHandler> capability : getChemicalCapabilities()) {
+        for (ItemCapability<? extends IChemicalHandler, Direction> capability : getChemicalItemCapabilities()) {
             ChemicalStack gas = getGasContained(stack, capability);
             if (gas == null || gas.isEmpty()) {
                 continue;
@@ -113,9 +112,8 @@ public class GasUtils {
     }
 
     @Nullable
-    public static ChemicalStack getGasContained(ItemStack stack, Capability<? extends IChemicalHandler> capability) {
-        LazyOptional<? extends IChemicalHandler> c = stack.getCapability(capability);
-        IChemicalHandler handler = c.orElse(null);
+    public static ChemicalStack getGasContained(ItemStack stack, ItemCapability<? extends IChemicalHandler, Direction> capability) {
+        IChemicalHandler handler = stack.getCapability(capability, null);
         if (handler == null) {
             return null;
         }
@@ -162,6 +160,7 @@ public class GasUtils {
     }
 
     public static ResourceLocation getResourceLocation(Chemical chemical) {
+        // TODO Re add when Mekanism is updated
         /*switch (ChemicalType.getTypeFor(chemical)) {
             case INFUSION -> {
                 return MekanismAPI.infuseTypeRegistry().getKey((InfuseType) chemical);
@@ -199,18 +198,29 @@ public class GasUtils {
         }
     }
 
-    public static Capability<? extends IChemicalHandler>[] getChemicalCapabilities() {
-        return new Capability[]{
-                ModCapabilities.GAS_HANDLER_CAPABILITY,
+    public static BlockCapability<? extends IChemicalHandler<?, ?>, Direction>[] getChemicalBlockCapabilities() {
+        return new BlockCapability[]{
+                // TODO Re add when Mekanism is updated
+                /*ModCapabilities.GAS_HANDLER_CAPABILITY,
                 ModCapabilities.INFUSION_HANDLER_CAPABILITY,
                 ModCapabilities.PIGMENT_HANDLER_CAPABILITY,
-                ModCapabilities.SLURRY_HANDLER_CAPABILITY
+                ModCapabilities.SLURRY_HANDLER_CAPABILITY*/
         };
     }
 
-    public static boolean hasChemicalCapability(ICapabilityProvider provider, Direction facing) {
-        for (Capability<?> capability : getChemicalCapabilities()) {
-            if (provider.getCapability(capability, facing).isPresent()) {
+    public static ItemCapability<? extends IChemicalHandler<?, ?>, Direction>[] getChemicalItemCapabilities() {
+        return new ItemCapability[]{
+                // TODO Re add when Mekanism is updated
+                /*ModCapabilities.GAS_HANDLER_CAPABILITY,
+                ModCapabilities.INFUSION_HANDLER_CAPABILITY,
+                ModCapabilities.PIGMENT_HANDLER_CAPABILITY,
+                ModCapabilities.SLURRY_HANDLER_CAPABILITY*/
+        };
+    }
+
+    public static boolean hasChemicalCapability(Level world, BlockPos pos, Direction facing) {
+        for (BlockCapability<?, Direction> capability : getChemicalBlockCapabilities()) {
+            if (world.getCapability(capability, pos, facing) != null) {
                 return true;
             }
         }

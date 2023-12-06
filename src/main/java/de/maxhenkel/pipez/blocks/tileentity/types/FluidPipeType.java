@@ -13,11 +13,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,8 +33,8 @@ public class FluidPipeType extends PipeType<Fluid> {
     }
 
     @Override
-    public Capability<?> getCapability() {
-        return Capabilities.FLUID_HANDLER;
+    public BlockCapability<?, Direction> getCapability() {
+        return Capabilities.FluidHandler.BLOCK;
     }
 
     @Override
@@ -69,7 +70,7 @@ public class FluidPipeType extends PipeType<Fluid> {
             if (extractingConnection == null) {
                 continue;
             }
-            IFluidHandler fluidHandler = extractingConnection.getFluidHandler(tileEntity.getLevel()).orElse(null);
+            IFluidHandler fluidHandler = extractingConnection.getFluidHandler();
             if (fluidHandler == null) {
                 continue;
             }
@@ -94,7 +95,7 @@ public class FluidPipeType extends PipeType<Fluid> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IFluidHandler destination = connection.getFluidHandler(tileEntity.getLevel()).orElse(null);
+            IFluidHandler destination = connection.getFluidHandler();
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < fluidHandler.getTanks(); j++) {
@@ -128,7 +129,7 @@ public class FluidPipeType extends PipeType<Fluid> {
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            IFluidHandler destination = connection.getFluidHandler(tileEntity.getLevel()).orElse(null);
+            IFluidHandler destination = connection.getFluidHandler();
             if (destination == null) {
                 continue;
             }

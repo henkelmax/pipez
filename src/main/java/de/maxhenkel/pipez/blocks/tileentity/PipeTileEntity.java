@@ -3,7 +3,6 @@ package de.maxhenkel.pipez.blocks.tileentity;
 import de.maxhenkel.corelib.blockentity.ITickableBlockEntity;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
-import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.utils.MekanismUtils;
 import mekanism.api.chemical.ChemicalType;
 import mekanism.api.chemical.IChemicalHandler;
@@ -21,6 +20,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -28,12 +28,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
+
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -140,6 +141,10 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     private void updateConnectionCache() {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            connectionCache = null;
+            return;
+        }
         BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof PipeBlock)) {
             connectionCache = null;
@@ -155,11 +160,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         Map<BlockPos, Integer> queue = new HashMap<>();
         List<BlockPos> travelPositions = new ArrayList<>();
 
-        addToQueue(level, worldPosition, queue, travelPositions, connections, 1);
+        addToQueue(serverLevel, worldPosition, queue, travelPositions, connections, 1);
 
         while (queue.size() > 0) {
             Map.Entry<BlockPos, Integer> blockPosIntegerEntry = queue.entrySet().stream().findAny().get();
-            addToQueue(level, blockPosIntegerEntry.getKey(), queue, travelPositions, connections, blockPosIntegerEntry.getValue());
+            addToQueue(serverLevel, blockPosIntegerEntry.getKey(), queue, travelPositions, connections, blockPosIntegerEntry.getValue());
             travelPositions.add(blockPosIntegerEntry.getKey());
             queue.remove(blockPosIntegerEntry.getKey());
         }
@@ -168,6 +173,10 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     private void updateExtractingConnectionCache() {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            connectionCache = null;
+            return;
+        }
         BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof PipeBlock)) {
             extractingConnectionCache = null;
@@ -181,11 +190,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                 extractingConnectionCache[direction.get3DDataValue()] = null;
                 continue;
             }
-            extractingConnectionCache[direction.get3DDataValue()] = new Connection(getBlockPos().relative(direction), direction.getOpposite(), 1);
+            extractingConnectionCache[direction.get3DDataValue()] = new Connection(serverLevel, getBlockPos().relative(direction), direction.getOpposite(), 1);
         }
     }
 
-    public void addToQueue(Level world, BlockPos position, Map<BlockPos, Integer> queue, List<BlockPos> travelPositions, Map<DirectionalPosition, Connection> insertPositions, int distance) {
+    public void addToQueue(ServerLevel world, BlockPos position, Map<BlockPos, Integer> queue, List<BlockPos> travelPositions, Map<DirectionalPosition, Connection> insertPositions, int distance) {
         Block block = world.getBlockState(position).getBlock();
         if (!(block instanceof PipeBlock)) {
             return;
@@ -195,7 +204,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             if (pipeBlock.isConnected(world, position, direction)) {
                 BlockPos p = position.relative(direction);
                 DirectionalPosition dp = new DirectionalPosition(p, direction.getOpposite());
-                Connection connection = new Connection(dp.getPos(), dp.getDirection(), distance);
+                Connection connection = new Connection(world, dp.getPos(), dp.getDirection(), distance);
                 if (!isExtracting(level, position, direction) && canInsert(level, connection)) {
                     if (!insertPositions.containsKey(dp)) {
                         insertPositions.put(dp, connection);
@@ -343,25 +352,29 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         private final BlockPos pos;
         private final Direction direction;
         private final int distance;
-        private LazyOptional<IItemHandler> itemHandler;
-        private LazyOptional<IEnergyStorage> energyHandler;
-        private LazyOptional<IFluidHandler> fluidHandler;
-        private LazyOptional<IGasHandler> gasHandler;
+        private BlockCapabilityCache<IItemHandler, Direction> itemHandler;
+        private BlockCapabilityCache<IEnergyStorage, Direction> energyHandler;
+        private BlockCapabilityCache<IFluidHandler, Direction> fluidHandler;
+
+        // TODO Re add when Mekanism is updated
+        /*private LazyOptional<IGasHandler> gasHandler;
         private LazyOptional<IInfusionHandler> infusionHandler;
         private LazyOptional<IPigmentHandler> pigmentHandler;
-        private LazyOptional<ISlurryHandler> slurryHandler;
+        private LazyOptional<ISlurryHandler> slurryHandler;*/
 
-        public Connection(BlockPos pos, Direction direction, int distance) {
+        public Connection(ServerLevel level, BlockPos pos, Direction direction, int distance) {
             this.pos = pos;
             this.direction = direction;
             this.distance = distance;
-            this.itemHandler = LazyOptional.empty();
-            this.energyHandler = LazyOptional.empty();
-            this.fluidHandler = LazyOptional.empty();
-            this.gasHandler = LazyOptional.empty();
+
+            itemHandler = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, level, pos, direction);
+            energyHandler = BlockCapabilityCache.create(Capabilities.EnergyStorage.BLOCK, level, pos, direction);
+            fluidHandler = BlockCapabilityCache.create(Capabilities.FluidHandler.BLOCK, level, pos, direction);
+            // TODO Re add when Mekanism is updated
+            /*this.gasHandler = LazyOptional.empty();
             this.infusionHandler = LazyOptional.empty();
             this.pigmentHandler = LazyOptional.empty();
-            this.slurryHandler = LazyOptional.empty();
+            this.slurryHandler = LazyOptional.empty();*/
         }
 
         public BlockPos getPos() {
@@ -385,60 +398,68 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                     '}';
         }
 
-        public LazyOptional<IItemHandler> getItemHandler(Level level) {
-            if (!itemHandler.isPresent()) {
-                itemHandler = getCapabilityRaw(level, Capabilities.ITEM_HANDLER);
-            }
-            return itemHandler;
+        @Nullable
+        public IItemHandler getItemHandler() {
+            return itemHandler.getCapability();
         }
 
-        public LazyOptional<IEnergyStorage> getEnergyHandler(Level level) {
-            if (!energyHandler.isPresent()) {
-                energyHandler = getCapabilityRaw(level, Capabilities.ENERGY);
-            }
-            return energyHandler;
+        @Nullable
+        public IEnergyStorage getEnergyHandler() {
+            return energyHandler.getCapability();
         }
 
-        public LazyOptional<IFluidHandler> getFluidHandler(Level level) {
-            if (!fluidHandler.isPresent()) {
-                fluidHandler = getCapabilityRaw(level, Capabilities.FLUID_HANDLER);
-            }
-            return fluidHandler;
+        @Nullable
+        public IFluidHandler getFluidHandler() {
+            return fluidHandler.getCapability();
         }
 
-        public LazyOptional<IGasHandler> getGasHandler(Level level) {
-            if (!gasHandler.isPresent()) {
+        @Nullable
+        public IGasHandler getGasHandler() {
+            // TODO Re add when Mekanism is updated
+            /*if (!gasHandler.isPresent()) {
                 gasHandler = getCapabilityRaw(level, ModCapabilities.GAS_HANDLER_CAPABILITY);
             }
-            return gasHandler;
+            return gasHandler;*/
+            return null;
         }
 
-        public LazyOptional<IInfusionHandler> getInfusionHandler(Level level) {
-            if (!infusionHandler.isPresent()) {
+        @Nullable
+        public IInfusionHandler getInfusionHandler() {
+            // TODO Re add when Mekanism is updated
+            /*if (!infusionHandler.isPresent()) {
                 infusionHandler = getCapabilityRaw(level, ModCapabilities.INFUSION_HANDLER_CAPABILITY);
             }
-            return infusionHandler;
+            return infusionHandler;*/
+            return null;
         }
 
-        public LazyOptional<IPigmentHandler> getPigmentHandler(Level level) {
-            if (!pigmentHandler.isPresent()) {
+        @Nullable
+        public IPigmentHandler getPigmentHandler() {
+            // TODO Re add when Mekanism is updated
+            /*if (!pigmentHandler.isPresent()) {
                 pigmentHandler = getCapabilityRaw(level, ModCapabilities.PIGMENT_HANDLER_CAPABILITY);
             }
-            return pigmentHandler;
+            return pigmentHandler;*/
+            return null;
         }
 
-        public LazyOptional<ISlurryHandler> getSlurryHandler(Level level) {
-            if (!slurryHandler.isPresent()) {
+        @Nullable
+        public ISlurryHandler getSlurryHandler() {
+            // TODO Re add when Mekanism is updated
+            /*if (!slurryHandler.isPresent()) {
                 slurryHandler = getCapabilityRaw(level, ModCapabilities.SLURRY_HANDLER_CAPABILITY);
             }
-            return slurryHandler;
+            return slurryHandler;*/
+            return null;
         }
 
-        public LazyOptional<? extends IChemicalHandler> getChemicalHandler(ChemicalType type, Level level) {
+        @Nullable
+        public <T extends IChemicalHandler> T getChemicalHandler(ChemicalType type) {
             if (!MekanismUtils.isMekanismInstalled()) {
-                return LazyOptional.empty();
+                return null;
             }
-            switch (type) {
+            // TODO Re add when Mekanism is updated
+            /*switch (type) {
                 case GAS -> {
                     return getGasHandler(level);
                 }
@@ -452,18 +473,21 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                     return getSlurryHandler(level);
                 }
             }
-            return LazyOptional.empty();
+            return LazyOptional.empty();*/
+            return null;
         }
 
-        public <T> LazyOptional<T> getCapability(Level level, Capability<T> capability) {
-            if (capability == Capabilities.ITEM_HANDLER) {
-                return getItemHandler(level).cast();
-            } else if (capability == Capabilities.ENERGY) {
-                return getEnergyHandler(level).cast();
-            } else if (capability == Capabilities.FLUID_HANDLER) {
-                return getFluidHandler(level).cast();
+        @Nullable
+        public <T> T getCapability(BlockCapability<T, Direction> capability) {
+            if (capability == Capabilities.ItemHandler.BLOCK) {
+                return (T) getItemHandler();
+            } else if (capability == Capabilities.EnergyStorage.BLOCK) {
+                return (T) getEnergyHandler();
+            } else if (capability == Capabilities.FluidHandler.BLOCK) {
+                return (T) getFluidHandler();
             }
-            if (!MekanismUtils.isMekanismInstalled()) {
+            // TODO Re add when Mekanism is updated
+            /*if (!MekanismUtils.isMekanismInstalled()) {
                 return LazyOptional.empty();
             }
             if (capability == ModCapabilities.GAS_HANDLER_CAPABILITY) {
@@ -475,10 +499,12 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             } else if (capability == ModCapabilities.SLURRY_HANDLER_CAPABILITY) {
                 return getSlurryHandler(level).cast();
             }
-            return LazyOptional.empty();
+            return LazyOptional.empty();*/
+            return null;
         }
 
-        private <T> LazyOptional<T> getCapabilityRaw(Level level, Capability<T> capability) {
+        // TODO Re add when Mekanism is updated
+        /*private <T> LazyOptional<T> getCapabilityRaw(Level level, Capability<T> capability) {
             BlockEntity te = level.getBlockEntity(pos);
             if (te == null) {
                 return LazyOptional.empty();
@@ -487,7 +513,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
                 return LazyOptional.empty();
             }
             return te.getCapability(capability, direction);
-        }
+        }*/
 
     }
 

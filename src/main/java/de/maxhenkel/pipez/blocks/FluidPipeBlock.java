@@ -13,7 +13,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 
 public class FluidPipeBlock extends PipeBlock {
 
@@ -21,9 +21,8 @@ public class FluidPipeBlock extends PipeBlock {
     }
 
     @Override
-    public boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing) {
-        BlockEntity te = world.getBlockEntity(pos.relative(facing));
-        return (te != null && te.getCapability(Capabilities.FLUID_HANDLER, facing.getOpposite()).isPresent());
+    public boolean canConnectTo(Level world, BlockPos pos, Direction facing) {
+        return world.getCapability(Capabilities.FluidHandler.BLOCK, pos.relative(facing), facing.getOpposite()) != null;
     }
 
     @Override

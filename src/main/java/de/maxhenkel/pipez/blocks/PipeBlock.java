@@ -277,7 +277,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
                 .setValue(WATERLOGGED, fluidState.is(FluidTags.WATER) && fluidState.getAmount() == 8);
     }
 
-    public boolean isConnected(LevelAccessor world, BlockPos pos, Direction facing) {
+    public boolean isConnected(Level world, BlockPos pos, Direction facing) {
         PipeTileEntity pipe = getTileEntity(world, pos);
         PipeTileEntity other = getTileEntity(world, pos.relative(facing));
 
@@ -292,11 +292,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         return canSideConnect;
     }
 
-    public boolean isAbleToConnect(LevelAccessor world, BlockPos pos, Direction facing) {
+    public boolean isAbleToConnect(Level world, BlockPos pos, Direction facing) {
         return isPipe(world, pos, facing) || canConnectTo(world, pos, facing);
     }
 
-    public abstract boolean canConnectTo(LevelAccessor world, BlockPos pos, Direction facing);
+    public abstract boolean canConnectTo(Level world, BlockPos pos, Direction facing);
 
     public abstract boolean isPipe(LevelAccessor world, BlockPos pos, Direction facing);
 

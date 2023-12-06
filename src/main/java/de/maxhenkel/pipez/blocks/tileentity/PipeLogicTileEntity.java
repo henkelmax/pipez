@@ -4,7 +4,6 @@ import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import de.maxhenkel.pipez.utils.DirectionalLazyOptionalCache;
 import de.maxhenkel.pipez.utils.DummyFluidHandler;
 import de.maxhenkel.pipez.utils.DummyItemHandler;
 import de.maxhenkel.pipez.utils.PipeEnergyStorage;
@@ -14,19 +13,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
-import javax.annotation.Nonnull;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+
 import javax.annotation.Nullable;
 
 public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     protected PipeType<?>[] types;
     protected final int[][] rrIndex;
-    protected DirectionalLazyOptionalCache<PipeEnergyStorage> energyCache;
-    protected DirectionalLazyOptionalCache<DummyFluidHandler> fluidCache;
-    protected DirectionalLazyOptionalCache<DummyItemHandler> itemCache;
+
+    protected PipeEnergyStorage[] energyStorages;
 
     private int recursionDepth;
 
@@ -34,33 +31,31 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         super(tileEntityTypeIn, pos, state);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
-        energyCache = new DirectionalLazyOptionalCache<>();
-        fluidCache = new DirectionalLazyOptionalCache<>();
-        itemCache = new DirectionalLazyOptionalCache<>();
+        energyStorages = new PipeEnergyStorage[Direction.values().length];
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (remove) {
-            return super.getCapability(cap, side);
+    @Nullable
+    public <T> T onRegisterCapability(BlockCapability<T, Direction> capability, Direction side) {
+        if (!isExtracting(side)) {
+            return null;
         }
-
-        if (cap == Capabilities.ENERGY && hasType(EnergyPipeType.INSTANCE)) {
+        if (capability == Capabilities.EnergyStorage.BLOCK && hasType(EnergyPipeType.INSTANCE)) {
             if (side != null) {
-                return energyCache.get(side).cast();
+                if (energyStorages[side.get3DDataValue()] == null) {
+                    energyStorages[side.get3DDataValue()] = new PipeEnergyStorage(this, side);
+                }
+                return (T) energyStorages[side.get3DDataValue()];
             }
-        } else if (cap == Capabilities.FLUID_HANDLER && hasType(FluidPipeType.INSTANCE)) {
+        } else if (capability == Capabilities.FluidHandler.BLOCK && hasType(FluidPipeType.INSTANCE)) {
             if (side != null) {
-                return fluidCache.get(side).cast();
+                return (T) DummyFluidHandler.INSTANCE;
             }
-        } else if (cap == Capabilities.ITEM_HANDLER && hasType(ItemPipeType.INSTANCE)) {
+        } else if (capability == Capabilities.ItemHandler.BLOCK && hasType(ItemPipeType.INSTANCE)) {
             if (side != null) {
-                return itemCache.get(side).cast();
+                return (T) DummyItemHandler.INSTANCE;
             }
         }
-
-        return super.getCapability(cap, side);
+        return null;
     }
 
     public boolean hasType(PipeType<?> type) {
@@ -140,8 +135,25 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         if (hasType(EnergyPipeType.INSTANCE)) {
             for (Direction side : Direction.values()) {
                 if (isExtracting(side)) {
-                    energyCache.get(side).ifPresent(PipeEnergyStorage::tick);
+                    if (energyStorages[side.get3DDataValue()] != null) {
+                        energyStorages[side.get3DDataValue()].tick();
+                    }
                 }
+            }
+        }
+    }
+
+    public void invalidateCapabilities() {
+        if (level != null) {
+            level.invalidateCapabilities(worldPosition);
+        }
+        if (!hasType(EnergyPipeType.INSTANCE)) {
+            return;
+        }
+        for (Direction dir : Direction.values()) {
+            if (!isExtracting(dir)) {
+                //TODO Check if this causes issues when reloading or other edge cases
+                energyStorages[dir.get3DDataValue()] = null;
             }
         }
     }
@@ -149,45 +161,26 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     @Override
     public void setExtracting(Direction side, boolean extracting) {
         super.setExtracting(side, extracting);
-        if (hasType(EnergyPipeType.INSTANCE)) {
-            energyCache.revalidate(side, s -> extracting, (s) -> new PipeEnergyStorage(this, s));
-        }
-        if (hasType(FluidPipeType.INSTANCE)) {
-            fluidCache.revalidate(side, s -> extracting, (s) -> DummyFluidHandler.INSTANCE);
-        }
-        if (hasType(ItemPipeType.INSTANCE)) {
-            itemCache.revalidate(side, s -> extracting, (s) -> DummyItemHandler.INSTANCE);
-        }
+        invalidateCapabilities();
     }
 
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
-        if (hasType(EnergyPipeType.INSTANCE)) {
-            energyCache.revalidate(this::isExtracting, (s) -> new PipeEnergyStorage(this, s));
-        }
-        if (hasType(FluidPipeType.INSTANCE)) {
-            fluidCache.revalidate(this::isExtracting, (s) -> DummyFluidHandler.INSTANCE);
-        }
-        if (hasType(ItemPipeType.INSTANCE)) {
-            itemCache.revalidate(this::isExtracting, (s) -> DummyItemHandler.INSTANCE);
-        }
+        invalidateCapabilities();
     }
 
     @Override
     public void setRemoved() {
-        energyCache.invalidate();
-        fluidCache.invalidate();
-        itemCache.invalidate();
+        invalidateCapabilities();
         super.setRemoved();
     }
 
     @Override
     public boolean canInsert(Level level, Connection connection) {
         for (PipeType<?> type : types) {
-            for (Capability<?> provider : type.getCapabilities()) {
-                LazyOptional<?> capability = connection.getCapability(level, provider);
-                if (capability.isPresent()) {
+            for (BlockCapability<?, Direction> provider : type.getCapabilities()) {
+                if (connection.getCapability(provider) != null) {
                     return true;
                 }
             }
