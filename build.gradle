@@ -1,6 +1,6 @@
 plugins {
-    id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
-    id 'net.neoforged.gradle.mixin' version "${neogradle_mixin_version}"
+    id 'net.minecraftforge.gradle' version "${forgegradle_version}"
+    id 'org.spongepowered.mixin' version "${mixingradle_version}"
     id 'com.matthewprenger.cursegradle' version "${cursegradle_version}"
     id 'com.modrinth.minotaur' version "${minotaur_version}"
     id 'com.github.johnrengelman.shadow' version "${shadow_version}"
@@ -14,15 +14,15 @@ repositories {
 }
 
 dependencies {
-    compileOnly fg.deobf("maven.modrinth:jei:${jei_version}")
-    compileOnly fg.deobf("maven.modrinth:the-one-probe:${theoneprobe_version}")
-    compileOnly fg.deobf("maven.modrinth:jade:${jade_version}")
+    implementation fg.deobf("maven.modrinth:jei:${jei_version}")
+    implementation fg.deobf("maven.modrinth:the-one-probe:${theoneprobe_version}")
+    implementation fg.deobf("maven.modrinth:jade:${jade_version}")
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
-    // runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:additions")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:tools")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}")
