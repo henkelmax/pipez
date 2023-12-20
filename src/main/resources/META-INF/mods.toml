@@ -1,49 +1,49 @@
-modLoader="javafml"
-loaderVersion="${mod_loader_version}"
-license="All rights reserved"
-issueTrackerURL="https://github.com/henkelmax/pipez/issues"
+modLoader = "javafml"
+loaderVersion = "*"
+license = "All rights reserved"
+issueTrackerURL = "https://github.com/henkelmax/pipez/issues"
 [[mods]]
-modId="${mod_id}"
-version="${mod_version}"
-displayName="${mod_name}"
-updateJSONURL="https://maxhenkel.de/update/pipez.json"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/pipez"
-logoFile="icon.png"
-authors="${mod_vendor}"
-description='''Simple and efficient pipes'''
-[[dependencies.${mod_id}]]
-    modId="forge"
-    mandatory=true
-    versionRange="${mod_forge_version}"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[${mod_minecraft_version}]"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="mekanism"
-    mandatory=false
-    versionRange="${mekanism_version_range}"
-    ordering="AFTER"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="jei"
-    mandatory=false
-    versionRange="*"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="theoneprobe"
-    mandatory=false
-    versionRange="*"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="jade"
-    mandatory=false
-    versionRange="*"
-    ordering="NONE"
-    side="BOTH"
+modId = "pipez"
+version = "${mod_version}"
+displayName = "Pipez"
+updateJSONURL = "https://update.maxhenkel.de/forge/pipez"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/pipez"
+logoFile = "icon.png"
+authors = "Max Henkel"
+description = '''Simple and efficient pipes'''
+[[dependencies.pipez]]
+modId = "forge"
+mandatory = true
+versionRange = "${forge_dependency}"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.pipez]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${minecraft_version}]"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.pipez]]
+modId = "mekanism"
+mandatory = false
+versionRange = "${mekanism_dependency}"
+ordering = "AFTER"
+side = "BOTH"
+[[dependencies.pipez]]
+modId = "jei"
+mandatory = false
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.pipez]]
+modId = "theoneprobe"
+mandatory = false
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.pipez]]
+modId = "jade"
+mandatory = false
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
