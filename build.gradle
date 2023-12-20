@@ -32,7 +32,7 @@ dependencies {
 processResources {
     filesMatching('**/*.toml') {
         expand 'mod_version': mod_version,
-                'neoforge_dependency': neoforge_dependency,
+                'forge_dependency': forge_dependency,
                 'minecraft_version': minecraft_version,
                 'mekanism_dependency': mekanism_dependency
     }
