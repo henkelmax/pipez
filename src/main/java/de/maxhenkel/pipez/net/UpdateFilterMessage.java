@@ -2,20 +2,24 @@ package de.maxhenkel.pipez.net;
 
 import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.Filter;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.IPipeContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 import java.util.List;
 import java.util.Optional;
 
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
+
+    public static ResourceLocation ID = new ResourceLocation(Main.MODID, "update_filter");
 
     private CompoundTag filter;
     private int index;
@@ -30,16 +34,16 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
     }
 
     @Override
-    public Dist getExecutingSide() {
-        return Dist.DEDICATED_SERVER;
+    public PacketFlow getExecutingSide() {
+        return PacketFlow.SERVERBOUND;
     }
 
     @Override
-    public void executeServerSide(NetworkEvent.Context context) {
-        AbstractContainerMenu container = context.getSender().containerMenu;
-
-        if (container instanceof IPipeContainer) {
-            IPipeContainer pipeContainer = (IPipeContainer) container;
+    public void executeServerSide(PlayPayloadContext context) {
+        if (!(context.player().orElse(null) instanceof ServerPlayer sender)) {
+            return;
+        }
+        if (sender.containerMenu instanceof IPipeContainer pipeContainer) {
             PipeType<?>[] pipeTypes = pipeContainer.getPipe().getPipeTypes();
             if (index >= pipeTypes.length) {
                 return;
@@ -57,7 +61,7 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
             }
             pipeContainer.getPipe().setFilters(pipeContainer.getSide(), pipeType, filters);
 
-            PipeContainerProvider.openGui(context.getSender(), pipeContainer.getPipe(), pipeContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, pipeContainer.getPipe(), pipeContainer.getSide(), index));
+            PipeContainerProvider.openGui(sender, pipeContainer.getPipe(), pipeContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, pipeContainer.getPipe(), pipeContainer.getSide(), index));
         }
     }
 
@@ -72,5 +76,10 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
     public void toBytes(FriendlyByteBuf packetBuffer) {
         packetBuffer.writeNbt(filter);
         packetBuffer.writeInt(index);
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 }

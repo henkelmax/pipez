@@ -11,14 +11,15 @@ import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,46 +33,47 @@ public class Main {
     public static ServerConfig SERVER_CONFIG;
     public static ClientConfig CLIENT_CONFIG;
 
-    public static SimpleChannel SIMPLE_CHANNEL;
-
-    public Main() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(IMC::enqueueIMC);
+    public Main(IEventBus eventBus) {
+        eventBus.addListener(this::commonSetup);
+        eventBus.addListener(this::onRegisterPayloadHandler);
+        eventBus.addListener(IMC::enqueueIMC);
 
         SERVER_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.SERVER, ServerConfig.class);
         CLIENT_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.CLIENT, ClientConfig.class);
 
         if (FMLEnvironment.dist.isClient()) {
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(Main.this::clientSetup);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelRegistry::onModelRegister);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelRegistry::onModelBake);
+            eventBus.addListener(Main.this::clientSetup);
+            eventBus.addListener(ModelRegistry::onModelRegister);
+            eventBus.addListener(ModelRegistry::onModelBake);
         }
 
-        ModBlocks.init();
-        ModItems.init();
-        ModRecipes.init();
-        Containers.init();
-        ModTileEntities.init();
-        ModCreativeTabs.init();
+        ModBlocks.init(eventBus);
+        ModItems.init(eventBus);
+        ModRecipes.init(eventBus);
+        Containers.init(eventBus);
+        ModTileEntities.init(eventBus);
+        ModCreativeTabs.init(eventBus);
     }
 
     public void commonSetup(FMLCommonSetupEvent event) {
         NeoForge.EVENT_BUS.register(new BlockEvents());
-
-        SIMPLE_CHANNEL = CommonRegistry.registerChannel(Main.MODID, "default");
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 0, CycleDistributionMessage.class);
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 1, CycleRedstoneModeMessage.class);
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 2, CycleFilterModeMessage.class);
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 3, UpdateFilterMessage.class);
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 4, RemoveFilterMessage.class);
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 5, EditFilterMessage.class);
-        CommonRegistry.registerMessage(SIMPLE_CHANNEL, 6, OpenExtractMessage.class);
     }
 
     @OnlyIn(Dist.CLIENT)
     public void clientSetup(FMLClientSetupEvent event) {
         ModTileEntities.clientSetup();
         Containers.clientSetup();
+    }
+
+    public void onRegisterPayloadHandler(RegisterPayloadHandlerEvent event) {
+        IPayloadRegistrar registrar = event.registrar(MODID).versioned("0");
+        CommonRegistry.registerMessage(registrar, CycleDistributionMessage.class);
+        CommonRegistry.registerMessage(registrar, CycleRedstoneModeMessage.class);
+        CommonRegistry.registerMessage(registrar, CycleFilterModeMessage.class);
+        CommonRegistry.registerMessage(registrar, UpdateFilterMessage.class);
+        CommonRegistry.registerMessage(registrar, RemoveFilterMessage.class);
+        CommonRegistry.registerMessage(registrar, EditFilterMessage.class);
+        CommonRegistry.registerMessage(registrar, OpenExtractMessage.class);
     }
 
 }

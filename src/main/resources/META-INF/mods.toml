@@ -13,37 +13,37 @@ authors = "Max Henkel"
 description = '''Simple and efficient pipes'''
 [[dependencies.pipez]]
 modId = "neoforge"
-mandatory = true
+type = "required"
 versionRange = "${neoforge_dependency}"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.pipez]]
 modId = "minecraft"
-mandatory = true
+type = "required"
 versionRange = "[${minecraft_version}]"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.pipez]]
 modId = "mekanism"
-mandatory = false
+type = "optional"
 versionRange = "${mekanism_dependency}"
 ordering = "AFTER"
 side = "BOTH"
 [[dependencies.pipez]]
 modId = "jei"
-mandatory = false
+type = "optional"
 versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.pipez]]
 modId = "theoneprobe"
-mandatory = false
+type = "optional"
 versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.pipez]]
 modId = "jade"
-mandatory = false
+type = "optional"
 versionRange = "*"
 ordering = "NONE"
 side = "BOTH"

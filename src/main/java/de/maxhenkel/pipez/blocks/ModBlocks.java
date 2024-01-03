@@ -3,7 +3,7 @@ package de.maxhenkel.pipez.blocks;
 import de.maxhenkel.pipez.Main;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -17,8 +17,8 @@ public class ModBlocks {
     public static final DeferredHolder<Block, UniversalPipeBlock> UNIVERSAL_PIPE = BLOCK_REGISTER.register("universal_pipe", UniversalPipeBlock::new);
     public static final DeferredHolder<Block, GasPipeBlock> GAS_PIPE = BLOCK_REGISTER.register("gas_pipe", GasPipeBlock::new);
 
-    public static void init() {
-        BLOCK_REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+    public static void init(IEventBus eventBus) {
+        BLOCK_REGISTER.register(eventBus);
     }
 
 }

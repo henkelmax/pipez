@@ -1,14 +1,18 @@
 package de.maxhenkel.pipez.net;
 
 import de.maxhenkel.corelib.net.Message;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public class CycleRedstoneModeMessage implements Message<CycleRedstoneModeMessage> {
+
+    public static ResourceLocation ID = new ResourceLocation(Main.MODID, "cycle_redstone_mode");
 
     private int index;
 
@@ -21,15 +25,16 @@ public class CycleRedstoneModeMessage implements Message<CycleRedstoneModeMessag
     }
 
     @Override
-    public Dist getExecutingSide() {
-        return Dist.DEDICATED_SERVER;
+    public PacketFlow getExecutingSide() {
+        return PacketFlow.SERVERBOUND;
     }
 
     @Override
-    public void executeServerSide(NetworkEvent.Context context) {
-        AbstractContainerMenu container = context.getSender().containerMenu;
-        if (container instanceof ExtractContainer) {
-            ExtractContainer extractContainer = (ExtractContainer) container;
+    public void executeServerSide(PlayPayloadContext context) {
+        if (!(context.player().orElse(null) instanceof ServerPlayer sender)) {
+            return;
+        }
+        if (sender.containerMenu instanceof ExtractContainer extractContainer) {
             PipeType<?> pipeType = extractContainer.getPipe().getPipeTypes()[index];
             extractContainer.getPipe().setRedstoneMode(extractContainer.getSide(), pipeType, extractContainer.getPipe().getRedstoneMode(extractContainer.getSide(), pipeType).cycle());
         }
@@ -44,5 +49,10 @@ public class CycleRedstoneModeMessage implements Message<CycleRedstoneModeMessag
     @Override
     public void toBytes(FriendlyByteBuf packetBuffer) {
         packetBuffer.writeInt(index);
+    }
+
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 }

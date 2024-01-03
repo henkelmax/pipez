@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
-import de.maxhenkel.corelib.net.NetUtils;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.corelib.tag.TagUtils;
@@ -31,6 +30,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -87,12 +87,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         addRenderableWidget(invertButton);
 
         cancelButton = Button.builder(Component.translatable("message.pipez.filter.cancel"), button -> {
-            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new OpenExtractMessage(getMenu().getIndex()));
+            PacketDistributor.SERVER.noArg().send(new OpenExtractMessage(getMenu().getIndex()));
         }).bounds(leftPos + 25, topPos + 105, 60, 20).build();
         addRenderableWidget(cancelButton);
 
         submitButton = Button.builder(Component.translatable("message.pipez.filter.submit"), button -> {
-            NetUtils.sendToServer(Main.SIMPLE_CHANNEL, new UpdateFilterMessage(filter, menu.getIndex()));
+            PacketDistributor.SERVER.noArg().send(new UpdateFilterMessage(filter, menu.getIndex()));
         }).bounds(leftPos + 91, topPos + 105, 60, 20).build();
         addRenderableWidget(submitButton);
 
