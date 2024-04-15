@@ -118,7 +118,7 @@ public class ItemPipeType extends PipeType<Item> {
                     }
                     ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
                     ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
-                    int insertedAmount = count - stack.getCount();
+                    int insertedAmount = simulatedExtract.getCount() - stack.getCount();
                     if (insertedAmount > 0) {
                         itemsToTransfer -= insertedAmount;
                         itemHandler.extractItem(j, insertedAmount, false);
