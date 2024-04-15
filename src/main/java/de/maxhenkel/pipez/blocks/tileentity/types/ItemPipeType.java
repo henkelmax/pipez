@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.blocks.tileentity.types;
 
-import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.ItemFilter;
 import de.maxhenkel.pipez.Main;
@@ -12,6 +11,7 @@ import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
@@ -20,7 +20,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -140,7 +139,7 @@ public class ItemPipeType extends PipeType<Item> {
     protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
         int itemsToTransfer = getRate(tileEntity, side);
 
-        HashSet<Item> nonFittingItems = new HashSet<>();
+        HashSet<Tuple<Item, CompoundTag>> nonFittingItems = new HashSet<>();
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
@@ -162,7 +161,7 @@ public class ItemPipeType extends PipeType<Item> {
                 if (count == 0) {
                     continue;
                 }
-                if (nonFittingItems.contains(item)) {
+                if (nonFittingItems.contains(new Tuple<>(item, tag))) {
                     continue;
                 }
                 if (canInsert(connection, item, tag, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
@@ -170,9 +169,9 @@ public class ItemPipeType extends PipeType<Item> {
                 }
                 ItemStack simulatedExtract = itemHandler.extractItem(i, itemsToTransfer, true);
                 ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
-                int insertedAmount = count - stack.getCount();
+                int insertedAmount = simulatedExtract.getCount() - stack.getCount();
                 if (insertedAmount <= 0) {
-                    nonFittingItems.add(simulatedExtract.getItem());
+                    nonFittingItems.add(new Tuple<>(simulatedExtract.getItem(), tag));
                 }
                 itemsToTransfer -= insertedAmount;
                 itemHandler.extractItem(i, insertedAmount, false);
