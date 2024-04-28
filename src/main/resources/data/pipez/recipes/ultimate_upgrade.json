@@ -7,17 +7,17 @@
   ],
   "key": {
     "N": {
-      "tag": "forge:ingots/netherite"
+      "tag": "c:ingots/netherite"
     },
     "R": {
-      "tag": "forge:storage_blocks/redstone"
+      "tag": "c:storage_blocks/redstone"
     },
     "U": {
       "item": "pipez:advanced_upgrade"
     }
   },
   "result": {
-    "item": "pipez:ultimate_upgrade",
+    "id": "pipez:ultimate_upgrade",
     "count": 1
   }
 }

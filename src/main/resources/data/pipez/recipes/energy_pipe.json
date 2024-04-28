@@ -7,17 +7,17 @@
   ],
   "key": {
     "B": {
-      "tag": "forge:storage_blocks/redstone"
+      "tag": "c:storage_blocks/redstone"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     }
   },
   "result": {
-    "item": "pipez:energy_pipe",
+    "id": "pipez:energy_pipe",
     "count": 16
   }
 }

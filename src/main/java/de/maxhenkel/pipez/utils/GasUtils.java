@@ -49,7 +49,7 @@ public class GasUtils {
     public static Tag<? extends Chemical> getGas(String name, boolean nullIfNotExists, ChemicalType type) {
         ResourceLocation id;
         if (name.startsWith("#")) {
-            return getGasTag(name.substring(1), nullIfNotExists, type);
+            return getGasTag(new ResourceLocation(name.substring(1)), nullIfNotExists, type);
         } else {
             Registry<? extends Chemical> registry = getRegistry(type);
             id = new ResourceLocation(name);
@@ -62,8 +62,7 @@ public class GasUtils {
     }
 
     @Nullable
-    public static Tag<Chemical> getGasTag(String name, boolean nullIfNotExists, ChemicalType type) {
-        ResourceLocation id = new ResourceLocation(name);
+    public static Tag<Chemical> getGasTag(ResourceLocation id, boolean nullIfNotExists, ChemicalType type) {
         TagKey<? extends Chemical> tagKey = null;
         Registry<? extends Chemical> registry = null;
         switch (type) {

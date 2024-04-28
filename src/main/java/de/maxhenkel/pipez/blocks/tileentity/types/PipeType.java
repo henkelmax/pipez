@@ -6,7 +6,9 @@ import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.datacomponents.AbstractPipeTypeData;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -15,12 +17,12 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public abstract class PipeType<T> {
-
-    public abstract String getKey();
+public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
 
     public abstract void tick(PipeLogicTileEntity tileEntity);
 
@@ -28,7 +30,8 @@ public abstract class PipeType<T> {
 
     public abstract BlockCapability<?, Direction> getCapability();
 
-    public abstract Filter<T> createFilter();
+    @Nullable
+    public abstract Filter<?, T> createFilter();
 
     public abstract String getTranslationKey();
 
@@ -56,7 +59,7 @@ public abstract class PipeType<T> {
         return getRate(tileEntity.getUpgrade(direction));
     }
 
-    public boolean matchesConnection(PipeTileEntity.Connection connection, Filter<T> filter) {
+    public boolean matchesConnection(PipeTileEntity.Connection connection, Filter<?, T> filter) {
         if (filter.getDestination() == null) {
             return true;
         }
@@ -150,4 +153,63 @@ public abstract class PipeType<T> {
         return new BlockCapability[]{getCapability()};
     }
 
+    public abstract DataComponentType<D> getDataComponentType();
+
+    public abstract D defaultData();
+
+    private D getOrDefault(ItemStack stack) {
+        D data = stack.get(getDataComponentType());
+        if (data == null) {
+            data = defaultData();
+        }
+        return data;
+    }
+
+    public List<Filter<?, ?>> getFilters(ItemStack stack) {
+        AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
+        if (data == null) {
+            return new ArrayList<>();
+        }
+        return data.copyFilterList();
+    }
+
+    public void setFilters(ItemStack stack, List<Filter<?, ?>> value) {
+        stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().filters(value).build());
+    }
+
+    public UpgradeTileEntity.RedstoneMode getRedstoneMode(ItemStack stack) {
+        AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
+        if (data == null) {
+            return getDefaultRedstoneMode();
+        }
+        return data.getRedstoneMode();
+    }
+
+    public void setRedstoneMode(ItemStack stack, UpgradeTileEntity.RedstoneMode value) {
+        stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().redstoneMode(value).build());
+    }
+
+    public UpgradeTileEntity.FilterMode getFilterMode(ItemStack stack) {
+        AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
+        if (data == null) {
+            return getDefaultFilterMode();
+        }
+        return data.getFilterMode();
+    }
+
+    public void setFilterMode(ItemStack stack, UpgradeTileEntity.FilterMode value) {
+        stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().filterMode(value).build());
+    }
+
+    public UpgradeTileEntity.Distribution getDistribution(ItemStack stack) {
+        AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
+        if (data == null) {
+            return getDefaultDistribution();
+        }
+        return data.getDistribution();
+    }
+
+    public void setDistribution(ItemStack stack, UpgradeTileEntity.Distribution value) {
+        stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().distribution(value).build());
+    }
 }

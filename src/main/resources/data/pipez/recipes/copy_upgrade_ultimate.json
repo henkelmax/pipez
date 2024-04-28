@@ -1,23 +1,15 @@
 {
-  "type": "pipez:copy_nbt",
+  "type": "pipez:copy_components",
   "source": {
     "tag": "pipez:upgrades"
   },
   "target": {
     "item": "pipez:ultimate_upgrade"
   },
-  "tags": [
-    "Item.RedstoneMode",
-    "Energy.RedstoneMode",
-    "Fluid.RedstoneMode",
-    "Gas.RedstoneMode",
-    "Item.Distribution",
-    "Energy.Distribution",
-    "Fluid.Distribution",
-    "Gas.Distribution",
-    "Item.Filters",
-    "Energy.Filters",
-    "Fluid.Filters",
-    "Gas.Filters"
+  "components": [
+    "pipez:item",
+    "pipez:fluid",
+    "pipez:gas",
+    "pipez:energy"
   ]
 }

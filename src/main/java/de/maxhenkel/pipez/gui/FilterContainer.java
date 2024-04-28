@@ -12,9 +12,9 @@ public class FilterContainer extends ContainerBase implements IPipeContainer {
     private PipeLogicTileEntity pipe;
     private Direction side;
     private int index;
-    private Filter<?> filter;
+    private Filter<?, ?> filter;
 
-    public FilterContainer(int id, Container playerInventory, PipeLogicTileEntity pipe, Direction side, int index, Filter<?> filter) {
+    public FilterContainer(int id, Container playerInventory, PipeLogicTileEntity pipe, Direction side, int index, Filter<?, ?> filter) {
         super(Containers.FILTER.get(), id, playerInventory, null);
         this.pipe = pipe;
         this.side = side;
@@ -33,7 +33,7 @@ public class FilterContainer extends ContainerBase implements IPipeContainer {
         return index;
     }
 
-    public Filter<?> getFilter() {
+    public Filter<?, ?> getFilter() {
         return filter;
     }
 

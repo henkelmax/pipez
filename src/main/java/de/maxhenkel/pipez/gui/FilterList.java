@@ -11,6 +11,7 @@ import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
+import de.maxhenkel.pipez.utils.ComponentUtils;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.utils.MekanismUtils;
 import de.maxhenkel.pipez.utils.WrappedGasStack;
@@ -20,7 +21,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -31,6 +31,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class FilterList extends WidgetBase {
 
     public static final ResourceLocation BACKGROUND = new ResourceLocation(Main.MODID, "textures/gui/container/extract.png");
 
-    protected Supplier<List<Filter<?>>> filters;
+    protected Supplier<List<Filter<?, ?>>> filters;
     protected int offset;
     protected int selected;
     private ScreenBase.HoverArea[] hoverAreas;
@@ -51,7 +52,7 @@ public class FilterList extends WidgetBase {
     private int columnCount;
     private CachedMap<DirectionalPosition, Pair<BlockState, ItemStack>> filterPosCache;
 
-    public FilterList(ExtractScreen screen, int posX, int posY, int xSize, int ySize, Supplier<List<Filter<?>>> filters) {
+    public FilterList(ExtractScreen screen, int posX, int posY, int xSize, int ySize, Supplier<List<Filter<?, ?>>> filters) {
         super(screen, posX, posY, xSize, ySize);
         this.filters = filters;
         columnHeight = 22;
@@ -73,12 +74,12 @@ public class FilterList extends WidgetBase {
     @Override
     protected void drawGuiContainerForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
-        List<Filter<?>> f = filters.get();
+        List<Filter<?, ?>> f = filters.get();
         for (int i = 0; i < hoverAreas.length; i++) {
             if (getOffset() + i >= f.size()) {
                 break;
             }
-            Filter<?> filter = f.get(getOffset() + i);
+            Filter<?, ?> filter = f.get(getOffset() + i);
             if (itemHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 AbstractStack<?> stack = getStack(filter);
                 if (stack != null && !stack.isEmpty()) {
@@ -96,7 +97,7 @@ public class FilterList extends WidgetBase {
                     List<Component> tooltip = new ArrayList<>();
                     Pair<BlockState, ItemStack> destPair = getBlockAt(filter.getDestination());
                     if (destPair.getKey() == null) {
-                        tooltip.add(ComponentUtils.wrapInSquareBrackets(Component.translatable("tooltip.pipez.filter.unknown_block")).withStyle(ChatFormatting.DARK_RED));
+                        tooltip.add(net.minecraft.network.chat.ComponentUtils.wrapInSquareBrackets(Component.translatable("tooltip.pipez.filter.unknown_block")).withStyle(ChatFormatting.DARK_RED));
                     } else {
                         tooltip.add(destPair.getKey().getBlock().getName().withStyle(ChatFormatting.BLUE));
                     }
@@ -115,7 +116,7 @@ public class FilterList extends WidgetBase {
     }
 
     @Nullable
-    public static AbstractStack<?> getStack(Filter<?> filter) {
+    public static AbstractStack<?> getStack(Filter<?, ?> filter) {
         Object o = null;
 
         if (filter.getTag() != null) {
@@ -125,13 +126,13 @@ public class FilterList extends WidgetBase {
         if (o instanceof Item) {
             ItemStack stack = new ItemStack((Item) o);
             if (filter.getMetadata() != null) {
-                stack.setTag(filter.getMetadata().copy());
+                stack.applyComponents(ComponentUtils.getPatch(Minecraft.getInstance().level.registryAccess(), filter.getMetadata().copy()));
             }
             return new WrappedItemStack(stack);
         } else if (o instanceof Fluid) {
             FluidStack stack = new FluidStack((Fluid) o, 1000);
             if (filter.getMetadata() != null) {
-                stack.setTag(filter.getMetadata().copy());
+                stack.applyComponents(ComponentUtils.getPatch(Minecraft.getInstance().level.registryAccess(), filter.getMetadata().copy()));
             }
             return new WrappedFluidStack(stack);
         }
@@ -150,13 +151,13 @@ public class FilterList extends WidgetBase {
     protected void drawGuiContainerBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
-        List<Filter<?>> f = filters.get();
+        List<Filter<?, ?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
             int startY = guiTop + pos * columnHeight;
-            Filter<?> filter = f.get(i);
+            Filter<?, ?> filter = f.get(i);
             if (i == getSelected()) {
                 guiGraphics.blit(BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
             } else {
@@ -231,7 +232,7 @@ public class FilterList extends WidgetBase {
     }
 
     public int getOffset() {
-        List<Filter<?>> f = filters.get();
+        List<Filter<?, ?>> f = filters.get();
         if (f.size() <= columnCount) {
             offset = 0;
         } else if (offset > f.size() - columnCount) {
@@ -263,7 +264,7 @@ public class FilterList extends WidgetBase {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
-        List<Filter<?>> f = filters.get();
+        List<Filter<?, ?>> f = filters.get();
         if (f.size() > columnCount) {
             if (deltaY < 0D) {
                 offset = Math.min(getOffset() + 1, f.size() - columnCount);
@@ -277,7 +278,7 @@ public class FilterList extends WidgetBase {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        List<Filter<?>> f = filters.get();
+        List<Filter<?, ?>> f = filters.get();
         for (int i = 0; i < hoverAreas.length; i++) {
             if (getOffset() + i >= f.size()) {
                 break;

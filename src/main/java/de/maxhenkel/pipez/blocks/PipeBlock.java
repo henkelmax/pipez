@@ -15,7 +15,9 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -38,7 +40,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -82,12 +83,12 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        Direction side = getSelection(state, worldIn, pos, player).getKey();
+    protected ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        Direction side = getSelection(state, level, pos, player).getKey();
         if (side != null) {
-            return onPipeSideActivated(state, worldIn, pos, player, handIn, hit, side);
+            return onPipeSideActivated(itemStack, state, level, pos, player, hand, hit, side);
         } else {
-            return super.use(state, worldIn, pos, player, handIn, hit);
+            return super.useItemOn(itemStack, state, level, pos, player, hand, hit);
         }
     }
 
@@ -126,8 +127,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         return InteractionResult.SUCCESS;
     }
 
-    public InteractionResult onPipeSideActivated(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
-        return super.use(state, worldIn, pos, player, handIn, hit);
+    public ItemInteractionResult onPipeSideActivated(ItemStack itemStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
+        return super.useItemOn(itemStack, state, worldIn, pos, player, handIn, hit);
     }
 
     public InteractionResult onPipeSideForceActivated(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, @Nullable Direction side) {
@@ -478,12 +479,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     public float getBlockReachDistance(Player player) {
-        AttributeInstance attribute = player.getAttribute(NeoForgeMod.BLOCK_REACH.value());
+        AttributeInstance attribute = player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
         if (attribute == null) {
-            return (float) NeoForgeMod.BLOCK_REACH.value().getDefaultValue();
+            return (float) Attributes.BLOCK_INTERACTION_RANGE.value().getDefaultValue();
         }
-        float distance = (float) attribute.getValue();
-        return player.isCreative() ? distance : distance - 0.5F;
+        return (float) attribute.getValue();
     }
 
     private double checkShape(BlockState state, BlockGetter world, BlockPos pos, Vec3 start, Vec3 end, VoxelShape shape, BooleanProperty direction) {

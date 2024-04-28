@@ -7,20 +7,20 @@
   ],
   "key": {
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     },
     "G": {
-      "tag": "forge:glass_panes"
+      "tag": "c:glass_panes"
     },
     "B": {
       "tag": "minecraft:buttons"
     }
   },
   "result": {
-    "item": "pipez:filter_destination_tool",
+    "id": "pipez:filter_destination_tool",
     "count": 1
   }
 }

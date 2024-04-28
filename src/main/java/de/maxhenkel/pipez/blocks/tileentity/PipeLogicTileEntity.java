@@ -9,6 +9,7 @@ import de.maxhenkel.pipez.utils.DummyItemHandler;
 import de.maxhenkel.pipez.utils.PipeEnergyStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -20,14 +21,14 @@ import javax.annotation.Nullable;
 
 public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
-    protected PipeType<?>[] types;
+    protected PipeType<?, ?>[] types;
     protected final int[][] rrIndex;
 
     protected PipeEnergyStorage[] energyStorages;
 
     private int recursionDepth;
 
-    public PipeLogicTileEntity(BlockEntityType<?> tileEntityTypeIn, PipeType<?>[] types, BlockPos pos, BlockState state) {
+    public PipeLogicTileEntity(BlockEntityType<?> tileEntityTypeIn, PipeType<?, ?>[] types, BlockPos pos, BlockState state) {
         super(tileEntityTypeIn, pos, state);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
@@ -58,8 +59,8 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         return null;
     }
 
-    public boolean hasType(PipeType<?> type) {
-        for (PipeType<?> t : types) {
+    public boolean hasType(PipeType<?, ?> type) {
+        for (PipeType<?, ?> t : types) {
             if (t == type) {
                 return true;
             }
@@ -67,15 +68,15 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         return false;
     }
 
-    public int getRoundRobinIndex(Direction direction, PipeType<?> pipeType) {
+    public int getRoundRobinIndex(Direction direction, PipeType<?, ?> pipeType) {
         return rrIndex[direction.get3DDataValue()][getIndex(pipeType)];
     }
 
-    public void setRoundRobinIndex(Direction direction, PipeType<?> pipeType, int value) {
+    public void setRoundRobinIndex(Direction direction, PipeType<?, ?> pipeType, int value) {
         rrIndex[direction.get3DDataValue()][getIndex(pipeType)] = value;
     }
 
-    public boolean isEnabled(Direction side, PipeType<?> pipeType) {
+    public boolean isEnabled(Direction side, PipeType<?, ?> pipeType) {
         UpgradeTileEntity.RedstoneMode redstoneMode = getRedstoneMode(side, pipeType);
         return redstoneMode != UpgradeTileEntity.RedstoneMode.ALWAYS_OFF;
     }
@@ -89,7 +90,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         return 0;
     }
 
-    public boolean shouldWork(Direction side, PipeType<?> pipeType) {
+    public boolean shouldWork(Direction side, PipeType<?, ?> pipeType) {
         RedstoneMode redstoneMode = getRedstoneMode(side, pipeType);
         if (redstoneMode.equals(RedstoneMode.ALWAYS_OFF)) {
             return false;
@@ -106,13 +107,13 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         return level.hasNeighborSignal(worldPosition);
     }
 
-    public PipeType<?>[] getPipeTypes() {
+    public PipeType<?, ?>[] getPipeTypes() {
         return types;
     }
 
-    public int getIndex(PipeType<?> pipeType) {
+    public int getIndex(PipeType<?, ?> pipeType) {
         for (int i = 0; i < getPipeTypes().length; i++) {
-            PipeType<?> type = getPipeTypes()[i];
+            PipeType<?, ?> type = getPipeTypes()[i];
             if (type == pipeType) {
                 return i;
             }
@@ -128,7 +129,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
             return;
         }
 
-        for (PipeType<?> type : getPipeTypes()) {
+        for (PipeType<?, ?> type : getPipeTypes()) {
             type.tick(this);
         }
 
@@ -165,8 +166,8 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.loadAdditional(compound, provider);
         invalidateCapabilities();
     }
 
@@ -178,7 +179,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     @Override
     public boolean canInsert(Level level, Connection connection) {
-        for (PipeType<?> type : types) {
+        for (PipeType<?, ?> type : types) {
             for (BlockCapability<?, Direction> provider : type.getCapabilities()) {
                 if (connection.getCapability(provider) != null) {
                     return true;

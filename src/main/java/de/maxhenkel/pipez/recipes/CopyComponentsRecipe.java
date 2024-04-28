@@ -1,13 +1,18 @@
 package de.maxhenkel.pipez.recipes;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.maxhenkel.corelib.helpers.Pair;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -16,27 +21,24 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class CopyNbtRecipe extends CustomRecipe {
+public class CopyComponentsRecipe extends CustomRecipe {
 
     private final Ingredient sourceIngredient;
     private final Ingredient targetIngredient;
-    private final List<String> tags;
+    private final List<ResourceLocation> components;
 
-    public CopyNbtRecipe(Ingredient sourceIngredient, Ingredient targetIngredient, List<String> tags) {
+    public CopyComponentsRecipe(Ingredient sourceIngredient, Ingredient targetIngredient, List<ResourceLocation> components) {
         super(CraftingBookCategory.MISC);
         this.sourceIngredient = sourceIngredient;
         this.targetIngredient = targetIngredient;
-        this.tags = tags;
+        this.components = components;
     }
 
     public Pair<ItemStack, List<ItemStack>> getResult(CraftingContainer inv) {
         ItemStack source = null;
         List<ItemStack> toCopy = new ArrayList<>();
-
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) {
@@ -50,13 +52,13 @@ public class CopyNbtRecipe extends CustomRecipe {
             }
 
             if (matchesSource) {
-                if (source == null && stack.hasTag()) {
+                if (source == null && hasComponent(stack)) {
                     source = stack;
                     continue;
                 }
             }
             if (matchesTarget) {
-                if (!stack.hasTag()) {
+                if (!hasComponent(stack)) {
                     toCopy.add(stack);
                     continue;
                 }
@@ -64,6 +66,10 @@ public class CopyNbtRecipe extends CustomRecipe {
             return new Pair<>(null, new ArrayList<>());
         }
         return new Pair<>(source, toCopy);
+    }
+
+    private boolean hasComponent(ItemStack stack) {
+        return stack.getComponentsPatch().entrySet().stream().map(Map.Entry::getKey).map(BuiltInRegistries.DATA_COMPONENT_TYPE::getKey).anyMatch(components::contains);
     }
 
     @Override
@@ -78,7 +84,7 @@ public class CopyNbtRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
+    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider provider) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
         if (result.getKey() == null) {
             return ItemStack.EMPTY;
@@ -91,48 +97,25 @@ public class CopyNbtRecipe extends CustomRecipe {
         } else if (result.getValue().size() == 1) {
             ItemStack stack = result.getValue().get(0).copy();
             stack.setCount(1);
-            CompoundTag tag = result.getKey().getTag();
-            CompoundTag copy = new CompoundTag();
-            for (String s : tags) {
-                Tag element = getPath(s, tag);
-                if (element != null) {
-                    setPath(s, copy, element);
+            DataComponentPatch patch = result.getKey().getComponentsPatch();
+
+            for (Map.Entry<DataComponentType<?>, Optional<?>> e : patch.entrySet()) {
+                if (e.getValue().isEmpty()) {
+                    continue;
                 }
+                ResourceLocation key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e.getKey());
+                if (key == null) {
+                    continue;
+                }
+                if (!components.contains(key)) {
+                    continue;
+                }
+                stack.set((DataComponentType) e.getKey(), e.getValue().get());
             }
-            stack.setTag(copy);
             return stack;
         }
 
         return ItemStack.EMPTY;
-    }
-
-    @Nullable
-    private Tag getPath(String path, CompoundTag tag) {
-        String[] p = path.split("\\.");
-        CompoundTag c = tag;
-        for (int i = 0; i < p.length - 1; i++) {
-            if (c.contains(p[i], Tag.TAG_COMPOUND)) {
-                c = c.getCompound(p[i]);
-            } else {
-                return null;
-            }
-        }
-        return c.get(p[p.length - 1]);
-    }
-
-    private void setPath(String path, CompoundTag tag, Tag element) {
-        String[] p = path.split("\\.");
-        CompoundTag c = tag;
-        for (int i = 0; i < p.length - 1; i++) {
-            if (c.contains(p[i], Tag.TAG_COMPOUND)) {
-                c = c.getCompound(p[i]);
-            } else {
-                CompoundTag newTag = new CompoundTag();
-                c.put(p[i], newTag);
-                c = newTag;
-            }
-        }
-        c.put(p[p.length - 1], element);
     }
 
     @Override
@@ -171,52 +154,47 @@ public class CopyNbtRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
-    public static class Serializer implements RecipeSerializer<CopyNbtRecipe> {
+    public static class Serializer implements RecipeSerializer<CopyComponentsRecipe> {
 
-        private final Codec<CopyNbtRecipe> codec;
+        private static final MapCodec<CopyComponentsRecipe> CODEC = RecordCodecBuilder.mapCodec((builder) -> builder
+                .group(
+                        Ingredient.CODEC_NONEMPTY
+                                .fieldOf("source")
+                                .forGetter((recipe) -> recipe.sourceIngredient),
+                        Ingredient.CODEC_NONEMPTY
+                                .fieldOf("target")
+                                .forGetter((recipe) -> recipe.targetIngredient),
+                        Codec.list(ResourceLocation.CODEC)
+                                .fieldOf("components")
+                                .forGetter((recipe) -> recipe.components)
+                ).apply(builder, CopyComponentsRecipe::new));
+
+        private static final StreamCodec<RegistryFriendlyByteBuf, CopyComponentsRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC,
+                r -> r.sourceIngredient,
+                Ingredient.CONTENTS_STREAM_CODEC,
+                r -> r.targetIngredient,
+                ByteBufCodecs.collection(ArrayList::new, ResourceLocation.STREAM_CODEC),
+                r -> r.components,
+                CopyComponentsRecipe::new
+        );
 
         public Serializer() {
-            codec = RecordCodecBuilder.create((builder) -> builder
-                    .group(
-                            Ingredient.CODEC_NONEMPTY
-                                    .fieldOf("source")
-                                    .forGetter((recipe) -> recipe.sourceIngredient),
-                            Ingredient.CODEC_NONEMPTY
-                                    .fieldOf("target")
-                                    .forGetter((recipe) -> recipe.targetIngredient),
-                            Codec.list(Codec.STRING)
-                                    .fieldOf("tags")
-                                    .forGetter((recipe) -> recipe.tags)
-                    ).apply(builder, CopyNbtRecipe::new));
+
         }
 
         @Override
-        public Codec<CopyNbtRecipe> codec() {
-            return codec;
+        public MapCodec<CopyComponentsRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public @Nullable CopyNbtRecipe fromNetwork(FriendlyByteBuf buffer) {
-            ArrayList<String> tags = new ArrayList<>();
-            int tagSize = buffer.readVarInt();
-            for (int i = 0; i < tagSize; i++) {
-                tags.add(buffer.readUtf());
-            }
-            return new CopyNbtRecipe(Ingredient.fromNetwork(buffer), Ingredient.fromNetwork(buffer), tags);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buffer, CopyNbtRecipe recipe) {
-            buffer.writeVarInt(recipe.tags.size());
-            for (String s : recipe.tags) {
-                buffer.writeUtf(s);
-            }
-            recipe.sourceIngredient.toNetwork(buffer);
-            recipe.targetIngredient.toNetwork(buffer);
+        public StreamCodec<RegistryFriendlyByteBuf, CopyComponentsRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

@@ -1,11 +1,28 @@
 package de.maxhenkel.pipez;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
-public class DirectionalPosition implements INBTSerializable<CompoundTag> {
+public class DirectionalPosition {
+
+    public static final Codec<DirectionalPosition> CODEC = RecordCodecBuilder.create(i -> {
+        return i.group(
+                BlockPos.CODEC.fieldOf("position").forGetter(DirectionalPosition::getPos),
+                Direction.CODEC.fieldOf("direction").forGetter(DirectionalPosition::getDirection)
+        ).apply(i, DirectionalPosition::new);
+    });
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, DirectionalPosition> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            DirectionalPosition::getPos,
+            Direction.STREAM_CODEC,
+            DirectionalPosition::getDirection,
+            DirectionalPosition::new
+    );
 
     private BlockPos pos;
     private Direction direction;
@@ -47,24 +64,5 @@ public class DirectionalPosition implements INBTSerializable<CompoundTag> {
         int result = pos.hashCode();
         result = 31 * result + direction.hashCode();
         return result;
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag compound = new CompoundTag();
-        CompoundTag p = new CompoundTag();
-        p.putInt("X", pos.getX());
-        p.putInt("Y", pos.getY());
-        p.putInt("Z", pos.getZ());
-        compound.put("Position", p);
-        compound.putByte("Direction", (byte) direction.get3DDataValue());
-        return compound;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag compound) {
-        CompoundTag p = compound.getCompound("Position");
-        pos = new BlockPos(p.getInt("X"), p.getInt("Y"), p.getInt("Z"));
-        direction = Direction.from3DDataValue(compound.getByte("Direction"));
     }
 }

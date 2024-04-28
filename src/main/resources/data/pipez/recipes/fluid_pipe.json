@@ -10,14 +10,14 @@
       "item": "minecraft:bucket"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     }
   },
   "result": {
-    "item": "pipez:fluid_pipe",
+    "id": "pipez:fluid_pipe",
     "count": 16
   }
 }

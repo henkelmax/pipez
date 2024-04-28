@@ -57,7 +57,7 @@ public class TileInfoProvider implements IProbeInfoProvider {
                         .vertical()
                         .itemLabel(upgrade);
             }
-            for (PipeType<?> type : pipeTile.getPipeTypes()) {
+            for (PipeType<?, ?> type : pipeTile.getPipeTypes()) {
                 if (pipeTile.isEnabled(selectedSide, type)) {
                     i = i.text(type.getTransferText(pipeTile.getUpgrade(selectedSide)));
                 }

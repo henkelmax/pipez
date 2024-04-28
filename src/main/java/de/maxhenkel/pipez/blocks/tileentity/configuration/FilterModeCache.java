@@ -3,33 +3,24 @@ package de.maxhenkel.pipez.blocks.tileentity.configuration;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.ByteTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FilterModeCache extends CachedPipeConfiguration<UpgradeTileEntity.FilterMode> {
 
-
-    public FilterModeCache(Supplier<NonNullList<ItemStack>> upgradeInventory, Function<PipeType<?>, UpgradeTileEntity.FilterMode> defaultValue, Runnable onDirty) {
-        super(upgradeInventory, "FilterMode", defaultValue, onDirty);
+    public FilterModeCache(Supplier<NonNullList<ItemStack>> upgradeInventory, Function<PipeType<?, ?>, UpgradeTileEntity.FilterMode> defaultValue, Runnable onDirty) {
+        super(upgradeInventory, defaultValue, onDirty);
     }
 
     @Override
-    public Tag serialize(UpgradeTileEntity.FilterMode value) {
-        return ByteTag.valueOf((byte) value.ordinal());
+    public UpgradeTileEntity.FilterMode get(PipeType<?, ?> pipeType, ItemStack stack) {
+        return pipeType.getFilterMode(stack);
     }
 
-    @Nullable
     @Override
-    public UpgradeTileEntity.FilterMode deserialize(PipeType pipeType, Tag inbt) {
-        if (inbt instanceof ByteTag) {
-            ByteTag byteNBT = (ByteTag) inbt;
-            return UpgradeTileEntity.FilterMode.values()[byteNBT.getAsByte()];
-        }
-        return null;
+    public void set(PipeType<?, ?> pipeType, ItemStack stack, UpgradeTileEntity.FilterMode value) {
+        pipeType.setFilterMode(stack, value);
     }
 }

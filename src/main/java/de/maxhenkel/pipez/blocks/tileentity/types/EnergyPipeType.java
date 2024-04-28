@@ -9,7 +9,10 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.datacomponents.EnergyData;
+import de.maxhenkel.pipez.items.ModItems;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapability;
@@ -18,31 +21,27 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class EnergyPipeType extends PipeType<Void> {
+public class EnergyPipeType extends PipeType<Void, EnergyData> {
 
     public static final EnergyPipeType INSTANCE = new EnergyPipeType();
-
-    @Override
-    public String getKey() {
-        return "Energy";
-    }
 
     @Override
     public BlockCapability<?, Direction> getCapability() {
         return Capabilities.EnergyStorage.BLOCK;
     }
 
+    @Nullable
     @Override
-    public boolean hasFilter() {
-        return false;
+    public Filter<?, Void> createFilter() {
+        return null;
     }
 
     @Override
-    public Filter<Void> createFilter() {
-        return new Filter<Void>() {
-        };
+    public boolean hasFilter() {
+        return false;
     }
 
     @Override
@@ -265,4 +264,15 @@ public class EnergyPipeType extends PipeType<Void> {
         }
     }
 
+    @Override
+    public DataComponentType<EnergyData> getDataComponentType() {
+        return ModItems.ENERGY_DATA_COMPONENT.get();
+    }
+
+    private static final EnergyData DEFAULT = new EnergyData(UpgradeTileEntity.FilterMode.WHITELIST, UpgradeTileEntity.RedstoneMode.IGNORED, UpgradeTileEntity.Distribution.ROUND_ROBIN, Collections.emptyList());
+
+    @Override
+    public EnergyData defaultData() {
+        return DEFAULT;
+    }
 }

@@ -1,6 +1,12 @@
 {
-  "type": "pipez:clear_nbt",
+  "type": "pipez:clear_components",
   "item": {
     "tag": "pipez:upgrades"
-  }
+  },
+  "components": [
+    "pipez:item",
+    "pipez:fluid",
+    "pipez:gas",
+    "pipez:energy"
+  ]
 }

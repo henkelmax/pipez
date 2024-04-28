@@ -25,14 +25,14 @@ public class FilterContainerProvider implements MenuProvider {
         return Component.translatable(pipe.getBlockState().getBlock().getDescriptionId());
     }
 
-    public static void openGui(Player player, PipeLogicTileEntity tileEntity, Direction direction, Filter<?> filter, int index, ContainerCreator containerCreator) {
+    public static void openGui(Player player, PipeLogicTileEntity tileEntity, Direction direction, Filter<?, ?> filter, int index, ContainerCreator containerCreator) {
         if (player instanceof ServerPlayer serverPlayer) {
 
             serverPlayer.openMenu(new FilterContainerProvider(containerCreator, tileEntity), packetBuffer -> {
                 packetBuffer.writeBlockPos(tileEntity.getBlockPos());
                 packetBuffer.writeEnum(direction);
                 packetBuffer.writeInt(index);
-                packetBuffer.writeNbt(filter.serializeNBT());
+                filter.toNetwork(packetBuffer);
             });
         }
     }

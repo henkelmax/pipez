@@ -1,92 +1,49 @@
 package de.maxhenkel.pipez;
 
+import com.mojang.serialization.Codec;
 import de.maxhenkel.corelib.tag.SingleElementTag;
+import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.corelib.tag.TagUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class FluidFilter extends Filter<Fluid> {
+public class FluidFilter extends Filter<FluidFilter, Fluid> {
 
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag compound = new CompoundTag();
-        if (tag != null) {
-            if (tag instanceof SingleElementTag) {
-                Fluid element = ((SingleElementTag<Fluid>) tag).getElement();
-                if (BuiltInRegistries.FLUID.containsValue(element)) {
-                    ResourceLocation key = BuiltInRegistries.FLUID.getKey(element);
-                    compound.putString("Fluid", key.toString());
-                }
-            } else {
-                compound.putString("Tag", tag.getName().toString());
-            }
+    private static final TagConverter<Fluid> TAG_CONVERTER = (single, location) -> {
+        if (single) {
+            return new SingleElementTag<>(location, BuiltInRegistries.FLUID.get(location));
+        } else {
+            return TagUtils.getFluidTag(location);
         }
-        if (metadata != null) {
-            compound.put("Metadata", metadata);
-        }
-        if (exactMetadata) {
-            compound.putBoolean("ExactMetadata", true);
-        }
-        if (destination != null) {
-            compound.put("Destination", destination.serializeNBT());
-        }
-        if (invert) {
-            compound.putBoolean("Invert", true);
-        }
-        compound.putUUID("ID", id);
+    };
+    public static final Codec<Tag<Fluid>> TAG_CODEC = tagCodec(TAG_CONVERTER);
+    public static final StreamCodec<RegistryFriendlyByteBuf, Tag<Fluid>> STREAM_TAG_CODEC = tagStreamCodec(TAG_CONVERTER);
 
-        return compound;
+    public static final Codec<FluidFilter> CODEC = codec(FluidFilter.class, TAG_CODEC);
+    public static final StreamCodec<RegistryFriendlyByteBuf, FluidFilter> STREAM_CODEC = streamCodec(FluidFilter.class, STREAM_TAG_CODEC);
+
+    public FluidFilter(UUID id, @Nullable Tag<Fluid> tag, @Nullable CompoundTag metadata, boolean exactMetadata, @Nullable DirectionalPosition destination, boolean invert) {
+        super(id, tag, metadata, exactMetadata, destination, invert);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag compound) {
-        tag = null;
-        if (compound.contains("Fluid", Tag.TAG_STRING)) {
-            ResourceLocation fluidLocation = new ResourceLocation(compound.getString("Fluid"));
-            if (BuiltInRegistries.FLUID.containsKey(fluidLocation)) {
-                Fluid fluid = BuiltInRegistries.FLUID.get(fluidLocation);
-                tag = new SingleElementTag<>(BuiltInRegistries.FLUID.getKey(fluid), fluid);
-            }
-        }
-        if (compound.contains("Tag", Tag.TAG_STRING)) {
-            tag = TagUtils.getFluidTag(new ResourceLocation(compound.getString("Tag")));
-        }
+    public Codec<FluidFilter> getCodec() {
+        return CODEC;
+    }
 
-        if (compound.contains("Metadata", Tag.TAG_COMPOUND)) {
-            metadata = compound.getCompound("Metadata");
-        } else {
-            metadata = null;
-        }
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, FluidFilter> getStreamCodec() {
+        return STREAM_CODEC;
+    }
 
-        if (compound.contains("ExactMetadata", Tag.TAG_BYTE)) {
-            exactMetadata = compound.getBoolean("ExactMetadata");
-        } else {
-            exactMetadata = false;
-        }
-
-        if (compound.contains("Destination", Tag.TAG_COMPOUND)) {
-            destination = new DirectionalPosition();
-            destination.deserializeNBT(compound.getCompound("Destination"));
-        } else {
-            destination = null;
-        }
-
-        if (compound.contains("Invert", Tag.TAG_BYTE)) {
-            invert = compound.getBoolean("Invert");
-        } else {
-            invert = false;
-        }
-
-        if (compound.contains("ID", Tag.TAG_INT_ARRAY)) {
-            id = compound.getUUID("ID");
-        } else {
-            id = UUID.randomUUID();
-        }
+    public FluidFilter() {
+        this(UUID.randomUUID(), null, null, false, null, false);
     }
 
 }

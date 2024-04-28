@@ -7,17 +7,17 @@
   ],
   "key": {
     "N": {
-      "tag": "forge:nuggets/iron"
+      "tag": "c:nuggets/iron"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     }
   },
   "result": {
-    "item": "pipez:basic_upgrade",
+    "id": "pipez:basic_upgrade",
     "count": 1
   }
 }

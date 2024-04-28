@@ -10,19 +10,19 @@
       "item": "mekanism:alloy_infused"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "R": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     }
   },
   "result": {
-    "item": "pipez:gas_pipe",
+    "id": "pipez:gas_pipe",
     "count": 16
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mekanism"
     }
   ]

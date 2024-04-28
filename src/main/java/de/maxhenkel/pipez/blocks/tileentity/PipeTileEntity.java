@@ -12,6 +12,7 @@ import mekanism.api.chemical.pigment.IPigmentHandler;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -285,8 +286,8 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.loadAdditional(compound, provider);
         extractingSides = new boolean[Direction.values().length];
         ListTag extractingList = compound.getList("ExtractingSides", Tag.TAG_BYTE);
         if (extractingList.size() >= extractingSides.length) {
@@ -308,8 +309,8 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.saveAdditional(compound, provider);
 
         ListTag extractingList = new ListTag();
         for (boolean extractingSide : extractingSides) {
@@ -342,9 +343,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        CompoundTag updateTag = super.getUpdateTag();
-        saveAdditional(updateTag);
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        CompoundTag updateTag = super.getUpdateTag(provider);
+        saveAdditional(updateTag, provider);
         return updateTag;
     }
 

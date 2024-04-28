@@ -1,8 +1,14 @@
 package de.maxhenkel.pipez.items;
 
+import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.ModBlocks;
+import de.maxhenkel.pipez.datacomponents.EnergyData;
+import de.maxhenkel.pipez.datacomponents.FluidData;
+import de.maxhenkel.pipez.datacomponents.GasData;
+import de.maxhenkel.pipez.datacomponents.ItemData;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -27,8 +33,18 @@ public class ModItems {
     public static final DeferredHolder<Item, Item> UNIVERSAL_PIPE = ITEM_REGISTER.register("universal_pipe", () -> ModBlocks.UNIVERSAL_PIPE.get().toItem());
     public static final DeferredHolder<Item, Item> GAS_PIPE = ITEM_REGISTER.register("gas_pipe", () -> ModBlocks.GAS_PIPE.get().toItem());
 
+    private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, Main.MODID);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<DirectionalPosition>> DIRECTIONAL_POSITION_DATA_COMPONENT = DATA_COMPONENT_TYPE_REGISTER.register("directional_position", () -> DataComponentType.<DirectionalPosition>builder().persistent(DirectionalPosition.CODEC).networkSynchronized(DirectionalPosition.STREAM_CODEC).build());
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemData>> ITEM_DATA_COMPONENT = DATA_COMPONENT_TYPE_REGISTER.register("item", () -> DataComponentType.<ItemData>builder().persistent(ItemData.CODEC).networkSynchronized(ItemData.STREAM_CODEC).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<FluidData>> FLUID_DATA_COMPONENT = DATA_COMPONENT_TYPE_REGISTER.register("fluid", () -> DataComponentType.<FluidData>builder().persistent(FluidData.CODEC).networkSynchronized(FluidData.STREAM_CODEC).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<GasData>> GAS_DATA_COMPONENT = DATA_COMPONENT_TYPE_REGISTER.register("gas", () -> DataComponentType.<GasData>builder().persistent(GasData.CODEC).networkSynchronized(GasData.STREAM_CODEC).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<EnergyData>> ENERGY_DATA_COMPONENT = DATA_COMPONENT_TYPE_REGISTER.register("energy", () -> DataComponentType.<EnergyData>builder().persistent(EnergyData.CODEC).networkSynchronized(EnergyData.STREAM_CODEC).build());
+
     public static void init(IEventBus eventBus) {
         ITEM_REGISTER.register(eventBus);
+        DATA_COMPONENT_TYPE_REGISTER.register(eventBus);
     }
 
 }

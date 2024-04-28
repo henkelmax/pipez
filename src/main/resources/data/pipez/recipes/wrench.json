@@ -10,11 +10,11 @@
       "item": "minecraft:flint"
     },
     "S": {
-      "tag": "forge:rods"
+      "tag": "c:rods"
     }
   },
   "result": {
-    "item": "pipez:wrench",
+    "id": "pipez:wrench",
     "count": 1
   }
 }

@@ -21,7 +21,7 @@ public class FilterScreenGhostIngredientHandler implements IGhostIngredientHandl
 
     @Override
     public <I> List<Target<I>> getTargetsTyped(FilterScreen gui, ITypedIngredient<I> ingredient, boolean doStart) {
-        Filter<?> filter = gui.getMenu().getFilter();
+        Filter<?, ?> filter = gui.getMenu().getFilter();
         List<Target<I>> list = new ArrayList<>();
 
         if (ingredient.getIngredient() instanceof ItemStack stack) {
@@ -37,7 +37,7 @@ public class FilterScreenGhostIngredientHandler implements IGhostIngredientHandl
         return list;
     }
 
-    private boolean testItemStack(Filter<?> filter, ItemStack stack) {
+    private boolean testItemStack(Filter<?, ?> filter, ItemStack stack) {
         if (filter instanceof FluidFilter) {
             return FluidUtil.getFluidContained(stack).isPresent();
         } else if (filter instanceof GasFilter) {

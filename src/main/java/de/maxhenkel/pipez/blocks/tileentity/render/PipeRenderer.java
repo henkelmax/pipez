@@ -51,7 +51,7 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
         matrixStack.mulPose(getRotation(direction));
         matrixStack.translate(-0.5D, -0.5D, -0.5D);
         for (BakedQuad quad : quads) {
-            b.putBulkData(matrixStack.last(), quad, 1F, 1F, 1F, combinedLight, combinedOverlay);
+            b.putBulkData(matrixStack.last(), quad, 1F, 1F, 1F, 1F, combinedLight, combinedOverlay);
         }
 
         matrixStack.popPose();

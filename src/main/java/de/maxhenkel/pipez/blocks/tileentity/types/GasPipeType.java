@@ -8,6 +8,8 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.datacomponents.GasData;
+import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.MekanismUtils;
 import mekanism.api.Action;
@@ -16,22 +18,19 @@ import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalType;
 import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GasPipeType extends PipeType<Chemical> {
+public class GasPipeType extends PipeType<Chemical, GasData> {
 
     public static final GasPipeType INSTANCE = new GasPipeType();
-
-    @Override
-    public String getKey() {
-        return "Gas";
-    }
 
     @Override
     public BlockCapability<?, Direction> getCapability() {
@@ -48,7 +47,7 @@ public class GasPipeType extends PipeType<Chemical> {
     }
 
     @Override
-    public Filter<Chemical> createFilter() {
+    public Filter<?, Chemical> createFilter() {
         return new GasFilter();
     }
 
@@ -175,17 +174,17 @@ public class GasPipeType extends PipeType<Chemical> {
         return source.extractChemical(GasUtils.createChemicalStack(extracted.getType(), extracted.getAmount() - gasStack.getAmount()), Action.EXECUTE);
     }
 
-    private boolean canInsert(PipeTileEntity.Connection connection, ChemicalStack stack, List<Filter<?>> filters) {
-        for (Filter<Chemical> filter : filters.stream().map(filter -> (Filter<Chemical>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
+    private boolean canInsert(PipeTileEntity.Connection connection, ChemicalStack stack, List<Filter<?, ?>> filters) {
+        for (Filter<?, Chemical> filter : filters.stream().map(filter -> (Filter<?, Chemical>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
             if (matches(filter, stack)) {
                 return false;
             }
         }
-        List<Filter<Chemical>> collect = filters.stream().map(filter -> (Filter<Chemical>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
+        List<Filter<?, Chemical>> collect = filters.stream().map(filter -> (Filter<?, Chemical>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
         if (collect.isEmpty()) {
             return true;
         }
-        for (Filter<Chemical> filter : collect) {
+        for (Filter<?, Chemical> filter : collect) {
             if (matches(filter, stack)) {
                 return true;
             }
@@ -193,7 +192,7 @@ public class GasPipeType extends PipeType<Chemical> {
         return false;
     }
 
-    private boolean matches(Filter<Chemical> filter, ChemicalStack stack) {
+    private boolean matches(Filter<?, Chemical> filter, ChemicalStack stack) {
         return filter.getTag() == null || filter.getTag().contains(stack.getType());
     }
 
@@ -224,6 +223,18 @@ public class GasPipeType extends PipeType<Chemical> {
             default:
                 return Integer.MAX_VALUE;
         }
+    }
+
+    @Override
+    public DataComponentType<GasData> getDataComponentType() {
+        return ModItems.GAS_DATA_COMPONENT.get();
+    }
+
+    private static final GasData DEFAULT = new GasData(UpgradeTileEntity.FilterMode.WHITELIST, UpgradeTileEntity.RedstoneMode.IGNORED, UpgradeTileEntity.Distribution.ROUND_ROBIN, Collections.emptyList());
+
+    @Override
+    public GasData defaultData() {
+        return DEFAULT;
     }
 
 }

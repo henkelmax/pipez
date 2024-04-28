@@ -7,7 +7,8 @@ import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
 
-@WailaPlugin
+//TODO Re-add once Jade is updated
+//@WailaPlugin
 public class PluginPipes implements IWailaPlugin {
 
     @Override

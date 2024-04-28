@@ -1,15 +1,15 @@
 {
-  "type": "pipez:copy_nbt",
+  "type": "pipez:copy_components",
   "source": {
     "tag": "pipez:upgrades"
   },
   "target": {
     "item": "pipez:basic_upgrade"
   },
-  "tags": [
-    "Item.RedstoneMode",
-    "Energy.RedstoneMode",
-    "Fluid.RedstoneMode",
-    "Gas.RedstoneMode"
+  "components": [
+    "pipez:item",
+    "pipez:fluid",
+    "pipez:gas",
+    "pipez:energy"
   ]
 }

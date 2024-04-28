@@ -8,28 +8,30 @@ import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.IPipeContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 import java.util.Optional;
 
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
-    public static ResourceLocation ID = new ResourceLocation(Main.MODID, "update_filter");
+    public static final CustomPacketPayload.Type<UpdateFilterMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "update_filter"));
 
-    private CompoundTag filter;
+    private Filter filter;
+    private CompoundTag filterTag;
     private int index;
 
     public UpdateFilterMessage() {
 
     }
 
-    public UpdateFilterMessage(Filter<?> filter, int index) {
-        this.filter = filter.serializeNBT();
+    public UpdateFilterMessage(Filter filter, int index) {
+        this.filter = filter;
         this.index = index;
     }
 
@@ -39,47 +41,58 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
     }
 
     @Override
-    public void executeServerSide(PlayPayloadContext context) {
-        if (!(context.player().orElse(null) instanceof ServerPlayer sender)) {
+    public void executeServerSide(IPayloadContext context) {
+        if (!(context.player() instanceof ServerPlayer sender)) {
             return;
         }
-        if (sender.containerMenu instanceof IPipeContainer pipeContainer) {
-            PipeType<?>[] pipeTypes = pipeContainer.getPipe().getPipeTypes();
-            if (index >= pipeTypes.length) {
-                return;
-            }
-            PipeType<?> pipeType = pipeTypes[index];
-            Filter<?> f = pipeType.createFilter();
-            f.deserializeNBT(filter);
-            List<Filter<?>> filters = pipeContainer.getPipe().getFilters(pipeContainer.getSide(), pipeType);
-
-            Optional<Filter<?>> editFilter = filters.stream().filter(f1 -> f.getId().equals(f1.getId())).findFirst();
-            if (editFilter.isPresent()) {
-                editFilter.get().deserializeNBT(filter);
-            } else {
-                filters.add(f);
-            }
-            pipeContainer.getPipe().setFilters(pipeContainer.getSide(), pipeType, filters);
-
-            PipeContainerProvider.openGui(sender, pipeContainer.getPipe(), pipeContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, pipeContainer.getPipe(), pipeContainer.getSide(), index));
+        if (!(sender.containerMenu instanceof IPipeContainer pipeContainer)) {
+            return;
         }
+        PipeType<?, ?>[] pipeTypes = pipeContainer.getPipe().getPipeTypes();
+        if (index >= pipeTypes.length) {
+            return;
+        }
+        PipeType<?, ?> pipeType = pipeTypes[index];
+        filter = pipeType.createFilter();
+        if (filter == null) {
+            return;
+        }
+        filter = filter.fromNbt(filterTag);
+
+        List<Filter<?, ?>> filters = pipeContainer.getPipe().getFilters(pipeContainer.getSide(), pipeType);
+
+        Optional<Filter<?, ?>> editFilter = filters.stream().filter(f1 -> filter.getId().equals(f1.getId())).findFirst();
+        if (editFilter.isPresent()) {
+            int index = filters.indexOf(editFilter.get());
+            if (index >= 0) {
+                filters.set(index, filter);
+            } else {
+                filters.add(filter);
+            }
+        } else {
+            filters.add(filter);
+        }
+        pipeContainer.getPipe().setFilters(pipeContainer.getSide(), pipeType, filters);
+
+        PipeContainerProvider.openGui(sender, pipeContainer.getPipe(), pipeContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, pipeContainer.getPipe(), pipeContainer.getSide(), index));
     }
 
     @Override
-    public UpdateFilterMessage fromBytes(FriendlyByteBuf packetBuffer) {
-        filter = packetBuffer.readNbt();
+    public UpdateFilterMessage fromBytes(RegistryFriendlyByteBuf packetBuffer) {
+        filterTag = packetBuffer.readNbt();
         index = packetBuffer.readInt();
         return this;
     }
 
     @Override
-    public void toBytes(FriendlyByteBuf packetBuffer) {
-        packetBuffer.writeNbt(filter);
+    public void toBytes(RegistryFriendlyByteBuf packetBuffer) {
+        packetBuffer.writeNbt(filter.toNbt());
         packetBuffer.writeInt(index);
     }
 
     @Override
-    public ResourceLocation id() {
-        return ID;
+    public Type<UpdateFilterMessage> type() {
+        return TYPE;
     }
+
 }

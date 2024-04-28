@@ -1,15 +1,17 @@
 package de.maxhenkel.pipez.blocks.tileentity.types;
 
 import de.maxhenkel.corelib.item.ItemUtils;
-import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.ItemFilter;
-import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.datacomponents.ItemData;
+import de.maxhenkel.pipez.items.ModItems;
+import de.maxhenkel.pipez.utils.ComponentUtils;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -21,17 +23,13 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ItemPipeType extends PipeType<Item> {
+public class ItemPipeType extends PipeType<Item, ItemData> {
 
     public static final ItemPipeType INSTANCE = new ItemPipeType();
-
-    @Override
-    public String getKey() {
-        return "Item";
-    }
 
     @Override
     public BlockCapability<?, Direction> getCapability() {
@@ -39,7 +37,7 @@ public class ItemPipeType extends PipeType<Item> {
     }
 
     @Override
-    public Filter<Item> createFilter() {
+    public Filter<?, Item> createFilter() {
         return new ItemFilter();
     }
 
@@ -111,7 +109,7 @@ public class ItemPipeType extends PipeType<Item> {
                     if (simulatedExtract.isEmpty()) {
                         continue;
                     }
-                    if (canInsert(connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
+                    if (canInsert(tileEntity.getLevel().registryAccess(), connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
                         continue;
                     }
                     ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
@@ -159,7 +157,7 @@ public class ItemPipeType extends PipeType<Item> {
                 if (nonFittingItems.stream().anyMatch(stack -> ItemUtils.isStackable(stack, simulatedExtract))) {
                     continue;
                 }
-                if (canInsert(connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
+                if (canInsert(tileEntity.getLevel().registryAccess(), connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
                     continue;
                 }
                 ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
@@ -183,38 +181,38 @@ public class ItemPipeType extends PipeType<Item> {
         return true;
     }
 
-    private boolean canInsert(PipeTileEntity.Connection connection, ItemStack stack, List<Filter<?>> filters) {
-        for (Filter<Item> filter : filters.stream().map(filter -> (Filter<Item>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(filter, stack)) {
+    private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, ItemStack stack, List<Filter<?, ?>> filters) {
+        for (Filter<?, Item> filter : filters.stream().map(filter -> (Filter<?, Item>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
+            if (matches(provider, filter, stack)) {
                 return false;
             }
         }
-        List<Filter<Item>> collect = filters.stream().map(filter -> (Filter<Item>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
+        List<Filter<?, Item>> collect = filters.stream().map(filter -> (Filter<?, Item>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
         if (collect.isEmpty()) {
             return true;
         }
-        for (Filter<Item> filter : collect) {
-            if (matches(filter, stack)) {
+        for (Filter<?, Item> filter : collect) {
+            if (matches(provider, filter, stack)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean matches(Filter<Item> filter, ItemStack stack) {
+    private boolean matches(HolderLookup.Provider provider, Filter<?, Item> filter, ItemStack stack) {
         CompoundTag metadata = filter.getMetadata();
         if (metadata == null) {
             return filter.getTag() == null || filter.getTag().contains(stack.getItem());
         }
+        CompoundTag stackNBT = ComponentUtils.getTag(provider, stack);
         if (filter.isExactMetadata()) {
-            if (deepExactCompare(metadata, stack.getTag())) {
+            if (deepExactCompare(metadata, stackNBT)) {
                 return filter.getTag() == null || filter.getTag().contains(stack.getItem());
             } else {
                 return false;
             }
         } else {
-            CompoundTag stackNBT = stack.getTag();
-            if (stackNBT == null) {
+            if (stackNBT.isEmpty()) {
                 return metadata.size() <= 0;
             }
             if (!deepFuzzyCompare(metadata, stackNBT)) {
@@ -275,4 +273,17 @@ public class ItemPipeType extends PipeType<Item> {
                 return Integer.MAX_VALUE;
         }
     }
+
+    @Override
+    public DataComponentType<ItemData> getDataComponentType() {
+        return ModItems.ITEM_DATA_COMPONENT.get();
+    }
+
+    private static final ItemData DEFAULT = new ItemData(UpgradeTileEntity.FilterMode.WHITELIST, UpgradeTileEntity.RedstoneMode.IGNORED, UpgradeTileEntity.Distribution.NEAREST, Collections.emptyList());
+
+    @Override
+    public ItemData defaultData() {
+        return DEFAULT;
+    }
+
 }

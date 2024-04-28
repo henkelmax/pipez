@@ -1,1 +1,1 @@
-- Updated to NeoForges new networking system
+- Updated to 1.20.5

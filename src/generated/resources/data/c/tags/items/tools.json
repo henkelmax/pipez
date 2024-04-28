@@ -1,6 +1,6 @@
 {
   "replace": false,
   "values": [
-    "#forge:tools/wrench"
+    "#c:tools/wrench"
   ]
 }

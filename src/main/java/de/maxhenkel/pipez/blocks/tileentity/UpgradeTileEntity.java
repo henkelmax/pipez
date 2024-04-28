@@ -10,9 +10,7 @@ import de.maxhenkel.pipez.blocks.tileentity.configuration.FilterModeCache;
 import de.maxhenkel.pipez.blocks.tileentity.configuration.RedstoneModeCache;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.items.UpgradeItem;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
@@ -48,7 +46,7 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         redstoneModes = new RedstoneModeCache(() -> upgradeInventory, PipeType::getDefaultRedstoneMode, this::invalidateAllCaches);
         distributions = new DistributionCache(() -> upgradeInventory, PipeType::getDefaultDistribution, this::invalidateAllCaches);
         filterModes = new FilterModeCache(() -> upgradeInventory, PipeType::getDefaultFilterMode, this::invalidateAllCaches);
-        filters = new FilterCache(() -> upgradeInventory, PipeType::createFilter, this::invalidateAllCaches);
+        filters = new FilterCache(() -> upgradeInventory, this::invalidateAllCaches);
     }
 
     public void invalidateAllCaches() {
@@ -94,11 +92,11 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         filterModes.setValue(side, pipeType, filterMode);
     }
 
-    public <T> List<Filter<?>> getFilters(Direction side, PipeType<T> pipeType) {
+    public <T> List<Filter<?, ?>> getFilters(Direction side, PipeType<T, ?> pipeType) {
         return filters.getValue(side, pipeType);
     }
 
-    public <T> void setFilters(Direction side, PipeType<T> pipeType, List<Filter<?>> filter) {
+    public <T> void setFilters(Direction side, PipeType<T, ?> pipeType, List<Filter<?, ?>> filter) {
         filters.setValue(side, pipeType, filter);
     }
 
@@ -118,18 +116,17 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.loadAdditional(compound, provider);
         upgradeInventory.clear();
-        ItemUtils.readInventory(compound, "Upgrades", upgradeInventory);
+        ItemUtils.readInventory(provider, compound, "Upgrades", upgradeInventory);
         invalidateAllCaches();
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
-
-        ItemUtils.saveInventory(compound, "Upgrades", upgradeInventory);
+    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.saveAdditional(compound, provider);
+        ItemUtils.saveInventory(provider, compound, "Upgrades", upgradeInventory);
     }
 
     @Nullable

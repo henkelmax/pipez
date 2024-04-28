@@ -1,19 +1,13 @@
 package de.maxhenkel.pipez.integration.waila;
 
+import de.maxhenkel.pipez.ClientRegistryUtils;
 import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.blocks.PipeBlock;
-import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
-import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -31,16 +25,18 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
 
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
-        CompoundTag compound = blockAccessor.getServerData();
+        //TODO Implement once Jade is updated
+        /*CompoundTag compound = blockAccessor.getServerData();
         if (compound.contains("Upgrade", Tag.TAG_STRING)) {
-            iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade")));
+            iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade"), ClientRegistryUtils.getProvider()));
         }
-        iTooltip.addAll(getTooltips(compound));
+        iTooltip.addAll(getTooltips(compound));*/
     }
 
     @Override
     public void appendServerData(CompoundTag compound, BlockAccessor blockAccessor) {
-        if (blockAccessor.getBlockState().getBlock() instanceof PipeBlock) {
+        //TODO Implement once Jade is updated
+        /*if (blockAccessor.getBlockState().getBlock() instanceof PipeBlock) {
             BlockEntity te = blockAccessor.getBlockEntity();
             PipeBlock pipe = (PipeBlock) blockAccessor.getBlockState().getBlock();
             Direction selectedSide = pipe.getSelection(te.getBlockState(), blockAccessor.getLevel(), te.getBlockPos(), blockAccessor.getPlayer()).getKey();
@@ -60,25 +56,25 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
             ItemStack upgrade = pipeTile.getUpgradeItem(selectedSide);
 
             if (upgrade.isEmpty()) {
-                compound.putString("Upgrade", Component.Serializer.toJson(Component.translatable("tooltip.pipez.no_upgrade")));
+                compound.putString("Upgrade", Component.Serializer.toJson(Component.translatable("tooltip.pipez.no_upgrade"), ClientRegistryUtils.getProvider()));
             } else {
-                compound.putString("Upgrade", Component.Serializer.toJson(upgrade.getHoverName()));
+                compound.putString("Upgrade", Component.Serializer.toJson(upgrade.getHoverName(), ClientRegistryUtils.getProvider()));
             }
 
             List<Component> tooltips = new ArrayList<>();
-            for (PipeType<?> pipeType : pipeTile.getPipeTypes()) {
+            for (PipeType<?, ?> pipeType : pipeTile.getPipeTypes()) {
                 if (pipeTile.isEnabled(selectedSide, pipeType)) {
                     tooltips.add(pipeType.getTransferText(pipeTile.getUpgrade(selectedSide)));
                 }
             }
             putTooltips(compound, tooltips);
-        }
+        }*/
     }
 
     public void putTooltips(CompoundTag compound, List<Component> tooltips) {
         ListTag list = new ListTag();
         for (Component tooltip : tooltips) {
-            list.add(StringTag.valueOf(Component.Serializer.toJson(tooltip)));
+            list.add(StringTag.valueOf(Component.Serializer.toJson(tooltip, ClientRegistryUtils.getProvider())));
         }
         compound.put("Tooltips", list);
     }
@@ -90,7 +86,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
         }
         ListTag list = compound.getList("Tooltips", Tag.TAG_STRING);
         for (int i = 0; i < list.size(); i++) {
-            tooltips.add(Component.Serializer.fromJson(list.getString(i)));
+            tooltips.add(Component.Serializer.fromJson(list.getString(i), ClientRegistryUtils.getProvider()));
         }
         return tooltips;
     }

@@ -7,17 +7,19 @@ import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.FilterContainer;
 import de.maxhenkel.pipez.gui.containerfactory.FilterContainerProvider;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class EditFilterMessage implements Message<EditFilterMessage> {
 
-    public static ResourceLocation ID = new ResourceLocation(Main.MODID, "edit_filter_message");
+    public static final CustomPacketPayload.Type<EditFilterMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "edit_filter_message"));
 
-    private CompoundTag filter;
+    private Filter filter;
+    private CompoundTag filterTag;
     private int index;
 
     public EditFilterMessage() {
@@ -25,7 +27,7 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
     }
 
     public EditFilterMessage(Filter filter, int index) {
-        this.filter = filter.serializeNBT();
+        this.filter = filter;
         this.index = index;
     }
 
@@ -35,32 +37,37 @@ public class EditFilterMessage implements Message<EditFilterMessage> {
     }
 
     @Override
-    public void executeServerSide(PlayPayloadContext context) {
-        if (!(context.player().orElse(null) instanceof ServerPlayer sender)) {
+    public void executeServerSide(IPayloadContext context) {
+        if (!(context.player() instanceof ServerPlayer sender)) {
             return;
         }
-        if (sender.containerMenu instanceof ExtractContainer extractContainer) {
-            Filter<?> f = extractContainer.getPipe().getPipeTypes()[index].createFilter();
-            f.deserializeNBT(filter);
-            FilterContainerProvider.openGui(sender, extractContainer.getPipe(), extractContainer.getSide(), f, index, (id, playerInventory, playerEntity) -> new FilterContainer(id, playerInventory, extractContainer.getPipe(), extractContainer.getSide(), index, f));
+        if (!(sender.containerMenu instanceof ExtractContainer extractContainer)) {
+            return;
         }
+        filter = extractContainer.getPipe().getPipeTypes()[index].createFilter();
+        if (filter == null) {
+            return;
+        }
+        filter = filter.fromNbt(filterTag);
+        FilterContainerProvider.openGui(sender, extractContainer.getPipe(), extractContainer.getSide(), filter, index, (id, playerInventory, playerEntity) -> new FilterContainer(id, playerInventory, extractContainer.getPipe(), extractContainer.getSide(), index, filter));
     }
 
     @Override
-    public EditFilterMessage fromBytes(FriendlyByteBuf packetBuffer) {
-        filter = packetBuffer.readNbt();
+    public EditFilterMessage fromBytes(RegistryFriendlyByteBuf packetBuffer) {
+        filterTag = packetBuffer.readNbt();
         index = packetBuffer.readInt();
         return this;
     }
 
     @Override
-    public void toBytes(FriendlyByteBuf packetBuffer) {
-        packetBuffer.writeNbt(filter);
+    public void toBytes(RegistryFriendlyByteBuf packetBuffer) {
+        packetBuffer.writeNbt(filter.toNbt());
         packetBuffer.writeInt(index);
     }
 
     @Override
-    public ResourceLocation id() {
-        return ID;
+    public Type<EditFilterMessage> type() {
+        return TYPE;
     }
+
 }

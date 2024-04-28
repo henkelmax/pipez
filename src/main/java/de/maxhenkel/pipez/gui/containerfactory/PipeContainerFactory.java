@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.gui.containerfactory;
 
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import net.minecraft.core.Direction;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -17,7 +17,7 @@ public class PipeContainerFactory<T extends AbstractContainerMenu, U extends Upg
     }
 
     @Override
-    public T create(int windowId, Inventory inv, FriendlyByteBuf data) {
+    public T create(int windowId, Inventory inv, RegistryFriendlyByteBuf data) {
         BlockEntity te = inv.player.level().getBlockEntity(data.readBlockPos());
         Direction direction = data.readEnum(Direction.class);
         int index = data.readInt();

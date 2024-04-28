@@ -7,6 +7,7 @@ import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.utils.GasUtils;
+import de.maxhenkel.pipez.utils.NbtUtils;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -50,7 +51,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
 
     private HoverArea[] tabs;
-    private PipeType<?>[] pipeTypes;
+    private PipeType<?, ?>[] pipeTypes;
     private int currentindex;
 
     private FilterList filterList;
@@ -84,29 +85,29 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
         List<CycleIconButton.Icon> redstoneModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 16), new CycleIconButton.Icon(BACKGROUND, 192, 16), new CycleIconButton.Icon(BACKGROUND, 208, 16), new CycleIconButton.Icon(BACKGROUND, 224, 16));
         redstoneButton = new CycleIconButton(leftPos + 7, topPos + 7, redstoneModeIcons, redstoneModeIndex, button -> {
-            PacketDistributor.SERVER.noArg().send(new CycleRedstoneModeMessage(currentindex));
+            PacketDistributor.sendToServer(new CycleRedstoneModeMessage(currentindex));
         });
         Supplier<Integer> distributionIndex = () -> pipe.getDistribution(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
         List<CycleIconButton.Icon> distributionIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 0), new CycleIconButton.Icon(BACKGROUND, 192, 0), new CycleIconButton.Icon(BACKGROUND, 208, 0), new CycleIconButton.Icon(BACKGROUND, 224, 0));
         sortButton = new CycleIconButton(leftPos + 7, topPos + 31, distributionIcons, distributionIndex, button -> {
-            PacketDistributor.SERVER.noArg().send(new CycleDistributionMessage(currentindex));
+            PacketDistributor.sendToServer(new CycleDistributionMessage(currentindex));
         });
         Supplier<Integer> filterModeIndex = () -> pipeTypes[currentindex].hasFilter() ? pipe.getFilterMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal() : 0;
         List<CycleIconButton.Icon> filterModeIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 32), new CycleIconButton.Icon(BACKGROUND, 192, 32));
         filterButton = new CycleIconButton(leftPos + 7, topPos + 55, filterModeIcons, filterModeIndex, button -> {
-            PacketDistributor.SERVER.noArg().send(new CycleFilterModeMessage(currentindex));
+            PacketDistributor.sendToServer(new CycleFilterModeMessage(currentindex));
         });
         addFilterButton = Button.builder(Component.translatable("message.pipez.filter.add"), button -> {
-            PacketDistributor.SERVER.noArg().send(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
+            PacketDistributor.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex));
         }).bounds(leftPos + 31, topPos + 79, 40, 20).build();
         editFilterButton = Button.builder(Component.translatable("message.pipez.filter.edit"), button -> {
             if (filterList.getSelected() >= 0) {
-                PacketDistributor.SERVER.noArg().send(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
+                PacketDistributor.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
             }
         }).bounds(leftPos + 80, topPos + 79, 40, 20).build();
         removeFilterButton = Button.builder(Component.translatable("message.pipez.filter.remove"), button -> {
             if (filterList.getSelected() >= 0) {
-                PacketDistributor.SERVER.noArg().send(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
+                PacketDistributor.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
             }
         }).bounds(leftPos + 129, topPos + 79, 40, 20).build();
 
@@ -292,33 +293,25 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             return;
         }
 
-        Filter<?> filter = pipeTypes[currentindex].createFilter();
+        Filter<?, ?> filter = pipeTypes[currentindex].createFilter();
         filter.setExactMetadata(true);
 
         if (filter instanceof ItemFilter) {
             filter.setTag(new SingleElementTag(BuiltInRegistries.ITEM.getKey(stack.getItem()), stack.getItem()));
-            if (stack.hasTag()) {
-                filter.setMetadata(stack.getTag().copy());
-            } else {
-                filter.setMetadata(null);
-            }
-            PacketDistributor.SERVER.noArg().send(new UpdateFilterMessage(filter, currentindex));
+            filter.setMetadata(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).orElse(null));
+            PacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
                 filter.setTag(new SingleElementTag(BuiltInRegistries.FLUID.getKey(s.getFluid()), s.getFluid()));
-                if (s.hasTag()) {
-                    filter.setMetadata(s.getTag().copy());
-                } else {
-                    filter.setMetadata(null);
-                }
-                PacketDistributor.SERVER.noArg().send(new UpdateFilterMessage(filter, currentindex));
+                filter.setMetadata(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).orElse(null));
+                PacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
             });
         } else if (filter instanceof GasFilter) {
             ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 filter.setTag(new SingleElementTag(gas.getType().getRegistryName(), gas.getType()));
                 filter.setMetadata(null);
-                PacketDistributor.SERVER.noArg().send(new UpdateFilterMessage(filter, currentindex));
+                PacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }
         }
     }

@@ -12,6 +12,7 @@ import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
 import de.maxhenkel.pipez.utils.GasUtils;
+import de.maxhenkel.pipez.utils.NbtUtils;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalType;
@@ -21,6 +22,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -59,7 +61,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     private HoverArea destinationHoverArea;
     private HoverArea destinationTextHoverArea;
 
-    private Filter<?> filter;
+    private Filter<?, ?> filter;
 
     public FilterScreen(FilterContainer container, Inventory playerInventory, Component title) {
         super(BACKGROUND, container, playerInventory, title);
@@ -87,12 +89,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         addRenderableWidget(invertButton);
 
         cancelButton = Button.builder(Component.translatable("message.pipez.filter.cancel"), button -> {
-            PacketDistributor.SERVER.noArg().send(new OpenExtractMessage(getMenu().getIndex()));
+            PacketDistributor.sendToServer(new OpenExtractMessage(getMenu().getIndex()));
         }).bounds(leftPos + 25, topPos + 105, 60, 20).build();
         addRenderableWidget(cancelButton);
 
         submitButton = Button.builder(Component.translatable("message.pipez.filter.submit"), button -> {
-            PacketDistributor.SERVER.noArg().send(new UpdateFilterMessage(filter, menu.getIndex()));
+            PacketDistributor.sendToServer(new UpdateFilterMessage(filter, menu.getIndex()));
         }).bounds(leftPos + 91, topPos + 105, 60, 20).build();
         addRenderableWidget(submitButton);
 
@@ -233,7 +235,6 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         } else if (filter instanceof GasFilter) {
             Map.Entry<ChemicalType, Tag<? extends Chemical>> entry = GasUtils.getGas(text, true);
             filter.setTag((Tag) entry.getValue());
-            ((GasFilter) filter).setChemicalType(entry.getKey());
             if (filter.getTag() == null) {
                 item.setTextColor(ChatFormatting.DARK_RED.getColor());
             } else {
@@ -267,11 +268,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
 
         if (filter instanceof ItemFilter) {
             item.setValue(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
-            if (stack.hasTag()) {
-                nbt.setValue(stack.getTag().toString());
-            } else {
-                nbt.setValue("");
-            }
+            nbt.setValue(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).map(CompoundTag::toString).orElse(""));
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(this::onInsertStack);
         } else if (filter instanceof GasFilter) {
@@ -289,11 +286,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
 
         if (filter instanceof FluidFilter) {
             item.setValue(BuiltInRegistries.FLUID.getKey(stack.getFluid()).toString());
-            if (stack.hasTag()) {
-                nbt.setValue(stack.getTag().toString());
-            } else {
-                nbt.setValue("");
-            }
+            nbt.setValue(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).map(CompoundTag::toString).orElse(""));
         }
     }
 

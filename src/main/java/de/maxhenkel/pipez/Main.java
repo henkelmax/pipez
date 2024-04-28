@@ -18,8 +18,8 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,8 +38,8 @@ public class Main {
         eventBus.addListener(this::onRegisterPayloadHandler);
         eventBus.addListener(IMC::enqueueIMC);
 
-        SERVER_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.SERVER, ServerConfig.class);
-        CLIENT_CONFIG = CommonRegistry.registerConfig(ModConfig.Type.CLIENT, ClientConfig.class);
+        SERVER_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.SERVER, ServerConfig.class);
+        CLIENT_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.CLIENT, ClientConfig.class);
 
         if (FMLEnvironment.dist.isClient()) {
             eventBus.addListener(Main.this::clientSetup);
@@ -65,8 +65,8 @@ public class Main {
         Containers.clientSetup();
     }
 
-    public void onRegisterPayloadHandler(RegisterPayloadHandlerEvent event) {
-        IPayloadRegistrar registrar = event.registrar(MODID).versioned("0");
+    public void onRegisterPayloadHandler(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(MODID).versioned("0");
         CommonRegistry.registerMessage(registrar, CycleDistributionMessage.class);
         CommonRegistry.registerMessage(registrar, CycleRedstoneModeMessage.class);
         CommonRegistry.registerMessage(registrar, CycleFilterModeMessage.class);
