@@ -10,9 +10,10 @@ public class IMC {
 
     @SubscribeEvent
     public static void enqueueIMC(InterModEnqueueEvent event) {
-        if (ModList.get().isLoaded("theoneprobe")) {
+        //TODO Re-add when TheOneProbe is updated
+        /*if (ModList.get().isLoaded("theoneprobe")) {
             InterModComms.sendTo("theoneprobe", "getTheOneProbe", TheOneProbeModule::new);
-        }
+        }*/
     }
 
 }
