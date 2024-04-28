@@ -132,10 +132,10 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     @Nullable
     public Upgrade getUpgrade(Direction direction) {
         ItemStack stack = upgradeInventory.get(direction.get3DDataValue());
-        if (stack.getItem() instanceof UpgradeItem) {
-            return ((UpgradeItem) stack.getItem()).getTier();
+        if (!(stack.getItem() instanceof UpgradeItem upgradeItem)) {
+            return null;
         }
-        return null;
+        return upgradeItem.getTier();
     }
 
     public List<PipeTileEntity.Connection> getSortedConnections(Direction side, PipeType pipeType) {

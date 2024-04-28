@@ -167,35 +167,12 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
     private void checkButtons() {
         Upgrade upgrade = getMenu().getPipe().getUpgrade(getMenu().getSide());
-        if (upgrade == null) {
-            redstoneButton.active = false;
-            sortButton.active = false;
-            filterButton.active = false;
-            addFilterButton.active = false;
-            editFilterButton.active = false;
-            removeFilterButton.active = false;
-        } else if (upgrade.equals(Upgrade.BASIC)) {
-            redstoneButton.active = true;
-            sortButton.active = false;
-            filterButton.active = false;
-            addFilterButton.active = false;
-            editFilterButton.active = false;
-            removeFilterButton.active = false;
-        } else if (upgrade.equals(Upgrade.IMPROVED)) {
-            redstoneButton.active = true;
-            sortButton.active = true;
-            filterButton.active = false;
-            addFilterButton.active = false;
-            editFilterButton.active = false;
-            removeFilterButton.active = false;
-        } else {
-            redstoneButton.active = true;
-            sortButton.active = true;
-            filterButton.active = pipeTypes[currentindex].hasFilter();
-            addFilterButton.active = pipeTypes[currentindex].hasFilter();
-            editFilterButton.active = filterList.getSelected() >= 0;
-            removeFilterButton.active = filterList.getSelected() >= 0;
-        }
+        redstoneButton.active = Upgrade.canChangeRedstoneMode(upgrade);
+        sortButton.active = Upgrade.canChangeDistributionMode(upgrade);
+        filterButton.active = Upgrade.canChangeFilter(upgrade) && pipeTypes[currentindex].hasFilter();
+        addFilterButton.active = filterButton.active;
+        editFilterButton.active = Upgrade.canChangeFilter(upgrade) && filterList.getSelected() >= 0;
+        removeFilterButton.active = editFilterButton.active;
     }
 
     @Override

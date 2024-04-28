@@ -7,6 +7,7 @@ import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.datacomponents.AbstractPipeTypeData;
+import de.maxhenkel.pipez.items.UpgradeItem;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
@@ -165,7 +166,19 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
         return data;
     }
 
+    @Nullable
+    private Upgrade getUpgrade(ItemStack stack) {
+        if (!(stack.getItem() instanceof UpgradeItem upgradeItem)) {
+            return null;
+        }
+        return upgradeItem.getTier();
+    }
+
     public List<Filter<?, ?>> getFilters(ItemStack stack) {
+        Upgrade upgrade = getUpgrade(stack);
+        if (!Upgrade.canChangeFilter(upgrade)) {
+            return new ArrayList<>();
+        }
         AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
         if (data == null) {
             return new ArrayList<>();
@@ -178,6 +191,10 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
     }
 
     public UpgradeTileEntity.RedstoneMode getRedstoneMode(ItemStack stack) {
+        Upgrade upgrade = getUpgrade(stack);
+        if (!Upgrade.canChangeRedstoneMode(upgrade)) {
+            return getDefaultRedstoneMode();
+        }
         AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
         if (data == null) {
             return getDefaultRedstoneMode();
@@ -186,10 +203,18 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
     }
 
     public void setRedstoneMode(ItemStack stack, UpgradeTileEntity.RedstoneMode value) {
+        Upgrade upgrade = getUpgrade(stack);
+        if (!Upgrade.canChangeRedstoneMode(upgrade)) {
+            return;
+        }
         stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().redstoneMode(value).build());
     }
 
     public UpgradeTileEntity.FilterMode getFilterMode(ItemStack stack) {
+        Upgrade upgrade = getUpgrade(stack);
+        if (!Upgrade.canChangeFilter(upgrade)) {
+            return getDefaultFilterMode();
+        }
         AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
         if (data == null) {
             return getDefaultFilterMode();
@@ -198,10 +223,18 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
     }
 
     public void setFilterMode(ItemStack stack, UpgradeTileEntity.FilterMode value) {
+        Upgrade upgrade = getUpgrade(stack);
+        if (!Upgrade.canChangeFilter(upgrade)) {
+            return;
+        }
         stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().filterMode(value).build());
     }
 
     public UpgradeTileEntity.Distribution getDistribution(ItemStack stack) {
+        Upgrade upgrade = getUpgrade(stack);
+        if (!Upgrade.canChangeDistributionMode(upgrade)) {
+            return getDefaultDistribution();
+        }
         AbstractPipeTypeData<T> data = stack.get(getDataComponentType());
         if (data == null) {
             return getDefaultDistribution();
@@ -210,6 +243,10 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
     }
 
     public void setDistribution(ItemStack stack, UpgradeTileEntity.Distribution value) {
+        Upgrade upgrade = getUpgrade(stack);
+        if (!Upgrade.canChangeDistributionMode(upgrade)) {
+            return;
+        }
         stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().distribution(value).build());
     }
 }
