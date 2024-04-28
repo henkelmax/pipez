@@ -12,14 +12,15 @@ import java.util.List;
 
 public class WrenchItem extends Item {
 
+    public static final Component WRENCH_TOOLTIP = Component.translatable("tooltip.pipez.wrench").withStyle(ChatFormatting.GRAY);
+
     public WrenchItem() {
         super(new Properties().stacksTo(1));
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-        //TODO Make static
-        tooltip.add(Component.translatable("tooltip.pipez.wrench").withStyle(ChatFormatting.GRAY));
+        tooltip.add(WRENCH_TOOLTIP);
         super.appendHoverText(stack, context, tooltip, flagIn);
     }
 

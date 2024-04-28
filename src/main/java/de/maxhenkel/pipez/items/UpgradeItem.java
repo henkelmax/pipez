@@ -17,6 +17,11 @@ import java.util.List;
 
 public class UpgradeItem extends Item {
 
+    public static final Component CONFIGURED_ITEM_TOOLTIP = Component.translatable("tooltip.pipez.upgrade.configured.item");
+    public static final Component CONFIGURED_ENERGY_TOOLTIP = Component.translatable("tooltip.pipez.upgrade.configured.energy");
+    public static final Component CONFIGURED_FLUID_TOOLTIP = Component.translatable("tooltip.pipez.upgrade.configured.fluid");
+    public static final Component CONFIGURED_GAS_TOOLTIP = Component.translatable("tooltip.pipez.upgrade.configured.gas");
+
     private final Upgrade tier;
 
     public UpgradeItem(Upgrade tier) {
@@ -36,22 +41,21 @@ public class UpgradeItem extends Item {
 
         ItemData itemData = stack.get(ModItems.ITEM_DATA_COMPONENT);
         if (itemData != null) {
-            //TODO Make static
-            list.add(Component.translatable("tooltip.pipez.upgrade.configured.item"));
+            list.add(CONFIGURED_ITEM_TOOLTIP.copy());
         }
 
         EnergyData energyData = stack.get(ModItems.ENERGY_DATA_COMPONENT);
         if (energyData != null) {
-            list.add(Component.translatable("tooltip.pipez.upgrade.configured.energy"));
+            list.add(CONFIGURED_ENERGY_TOOLTIP.copy());
         }
 
         FluidData fluidData = stack.get(ModItems.FLUID_DATA_COMPONENT);
         if (fluidData != null) {
-            list.add(Component.translatable("tooltip.pipez.upgrade.configured.fluid"));
+            list.add(CONFIGURED_FLUID_TOOLTIP.copy());
         }
         GasData gasData = stack.get(ModItems.GAS_DATA_COMPONENT);
         if (gasData != null) {
-            list.add(Component.translatable("tooltip.pipez.upgrade.configured.gas"));
+            list.add(CONFIGURED_GAS_TOOLTIP.copy());
         }
 
         if (!list.isEmpty()) {
