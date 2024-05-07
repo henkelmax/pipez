@@ -25,9 +25,9 @@ public class Containers {
     );
 
     @OnlyIn(Dist.CLIENT)
-    public static void registerScreens(RegisterMenuScreensEvent Containers) {
-        Containers.register(EXTRACT.get(), ExtractScreen::new);
-        Containers.register(FILTER.get(), FilterScreen::new);
+    public static void registerScreens(RegisterMenuScreensEvent containers) {
+        containers.register(EXTRACT.get(), ExtractScreen::new);
+        containers.register(FILTER.get(), FilterScreen::new);
     }
 
     public static void init(IEventBus eventBus) {
