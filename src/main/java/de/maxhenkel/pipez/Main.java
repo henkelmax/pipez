@@ -45,6 +45,7 @@ public class Main {
             eventBus.addListener(Main.this::clientSetup);
             eventBus.addListener(ModelRegistry::onModelRegister);
             eventBus.addListener(ModelRegistry::onModelBake);
+            Containers.initClient(eventBus);
         }
 
         ModBlocks.init(eventBus);
@@ -62,7 +63,6 @@ public class Main {
     @OnlyIn(Dist.CLIENT)
     public void clientSetup(FMLClientSetupEvent event) {
         ModTileEntities.clientSetup();
-        Containers.clientSetup();
     }
 
     public void onRegisterPayloadHandler(RegisterPayloadHandlersEvent event) {

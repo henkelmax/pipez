@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.gui;
 
-import de.maxhenkel.corelib.ClientRegistry;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.gui.containerfactory.FilterContainerFactory;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerFactory;
@@ -9,6 +8,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -25,13 +25,16 @@ public class Containers {
     );
 
     @OnlyIn(Dist.CLIENT)
-    public static void clientSetup() {
-        ClientRegistry.registerScreen(EXTRACT.get(), ExtractScreen::new);
-        ClientRegistry.registerScreen(FILTER.get(), FilterScreen::new);
+    public static void registerScreens(RegisterMenuScreensEvent Containers) {
+        Containers.register(EXTRACT.get(), ExtractScreen::new);
+        Containers.register(FILTER.get(), FilterScreen::new);
     }
 
     public static void init(IEventBus eventBus) {
         MENU_TYPE_REGISTER.register(eventBus);
     }
 
+    public static void initClient(IEventBus eventBus) {
+        eventBus.addListener(Containers::registerScreens);
+    }
 }
