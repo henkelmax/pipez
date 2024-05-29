@@ -9,8 +9,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 public class BlockEvents {
@@ -32,7 +32,7 @@ public class BlockEvents {
         Direction side = pipe.getSelection(state, event.getLevel(), event.getPos(), event.getEntity()).getKey();
         InteractionResult result = pipe.onPipeSideForceActivated(state, event.getLevel(), event.getPos(), event.getEntity(), event.getHand(), event.getHitVec(), side);
         if (result.consumesAction()) {
-            event.setUseItem(Event.Result.ALLOW);
+            event.setUseItem(TriState.TRUE);
             event.setCancellationResult(result);
             event.setCanceled(true);
         }
@@ -57,7 +57,7 @@ public class BlockEvents {
 
         FilterDestinationToolItem.setDestination(heldItem, new DirectionalPosition(event.getPos().immutable(), event.getFace()));
         event.getEntity().displayClientMessage(Component.translatable("message.pipez.filter_destination_tool.destination.set"), true);
-        event.setUseItem(Event.Result.ALLOW);
+        event.setUseItem(TriState.TRUE);
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);
     }

@@ -1,4 +1,4 @@
-- Fixed error on startup
+- Updated NeoForge
 
 **NOTE**
 
