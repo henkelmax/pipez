@@ -1,4 +1,6 @@
-- Updated NeoForge
+- Fixed potential crash
+- Re-added The One Probe support
+- Re-added Jade support
 
 **NOTE**
 

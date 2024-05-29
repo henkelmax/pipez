@@ -2,12 +2,19 @@ package de.maxhenkel.pipez.integration.waila;
 
 import de.maxhenkel.pipez.ClientRegistryUtils;
 import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.blocks.PipeBlock;
+import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -25,20 +32,17 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
 
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
-        //TODO Implement once Jade is updated
-        /*CompoundTag compound = blockAccessor.getServerData();
+        CompoundTag compound = blockAccessor.getServerData();
         if (compound.contains("Upgrade", Tag.TAG_STRING)) {
             iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade"), ClientRegistryUtils.getProvider()));
         }
-        iTooltip.addAll(getTooltips(compound));*/
+        iTooltip.addAll(getTooltips(compound));
     }
 
     @Override
     public void appendServerData(CompoundTag compound, BlockAccessor blockAccessor) {
-        //TODO Implement once Jade is updated
-        /*if (blockAccessor.getBlockState().getBlock() instanceof PipeBlock) {
+        if (blockAccessor.getBlockState().getBlock() instanceof PipeBlock pipe) {
             BlockEntity te = blockAccessor.getBlockEntity();
-            PipeBlock pipe = (PipeBlock) blockAccessor.getBlockState().getBlock();
             Direction selectedSide = pipe.getSelection(te.getBlockState(), blockAccessor.getLevel(), te.getBlockPos(), blockAccessor.getPlayer()).getKey();
             if (selectedSide == null) {
                 return;
@@ -68,7 +72,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
                 }
             }
             putTooltips(compound, tooltips);
-        }*/
+        }
     }
 
     public void putTooltips(CompoundTag compound, List<Component> tooltips) {
