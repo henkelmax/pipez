@@ -1,6 +1,4 @@
-- Fixed potential crash
-- Re-added The One Probe support
-- Re-added Jade support
+- Fixed crash on servers
 
 **NOTE**
 

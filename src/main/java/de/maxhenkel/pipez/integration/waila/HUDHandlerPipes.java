@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.integration.waila;
 
-import de.maxhenkel.pipez.ClientRegistryUtils;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
@@ -34,9 +33,9 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
         CompoundTag compound = blockAccessor.getServerData();
         if (compound.contains("Upgrade", Tag.TAG_STRING)) {
-            iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade"), ClientRegistryUtils.getProvider()));
+            iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade"), blockAccessor.getLevel().registryAccess()));
         }
-        iTooltip.addAll(getTooltips(compound));
+        iTooltip.addAll(getTooltips(blockAccessor, compound));
     }
 
     @Override
@@ -60,9 +59,9 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
             ItemStack upgrade = pipeTile.getUpgradeItem(selectedSide);
 
             if (upgrade.isEmpty()) {
-                compound.putString("Upgrade", Component.Serializer.toJson(Component.translatable("tooltip.pipez.no_upgrade"), ClientRegistryUtils.getProvider()));
+                compound.putString("Upgrade", Component.Serializer.toJson(Component.translatable("tooltip.pipez.no_upgrade"), blockAccessor.getLevel().registryAccess()));
             } else {
-                compound.putString("Upgrade", Component.Serializer.toJson(upgrade.getHoverName(), ClientRegistryUtils.getProvider()));
+                compound.putString("Upgrade", Component.Serializer.toJson(upgrade.getHoverName(), blockAccessor.getLevel().registryAccess()));
             }
 
             List<Component> tooltips = new ArrayList<>();
@@ -71,26 +70,26 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
                     tooltips.add(pipeType.getTransferText(pipeTile.getUpgrade(selectedSide)));
                 }
             }
-            putTooltips(compound, tooltips);
+            putTooltips(blockAccessor, compound, tooltips);
         }
     }
 
-    public void putTooltips(CompoundTag compound, List<Component> tooltips) {
+    public void putTooltips(BlockAccessor blockAccessor, CompoundTag compound, List<Component> tooltips) {
         ListTag list = new ListTag();
         for (Component tooltip : tooltips) {
-            list.add(StringTag.valueOf(Component.Serializer.toJson(tooltip, ClientRegistryUtils.getProvider())));
+            list.add(StringTag.valueOf(Component.Serializer.toJson(tooltip, blockAccessor.getLevel().registryAccess())));
         }
         compound.put("Tooltips", list);
     }
 
-    public List<Component> getTooltips(CompoundTag compound) {
+    public List<Component> getTooltips(BlockAccessor blockAccessor, CompoundTag compound) {
         List<Component> tooltips = new ArrayList<>();
         if (!compound.contains("Tooltips", Tag.TAG_LIST)) {
             return tooltips;
         }
         ListTag list = compound.getList("Tooltips", Tag.TAG_STRING);
         for (int i = 0; i < list.size(); i++) {
-            tooltips.add(Component.Serializer.fromJson(list.getString(i), ClientRegistryUtils.getProvider()));
+            tooltips.add(Component.Serializer.fromJson(list.getString(i), blockAccessor.getLevel().registryAccess()));
         }
         return tooltips;
     }
