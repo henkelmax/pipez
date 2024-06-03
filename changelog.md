@@ -1,1 +1,1 @@
-- Updated to NeoForges new networking system
+- Added Czech translation
