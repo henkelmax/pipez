@@ -35,7 +35,10 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     }
 
     @Nullable
-    public <T> T onRegisterCapability(BlockCapability<T, Direction> capability, Direction side) {
+    public <T> T onRegisterCapability(BlockCapability<T, Direction> capability, @Nullable Direction side) {
+        if (side == null) {
+            return null;
+        }
         if (!isExtracting(side)) {
             return null;
         }
