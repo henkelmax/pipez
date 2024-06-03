@@ -1,4 +1,4 @@
-- Fixed crash on servers
+- Added Czech translation
 
 **NOTE**
 
