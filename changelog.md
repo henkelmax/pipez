@@ -1,4 +1,4 @@
-- Added Czech translation
+- Updated to 1.21
 
 **NOTE**
 

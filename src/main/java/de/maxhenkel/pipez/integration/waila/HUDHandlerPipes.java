@@ -27,7 +27,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
 
     static final HUDHandlerPipes INSTANCE = new HUDHandlerPipes();
 
-    private static final ResourceLocation UID = new ResourceLocation(Main.MODID, "pipe");
+    private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(Main.MODID, "pipe");
 
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {

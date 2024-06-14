@@ -49,10 +49,17 @@ public class GasUtils {
     public static Tag<? extends Chemical> getGas(String name, boolean nullIfNotExists, ChemicalType type) {
         ResourceLocation id;
         if (name.startsWith("#")) {
-            return getGasTag(new ResourceLocation(name.substring(1)), nullIfNotExists, type);
+            ResourceLocation resourceLocation = ResourceLocation.tryParse(name.substring(1));
+            if (resourceLocation == null) {
+                return nullIfNotExists ? null : getEmptyStack(type);
+            }
+            return getGasTag(resourceLocation, nullIfNotExists, type);
         } else {
             Registry<? extends Chemical> registry = getRegistry(type);
-            id = new ResourceLocation(name);
+            id = ResourceLocation.tryParse(name);
+            if (id == null) {
+                return nullIfNotExists ? null : getEmptyStack(type);
+            }
             if (!registry.containsKey(id)) {
                 return nullIfNotExists ? null : getEmptyStack(type);
             } else {

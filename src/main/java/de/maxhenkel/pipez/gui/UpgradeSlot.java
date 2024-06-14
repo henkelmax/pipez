@@ -13,7 +13,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 public class UpgradeSlot extends Slot {
 
-    public static final ResourceLocation UPGRADE_SLOT = new ResourceLocation(Main.MODID, "item/upgrade_slot");
+    public static final ResourceLocation UPGRADE_SLOT = ResourceLocation.fromNamespaceAndPath(Main.MODID, "item/upgrade_slot");
 
     public UpgradeSlot(Container inventoryIn, int index, int xPosition, int yPosition) {
         super(inventoryIn, index, xPosition, yPosition);

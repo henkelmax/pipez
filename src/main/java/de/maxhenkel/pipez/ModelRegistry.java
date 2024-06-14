@@ -3,6 +3,7 @@ package de.maxhenkel.pipez;
 import de.maxhenkel.corelib.CachedValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
@@ -15,15 +16,15 @@ public class ModelRegistry {
         ITEM_PIPE_EXTRACT("block/item_pipe_extract"),
         UNIVERSAL_PIPE_EXTRACT("block/universal_pipe_extract");
 
-        private final ResourceLocation resource;
+        private final ModelResourceLocation resource;
         private final CachedValue<BakedModel> cachedModel;
 
         Model(String name) {
-            resource = new ResourceLocation(Main.MODID, name);
+            resource = ModelResourceLocation.standalone(ResourceLocation.fromNamespaceAndPath(Main.MODID, name));
             cachedModel = new CachedValue<>(() -> Minecraft.getInstance().getModelManager().getModel(resource));
         }
 
-        public ResourceLocation getResourceLocation() {
+        public ModelResourceLocation getResourceLocation() {
             return resource;
         }
 

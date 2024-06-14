@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class CycleDistributionMessage implements Message<CycleDistributionMessage> {
 
-    public static final CustomPacketPayload.Type<CycleDistributionMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "cycle_distribution"));
+    public static final CustomPacketPayload.Type<CycleDistributionMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "cycle_distribution"));
 
     private int index;
 

@@ -16,7 +16,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class EditFilterMessage implements Message<EditFilterMessage> {
 
-    public static final CustomPacketPayload.Type<EditFilterMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "edit_filter_message"));
+    public static final CustomPacketPayload.Type<EditFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "edit_filter_message"));
 
     private Filter filter;
     private CompoundTag filterTag;

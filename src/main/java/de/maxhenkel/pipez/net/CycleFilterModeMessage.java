@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class CycleFilterModeMessage implements Message<CycleFilterModeMessage> {
 
-    public static final CustomPacketPayload.Type<CycleFilterModeMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "cycle_filter_mode"));
+    public static final CustomPacketPayload.Type<CycleFilterModeMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "cycle_filter_mode"));
 
     private int index;
 

@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class OpenExtractMessage implements Message<OpenExtractMessage> {
 
-    public static final CustomPacketPayload.Type<OpenExtractMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "open_extract"));
+    public static final CustomPacketPayload.Type<OpenExtractMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "open_extract"));
 
     private int index;
 

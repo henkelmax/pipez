@@ -15,10 +15,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 import java.util.*;
@@ -36,10 +33,10 @@ public class CopyComponentsRecipe extends CustomRecipe {
         this.components = components;
     }
 
-    public Pair<ItemStack, List<ItemStack>> getResult(CraftingContainer inv) {
+    public Pair<ItemStack, List<ItemStack>> getResult(CraftingInput inv) {
         ItemStack source = null;
         List<ItemStack> toCopy = new ArrayList<>();
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) {
                 continue;
@@ -73,7 +70,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(CraftingInput inv, Level worldIn) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
 
         if (result.getKey() == null || result.getValue().isEmpty()) {
@@ -84,7 +81,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider provider) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
         if (result.getKey() == null) {
             return ItemStack.EMPTY;
@@ -119,7 +116,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
         Pair<ItemStack, List<ItemStack>> result = getResult(inv);
         if (result.getKey() == null) {
             return super.getRemainingItems(inv);
@@ -129,7 +126,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
             return super.getRemainingItems(inv);
         } else if (result.getValue().size() == 1) {
             NonNullList<ItemStack> res = super.getRemainingItems(inv);
-            for (int i = 0; i < inv.getContainerSize(); i++) {
+            for (int i = 0; i < inv.size(); i++) {
                 if (inv.getItem(i).equals(result.getKey())) {
                     ItemStack r = result.getKey().copy();
                     r.setCount(1);

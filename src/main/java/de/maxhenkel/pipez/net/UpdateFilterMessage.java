@@ -20,7 +20,7 @@ import java.util.Optional;
 
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
-    public static final CustomPacketPayload.Type<UpdateFilterMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "update_filter"));
+    public static final CustomPacketPayload.Type<UpdateFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "update_filter"));
 
     private Filter filter;
     private CompoundTag filterTag;

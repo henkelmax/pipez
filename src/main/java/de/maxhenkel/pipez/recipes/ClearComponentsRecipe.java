@@ -10,12 +10,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -36,9 +32,9 @@ public class ClearComponentsRecipe extends CustomRecipe {
     }
 
     @Nullable
-    public ItemStack getIngredient(CraftingContainer inv) {
+    public ItemStack getIngredient(CraftingInput inv) {
         ItemStack found = null;
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stackInSlot = inv.getItem(i);
             if (ingredient.test(stackInSlot)) {
                 if (found != null) {
@@ -54,12 +50,12 @@ public class ClearComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(CraftingInput inv, Level worldIn) {
         return getIngredient(inv) != null;
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider provider) {
         ItemStack ingredient = getIngredient(inv);
         if (ingredient == null) {
             return ItemStack.EMPTY;

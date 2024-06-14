@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class RemoveFilterMessage implements Message<RemoveFilterMessage> {
 
-    public static final CustomPacketPayload.Type<RemoveFilterMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "remove_filter"));
+    public static final CustomPacketPayload.Type<RemoveFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "remove_filter"));
 
     private UUID filter;
     private int index;

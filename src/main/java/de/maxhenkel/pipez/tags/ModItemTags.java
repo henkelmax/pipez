@@ -8,9 +8,9 @@ import net.minecraft.world.item.Item;
 
 public class ModItemTags {
 
-    public static final TagKey<Item> WRENCHES_TAG = ItemTags.create(new ResourceLocation("c", "wrenches"));
-    public static final TagKey<Item> WRENCH_TAG = ItemTags.create(new ResourceLocation("c", "tools/wrench"));
-    public static final TagKey<Item> TOOLS_TAG = ItemTags.create(new ResourceLocation("c", "tools"));
-    public static final TagKey<Item> UPGRADES_TAG = ItemTags.create(new ResourceLocation(Main.MODID, "upgrades"));
+    public static final TagKey<Item> WRENCHES_TAG = ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "wrenches"));
+    public static final TagKey<Item> WRENCH_TAG = ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "tools/wrench"));
+    public static final TagKey<Item> TOOLS_TAG = ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "tools"));
+    public static final TagKey<Item> UPGRADES_TAG = ItemTags.create(ResourceLocation.fromNamespaceAndPath(Main.MODID, "upgrades"));
 
 }

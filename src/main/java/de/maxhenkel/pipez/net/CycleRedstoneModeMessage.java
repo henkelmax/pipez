@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class CycleRedstoneModeMessage implements Message<CycleRedstoneModeMessage> {
 
-    public static final CustomPacketPayload.Type<CycleRedstoneModeMessage> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(Main.MODID, "cycle_redstone_mode"));
+    public static final CustomPacketPayload.Type<CycleRedstoneModeMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "cycle_redstone_mode"));
 
     private int index;
 

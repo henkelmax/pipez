@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FilterScreen extends ScreenBase<FilterContainer> {
-    public static final ResourceLocation BACKGROUND = new ResourceLocation(Main.MODID, "textures/gui/container/filter.png");
+    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/filter.png");
 
     private EditBox item;
     private EditBox nbt;
@@ -114,7 +114,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             if (s.startsWith("#")) {
                 s = s.substring(1);
             }
-            return ResourceLocation.isValidResourceLocation(s);
+            return ResourceLocation.tryParse(s) != null;
         });
         addRenderableWidget(item);
 

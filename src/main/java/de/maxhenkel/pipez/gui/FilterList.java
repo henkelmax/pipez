@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class FilterList extends WidgetBase {
 
-    public static final ResourceLocation BACKGROUND = new ResourceLocation(Main.MODID, "textures/gui/container/extract.png");
+    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/extract.png");
 
     protected Supplier<List<Filter<?, ?>>> filters;
     protected int offset;
