@@ -1,4 +1,4 @@
-- Updated to 1.21
+- Re-added Mekanism support
 
 **NOTE**
 

@@ -296,7 +296,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (filter instanceof GasFilter) {
-            item.setValue(stack.getType().getRegistryName().toString());
+            item.setValue(stack.getChemical().getRegistryName().toString());
             nbt.setValue("");
         }
     }

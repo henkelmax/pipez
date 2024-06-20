@@ -286,7 +286,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         } else if (filter instanceof GasFilter) {
             ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
-                filter.setTag(new SingleElementTag(gas.getType().getRegistryName(), gas.getType()));
+                filter.setTag(new SingleElementTag(gas.getChemical().getRegistryName(), gas.getChemical()));
                 filter.setMetadata(null);
                 PacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }

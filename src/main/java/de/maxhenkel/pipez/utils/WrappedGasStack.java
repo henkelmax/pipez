@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.maxhenkel.corelib.client.RenderUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.WrappedFluidStack;
-import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
@@ -17,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +39,12 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
-        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getType().getIcon());
+        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getChemical().getIcon());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int chemicalTint = stack.getChemicalTint();
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), 1);
         RenderSystem.setShaderTexture(0, texture.atlasLocation());
-        WrappedFluidStack.fluidBlit(guiGraphics, x, y, 16, 16, texture, stack.getType().getTint());
+        WrappedFluidStack.fluidBlit(guiGraphics, x, y, 16, 16, texture, stack.getChemical().getTint());
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -55,7 +55,7 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
         tooltip.add(getDisplayName());
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
-            ResourceLocation registryName = GasUtils.getResourceLocation(stack.getType());
+            ResourceLocation registryName = GasUtils.getResourceLocation(stack.getChemical());
             if (registryName != null) {
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
