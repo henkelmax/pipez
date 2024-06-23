@@ -1,4 +1,4 @@
-- Re-added Mekanism support
+- Fixed blocks not dropping
 
 **NOTE**
 
