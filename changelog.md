@@ -1,4 +1,4 @@
-- Fixed blocks not dropping
+- Added Japanese translation
 
 **NOTE**
 
