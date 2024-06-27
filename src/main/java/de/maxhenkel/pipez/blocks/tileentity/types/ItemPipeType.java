@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.blocks.tileentity.types;
 
-import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.ItemFilter;
 import de.maxhenkel.pipez.Main;
@@ -12,6 +11,7 @@ import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
@@ -20,7 +20,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,13 +107,16 @@ public class ItemPipeType extends PipeType<Item> {
             boolean hasInserted = false;
             if (destination != null && !inventoriesFull[p] && !isFull(destination)) {
                 for (int j = 0; j < itemHandler.getSlots(); j++) {
+                    Item item = itemHandler.getStackInSlot(j).getItem();
+                    int count = itemHandler.getStackInSlot(j).getCount();
+                    CompoundTag tag = itemHandler.getStackInSlot(j).getTag();
+                    if (count == 0) {
+                        continue;
+                    }
+                    if (canInsert(connection, item, tag, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
+                        continue;
+                    }
                     ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
-                    if (simulatedExtract.isEmpty()) {
-                        continue;
-                    }
-                    if (canInsert(connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
-                        continue;
-                    }
                     ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
                     int insertedAmount = simulatedExtract.getCount() - stack.getCount();
                     if (insertedAmount > 0) {
@@ -136,7 +139,7 @@ public class ItemPipeType extends PipeType<Item> {
     protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
         int itemsToTransfer = getRate(tileEntity, side);
 
-        ArrayList<ItemStack> nonFittingItems = new ArrayList<>();
+        HashSet<Tuple<Item, CompoundTag>> nonFittingItems = new HashSet<>();
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
@@ -152,20 +155,23 @@ public class ItemPipeType extends PipeType<Item> {
                 if (itemsToTransfer <= 0) {
                     break connectionLoop;
                 }
+                Item item = itemHandler.getStackInSlot(i).getItem();
+                int count = itemHandler.getStackInSlot(i).getCount();
+                CompoundTag tag = itemHandler.getStackInSlot(i).getTag();
+                if (count == 0) {
+                    continue;
+                }
+                if (nonFittingItems.contains(new Tuple<>(item, tag))) {
+                    continue;
+                }
+                if (canInsert(connection, item, tag, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
+                    continue;
+                }
                 ItemStack simulatedExtract = itemHandler.extractItem(i, itemsToTransfer, true);
-                if (simulatedExtract.isEmpty()) {
-                    continue;
-                }
-                if (nonFittingItems.stream().anyMatch(stack -> ItemUtils.isStackable(stack, simulatedExtract))) {
-                    continue;
-                }
-                if (canInsert(connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
-                    continue;
-                }
                 ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
                 int insertedAmount = simulatedExtract.getCount() - stack.getCount();
                 if (insertedAmount <= 0) {
-                    nonFittingItems.add(simulatedExtract);
+                    nonFittingItems.add(new Tuple<>(simulatedExtract.getItem(), tag));
                 }
                 itemsToTransfer -= insertedAmount;
                 itemHandler.extractItem(i, insertedAmount, false);
@@ -183,9 +189,9 @@ public class ItemPipeType extends PipeType<Item> {
         return true;
     }
 
-    private boolean canInsert(PipeTileEntity.Connection connection, ItemStack stack, List<Filter<?>> filters) {
+    private boolean canInsert(PipeTileEntity.Connection connection, Item item, CompoundTag tag, List<Filter<?>> filters) {
         for (Filter<Item> filter : filters.stream().map(filter -> (Filter<Item>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(filter, stack)) {
+            if (matches(filter, item, tag)) {
                 return false;
             }
         }
@@ -194,33 +200,32 @@ public class ItemPipeType extends PipeType<Item> {
             return true;
         }
         for (Filter<Item> filter : collect) {
-            if (matches(filter, stack)) {
+            if (matches(filter, item, tag)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean matches(Filter<Item> filter, ItemStack stack) {
+    private boolean matches(Filter<Item> filter, Item item, CompoundTag stackNBT) {
         CompoundTag metadata = filter.getMetadata();
         if (metadata == null) {
-            return filter.getTag() == null || filter.getTag().contains(stack.getItem());
+            return filter.getTag() == null || filter.getTag().contains(item);
         }
         if (filter.isExactMetadata()) {
-            if (deepExactCompare(metadata, stack.getTag())) {
-                return filter.getTag() == null || filter.getTag().contains(stack.getItem());
+            if (deepExactCompare(metadata, stackNBT)) {
+                return filter.getTag() == null || filter.getTag().contains(item);
             } else {
                 return false;
             }
         } else {
-            CompoundTag stackNBT = stack.getTag();
             if (stackNBT == null) {
                 return metadata.size() <= 0;
             }
             if (!deepFuzzyCompare(metadata, stackNBT)) {
                 return false;
             }
-            return filter.getTag() == null || filter.getTag().contains(stack.getItem());
+            return filter.getTag() == null || filter.getTag().contains(item);
         }
     }
 
