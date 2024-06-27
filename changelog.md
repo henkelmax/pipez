@@ -1,1 +1,1 @@
-- Added Czech translation
+- Added Japanese translation
