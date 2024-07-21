@@ -1,4 +1,4 @@
-- Added Japanese translation
+- Added Turkish translation
 
 **NOTE**
 
