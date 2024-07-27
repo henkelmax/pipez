@@ -1,4 +1,4 @@
-- Added Turkish translation
+- Fixed crash when changing options of pipe types that can't have filters
 
 **NOTE**
 

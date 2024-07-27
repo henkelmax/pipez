@@ -175,7 +175,7 @@ public abstract class AbstractPipeTypeData<T> {
                     AbstractPipeTypeData::getDistribution,
                     (filterMode, redstoneMode, distribution) -> {
                         try {
-                            return constructor.newInstance(filterMode, redstoneMode, distribution, null);
+                            return constructor.newInstance(filterMode, redstoneMode, distribution, Collections.emptyList());
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
