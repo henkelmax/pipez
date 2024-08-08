@@ -1,4 +1,4 @@
-- Fixed crash when changing options of pipe types that can't have filters
+- Updated to 1.21.1
 
 **NOTE**
 
