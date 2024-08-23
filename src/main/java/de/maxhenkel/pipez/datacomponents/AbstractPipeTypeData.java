@@ -24,11 +24,15 @@ public abstract class AbstractPipeTypeData<T> {
 
     protected List<Filter<?, T>> filters;
 
-    public AbstractPipeTypeData(UpgradeTileEntity.FilterMode filterMode, UpgradeTileEntity.RedstoneMode redstoneMode, UpgradeTileEntity.Distribution distribution, List<Filter<?, T>> filters) {
+    public AbstractPipeTypeData(UpgradeTileEntity.FilterMode filterMode, UpgradeTileEntity.RedstoneMode redstoneMode, UpgradeTileEntity.Distribution distribution, @Nullable List<Filter<?, T>> filters) {
         this.filterMode = filterMode;
         this.redstoneMode = redstoneMode;
         this.distribution = distribution;
-        this.filters = Collections.unmodifiableList(filters);
+        if (filters == null) {
+            this.filters = Collections.emptyList();
+        } else {
+            this.filters = Collections.unmodifiableList(filters);
+        }
     }
 
     public UpgradeTileEntity.FilterMode getFilterMode() {

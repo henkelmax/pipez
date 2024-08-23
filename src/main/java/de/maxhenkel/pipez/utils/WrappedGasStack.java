@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.maxhenkel.corelib.client.RenderUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.WrappedFluidStack;
+import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
@@ -29,9 +30,8 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
 
     @Nullable
     public static WrappedGasStack dummyStack(Object o) {
-        if (o instanceof Chemical<?>) {
-            ChemicalStack stack = GasUtils.createChemicalStack((Chemical) o, 1000);
-            return new WrappedGasStack(stack);
+        if (o instanceof Chemical chemical) {
+            return new WrappedGasStack(new ChemicalStack(chemical, 1000));
         }
         return null;
     }
@@ -55,7 +55,7 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
         tooltip.add(getDisplayName());
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
-            ResourceLocation registryName = GasUtils.getResourceLocation(stack.getChemical());
+            ResourceLocation registryName = MekanismAPI.CHEMICAL_REGISTRY.getKey(stack.getChemical());;
             if (registryName != null) {
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }

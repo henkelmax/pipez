@@ -1,4 +1,4 @@
-- Updated to 1.21.1
+- Fixed compatibility with latest Mekanism version
 
 **NOTE**
 

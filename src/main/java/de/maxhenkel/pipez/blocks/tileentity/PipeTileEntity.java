@@ -5,11 +5,7 @@ import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.utils.MekanismUtils;
-import mekanism.api.chemical.ChemicalType;
-import mekanism.api.chemical.gas.IGasHandler;
-import mekanism.api.chemical.infuse.IInfusionHandler;
-import mekanism.api.chemical.pigment.IPigmentHandler;
-import mekanism.api.chemical.slurry.ISlurryHandler;
+import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -357,10 +353,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         private BlockCapabilityCache<IEnergyStorage, Direction> energyHandler;
         private BlockCapabilityCache<IFluidHandler, Direction> fluidHandler;
 
-        private Optional<BlockCapabilityCache<IGasHandler, Direction>> gasHandler;
-        private Optional<BlockCapabilityCache<IInfusionHandler, Direction>> infusionHandler;
-        private Optional<BlockCapabilityCache<IPigmentHandler, Direction>> pigmentHandler;
-        private Optional<BlockCapabilityCache<ISlurryHandler, Direction>> slurryHandler;
+        private Optional<BlockCapabilityCache<IChemicalHandler, Direction>> chemicalHandler;
 
         public Connection(ServerLevel level, BlockPos pos, Direction direction, int distance) {
             this.pos = pos;
@@ -371,15 +364,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             energyHandler = BlockCapabilityCache.create(Capabilities.EnergyStorage.BLOCK, level, pos, direction);
             fluidHandler = BlockCapabilityCache.create(Capabilities.FluidHandler.BLOCK, level, pos, direction);
             if (MekanismUtils.isMekanismInstalled()) {
-                gasHandler = Optional.of(BlockCapabilityCache.create(ModCapabilities.GAS_HANDLER_CAPABILITY, level, pos, direction));
-                infusionHandler = Optional.of(BlockCapabilityCache.create(ModCapabilities.INFUSION_HANDLER_CAPABILITY, level, pos, direction));
-                pigmentHandler = Optional.of(BlockCapabilityCache.create(ModCapabilities.PIGMENT_HANDLER_CAPABILITY, level, pos, direction));
-                slurryHandler = Optional.of(BlockCapabilityCache.create(ModCapabilities.SLURRY_HANDLER_CAPABILITY, level, pos, direction));
+                chemicalHandler = Optional.of(BlockCapabilityCache.create(ModCapabilities.CHEMICAL_HANDLER_CAPABILITY, level, pos, direction));
             } else {
-                gasHandler = Optional.empty();
-                infusionHandler = Optional.empty();
-                pigmentHandler = Optional.empty();
-                slurryHandler = Optional.empty();
+                chemicalHandler = Optional.empty();
             }
         }
 
@@ -420,45 +407,8 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         }
 
         @Nullable
-        public IGasHandler getGasHandler() {
-            return gasHandler.map(BlockCapabilityCache::getCapability).orElse(null);
-        }
-
-        @Nullable
-        public IInfusionHandler getInfusionHandler() {
-            return infusionHandler.map(BlockCapabilityCache::getCapability).orElse(null);
-        }
-
-        @Nullable
-        public IPigmentHandler getPigmentHandler() {
-            return pigmentHandler.map(BlockCapabilityCache::getCapability).orElse(null);
-        }
-
-        @Nullable
-        public ISlurryHandler getSlurryHandler() {
-            return slurryHandler.map(BlockCapabilityCache::getCapability).orElse(null);
-        }
-
-        @Nullable
-        public Object getChemicalHandler(ChemicalType type) {
-            if (!MekanismUtils.isMekanismInstalled()) {
-                return null;
-            }
-            switch (type) {
-                case GAS -> {
-                    return getGasHandler();
-                }
-                case INFUSION -> {
-                    return getInfusionHandler();
-                }
-                case PIGMENT -> {
-                    return getPigmentHandler();
-                }
-                case SLURRY -> {
-                    return getSlurryHandler();
-                }
-            }
-            return null;
+        public IChemicalHandler getChemicalHandler() {
+            return chemicalHandler.map(BlockCapabilityCache::getCapability).orElse(null);
         }
 
         @Nullable
@@ -473,14 +423,8 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             if (!MekanismUtils.isMekanismInstalled()) {
                 return null;
             }
-            if (capability == ModCapabilities.GAS_HANDLER_CAPABILITY) {
-                return (T) getGasHandler();
-            } else if (capability == ModCapabilities.INFUSION_HANDLER_CAPABILITY) {
-                return (T) getInfusionHandler();
-            } else if (capability == ModCapabilities.PIGMENT_HANDLER_CAPABILITY) {
-                return (T) getPigmentHandler();
-            } else if (capability == ModCapabilities.SLURRY_HANDLER_CAPABILITY) {
-                return (T) getSlurryHandler();
+            if (capability == ModCapabilities.CHEMICAL_HANDLER_CAPABILITY) {
+                return (T) getChemicalHandler();
             }
             return null;
         }

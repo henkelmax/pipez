@@ -66,7 +66,7 @@ public class Main {
     }
 
     public void onRegisterPayloadHandler(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(MODID).versioned("0");
+        PayloadRegistrar registrar = event.registrar(MODID).versioned("1");
         CommonRegistry.registerMessage(registrar, CycleDistributionMessage.class);
         CommonRegistry.registerMessage(registrar, CycleRedstoneModeMessage.class);
         CommonRegistry.registerMessage(registrar, CycleFilterModeMessage.class);

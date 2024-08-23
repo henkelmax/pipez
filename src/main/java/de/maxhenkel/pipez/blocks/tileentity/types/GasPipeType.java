@@ -11,12 +11,10 @@ import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.datacomponents.GasData;
 import de.maxhenkel.pipez.items.ModItems;
-import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.MekanismUtils;
 import mekanism.api.Action;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
-import mekanism.api.chemical.ChemicalType;
 import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;
@@ -35,15 +33,7 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
 
     @Override
     public BlockCapability<?, Direction> getCapability() {
-        return ModCapabilities.GAS_HANDLER_CAPABILITY;
-    }
-
-    @Override
-    public BlockCapability<?, Direction>[] getCapabilities() {
-        if (!MekanismUtils.isMekanismInstalled()) {
-            return new BlockCapability[0];
-        }
-        return GasUtils.getChemicalBlockCapabilities();
+        return ModCapabilities.CHEMICAL_HANDLER_CAPABILITY;
     }
 
     @Override
@@ -82,26 +72,24 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
             if (extractingConnection == null) {
                 continue;
             }
-            for (ChemicalType type : ChemicalType.values()) {
-                IChemicalHandler gasHandler = (IChemicalHandler) extractingConnection.getChemicalHandler(type);
-                if (gasHandler == null) {
-                    continue;
-                }
-                tickHandler(tileEntity, gasHandler, side, type);
+            IChemicalHandler chemicalHandler = extractingConnection.getChemicalHandler();
+            if (chemicalHandler == null) {
+                continue;
             }
+            tickHandler(tileEntity, chemicalHandler, side);
         }
     }
 
-    private void tickHandler(PipeLogicTileEntity tileEntity, IChemicalHandler gasHandler, Direction side, ChemicalType type) {
+    private void tickHandler(PipeLogicTileEntity tileEntity, IChemicalHandler gasHandler, Direction side) {
         List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
         if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
-            insertEqually(tileEntity, side, connections, gasHandler, type);
+            insertEqually(tileEntity, side, connections, gasHandler);
         } else {
-            insertOrdered(tileEntity, side, connections, gasHandler, type);
+            insertOrdered(tileEntity, side, connections, gasHandler);
         }
     }
 
-    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler, ChemicalType type) {
+    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler) {
         if (connections.isEmpty()) {
             return;
         }
@@ -111,12 +99,12 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IChemicalHandler destination = (IChemicalHandler) connection.getChemicalHandler(type);
+            IChemicalHandler destination = connection.getChemicalHandler();
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
-                for (int j = 0; j < gasHandler.getTanks(); j++) {
+                for (int j = 0; j < gasHandler.getChemicalTanks(); j++) {
                     ChemicalStack gasInTank = gasHandler.getChemicalInTank(j);
-                    ChemicalStack simulatedExtract = gasHandler.extractChemical(GasUtils.createChemicalStack(gasInTank.getChemical(), Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer)), Action.SIMULATE);
+                    ChemicalStack simulatedExtract = gasHandler.extractChemical(new ChemicalStack(gasInTank.getChemical(), Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer)), Action.SIMULATE);
                     if (simulatedExtract.isEmpty()) {
                         continue;
                     }
@@ -140,22 +128,22 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler, ChemicalType type) {
+    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler) {
         long mbToTransfer = getRate(tileEntity, side);
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            IChemicalHandler destination = (IChemicalHandler) connection.getChemicalHandler(type);
+            IChemicalHandler destination = connection.getChemicalHandler();
             if (destination == null) {
                 continue;
             }
 
-            for (int i = 0; i < gasHandler.getTanks(); i++) {
+            for (int i = 0; i < gasHandler.getChemicalTanks(); i++) {
                 if (mbToTransfer <= 0) {
                     break connectionLoop;
                 }
                 ChemicalStack gasInTank = gasHandler.getChemicalInTank(i);
-                ChemicalStack simulatedExtract = gasHandler.extractChemical(GasUtils.createChemicalStack(gasInTank.getChemical(), mbToTransfer), Action.SIMULATE);
+                ChemicalStack simulatedExtract = gasHandler.extractChemical(new ChemicalStack(gasInTank.getChemical(), mbToTransfer), Action.SIMULATE);
                 if (simulatedExtract.isEmpty()) {
                     continue;
                 }
@@ -171,7 +159,11 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
     private ChemicalStack transfer(IChemicalHandler source, IChemicalHandler destination, ChemicalStack transfer) {
         ChemicalStack extracted = source.extractChemical(transfer, Action.SIMULATE);
         ChemicalStack gasStack = destination.insertChemical(extracted, Action.EXECUTE);
-        return source.extractChemical(GasUtils.createChemicalStack(extracted.getChemical(), extracted.getAmount() - gasStack.getAmount()), Action.EXECUTE);
+        long amount = extracted.getAmount() - gasStack.getAmount();
+        if (amount <= 0) {
+            return ChemicalStack.EMPTY;
+        }
+        return source.extractChemical(new ChemicalStack(extracted.getChemical(), amount), Action.EXECUTE);
     }
 
     private boolean canInsert(PipeTileEntity.Connection connection, ChemicalStack stack, List<Filter<?, ?>> filters) {
