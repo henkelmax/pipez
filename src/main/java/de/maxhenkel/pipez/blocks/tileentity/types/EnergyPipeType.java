@@ -164,7 +164,8 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
 
             PipeTileEntity.Connection connection = connections.get(index);
             IEnergyStorage destination = connection.getEnergyHandler();
-            if (destination != null && destination.canReceive() && destination.receiveEnergy(1, true) >= 1) {
+            // destination.receiveEnergy(1, true) doesn't work for Mekanism machines, so we try to insert the maximum amount
+            if (destination != null && destination.canReceive() && destination.receiveEnergy(maxReceive, true) >= 1) {
                 destinations.add(new Pair<>(destination, index));
             }
         }

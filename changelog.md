@@ -1,4 +1,4 @@
-- Fixed compatibility with latest Mekanism version
+- Fixed Mekanism machines not accepting energy
 
 **NOTE**
 
