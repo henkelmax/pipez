@@ -5,10 +5,7 @@ import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.*;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +36,7 @@ public class GasUtils {
             if (!MekanismAPI.CHEMICAL_REGISTRY.containsKey(id)) {
                 return nullIfNotExists ? null : EMPTY_CHEMICAL_TAG;
             } else {
-                return new SingleElementTag<>(id, MekanismAPI.CHEMICAL_REGISTRY.get(id));
+                return new SingleElementTag<>(id, MekanismAPI.CHEMICAL_REGISTRY.get(id).map(Holder.Reference::value).orElse(MekanismAPI.EMPTY_CHEMICAL));
             }
         }
     }
@@ -47,8 +44,8 @@ public class GasUtils {
     @Nullable
     public static Tag<Chemical> getGasTag(ResourceLocation id, boolean nullIfNotExists) {
         TagKey<? extends Chemical> tagKey = TagKey.create(MekanismAPI.CHEMICAL_REGISTRY_NAME, id);
-        Registry<? extends Chemical> registry = MekanismAPI.CHEMICAL_REGISTRY;
-        Optional<HolderSet.Named<Chemical>> tag = registry.getTag((TagKey) tagKey);
+        DefaultedRegistry<? extends Chemical> registry = MekanismAPI.CHEMICAL_REGISTRY;
+        Optional<HolderSet.Named<Chemical>> tag = registry.get((TagKey) tagKey);
         if (tag.isEmpty()) {
             return nullIfNotExists ? null : EMPTY_CHEMICAL_TAG;
         } else {

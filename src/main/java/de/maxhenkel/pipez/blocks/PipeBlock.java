@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.blocks;
 
-import de.maxhenkel.corelib.block.IItemBlock;
 import de.maxhenkel.corelib.block.VoxelUtils;
 import de.maxhenkel.corelib.blockentity.SimpleBlockEntityTicker;
 import de.maxhenkel.corelib.helpers.Pair;
@@ -12,20 +11,16 @@ import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -35,6 +30,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.*;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -45,7 +41,7 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class PipeBlock extends Block implements IItemBlock, SimpleWaterloggedBlock, EntityBlock {
+public abstract class PipeBlock extends Block implements SimpleWaterloggedBlock, EntityBlock {
 
     public static final BooleanProperty DOWN = BooleanProperty.create("down");
     public static final BooleanProperty UP = BooleanProperty.create("up");
@@ -56,8 +52,8 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public static final BooleanProperty HAS_DATA = BooleanProperty.create("has_data");
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-    protected PipeBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK));
+    protected PipeBlock(Properties properties) {
+        super(properties.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK));
 
         registerDefaultState(stateDefinition.any()
                 .setValue(UP, false)
@@ -71,11 +67,6 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         );
     }
 
-    @Override
-    public Item toItem() {
-        return new BlockItem(this, new Item.Properties());
-    }
-
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
@@ -83,7 +74,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         Direction side = getSelection(state, level, pos, player).getKey();
         if (side != null) {
             return onPipeSideActivated(itemStack, state, level, pos, player, hand, hit, side);
@@ -127,7 +118,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         return InteractionResult.SUCCESS;
     }
 
-    public ItemInteractionResult onPipeSideActivated(ItemStack itemStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
+    public InteractionResult onPipeSideActivated(ItemStack itemStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
         return super.useItemOn(itemStack, state, worldIn, pos, player, handIn, hit);
     }
 
@@ -156,7 +147,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
                     player.drop(oldUpgrade, true);
                 }
             }
-            return InteractionResult.sidedSuccess(world.isClientSide);
+            return InteractionResult.SUCCESS;
         }
 
         return InteractionResult.PASS;
@@ -302,16 +293,16 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     public abstract boolean isPipe(LevelAccessor world, BlockPos pos, Direction facing);
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
-        if (stateIn.getValue(WATERLOGGED)) {
-            worldIn.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos pos1, BlockState state1, RandomSource randomSource) {
+        if (state.getValue(WATERLOGGED)) {
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
-        return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+        return super.updateShape(state, level, tickAccess, pos, direction, pos1, state1, randomSource);
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos pos1, boolean b) {
-        super.neighborChanged(state, world, pos, block, pos1, b);
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, @Nullable Orientation orientation, boolean b) {
+        super.neighborChanged(state, world, pos, block, orientation, b);
         BlockState newState = getState(world, pos, state);
         if (!state.getProperties().stream().allMatch(property -> state.getValue(property).equals(newState.getValue(property)))) {
             world.setBlockAndUpdate(pos, newState);
@@ -521,11 +512,6 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
             }
             super.onRemove(state, level, pos, newState, isMoving);
         }
-    }
-
-    @Override
-    public VoxelShape getOcclusionShape(BlockState state, BlockGetter worldIn, BlockPos pos) {
-        return getShape(worldIn, pos, state, false);
     }
 
     @Override

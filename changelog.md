@@ -1,4 +1,4 @@
-- Fixed Mekanism machines not accepting energy
+- Updated to 1.21.2
 
 **NOTE**
 

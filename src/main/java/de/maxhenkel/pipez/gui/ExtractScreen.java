@@ -14,6 +14,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -181,8 +182,6 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), 8F, (float) (imageHeight - 96 + 3), FONT_COLOR, false);
 
         filterList.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
-
-        drawHoverAreas(guiGraphics, mouseX, mouseY);
     }
 
     @Override
@@ -193,9 +192,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         if (hasTabs()) {
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    guiGraphics.blit(BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 48, 26, 24);
+                    guiGraphics.blit(RenderType::guiTextured, BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 48, 26, 24, 256, 256);
                 } else {
-                    guiGraphics.blit(BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 72, 26, 24);
+                    guiGraphics.blit(RenderType::guiTextured, BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 72, 26, 24, 256, 256);
                 }
             }
             for (int i = 0; i < pipeTypes.length; i++) {
@@ -208,6 +207,12 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 }
             }
         }
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        super.render(guiGraphics, x, y, partialTicks);
+        drawHoverAreas(guiGraphics, x, y);
     }
 
     public int getTabsX() {

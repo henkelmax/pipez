@@ -95,10 +95,10 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }).bounds(leftPos + 91, topPos + 105, 60, 20).build();
         addRenderableWidget(submitButton);
 
-        item = new EditBox(font, leftPos + 30, topPos + 18, 138, 16, Component.empty());
+        item = new EditBox(font, leftPos + 29, topPos + 17, 140, 18, Component.empty());
         item.setTextColor(ChatFormatting.WHITE.getColor());
         item.setBordered(true);
-        item.setMaxLength(1024);
+        item.setMaxLength(Integer.MAX_VALUE);
         if (filter.getTag() != null) {
             if (filter.getTag() instanceof SingleElementTag) {
                 item.setValue(filter.getTag().getName().toString());
@@ -115,10 +115,10 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         });
         addRenderableWidget(item);
 
-        nbt = new EditBox(font, leftPos + 8, topPos + 50, 160, 16, Component.empty());
+        nbt = new EditBox(font, leftPos + 7, topPos + 49, 162, 18, Component.empty());
         nbt.setTextColor(ChatFormatting.WHITE.getColor());
         nbt.setBordered(true);
-        nbt.setMaxLength(1024);
+        nbt.setMaxLength(Integer.MAX_VALUE);
         nbt.setValue(filter.getMetadata() != null ? filter.getMetadata().toString() : "");
         nbt.setResponder(this::onNbtTextChanged);
         nbt.visible = hasNBT();
@@ -313,8 +313,6 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         guiGraphics.drawString(font, Component.translatable("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR, false);
         guiGraphics.drawString(font, Component.translatable("message.pipez.filter.destination"), 8, 71, FONT_COLOR, false);
         guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), 8, (float) (imageHeight - 96 + 3), FONT_COLOR, false);
-
-        drawHoverAreas(guiGraphics, mouseX, mouseY);
     }
 
     @Override
@@ -343,6 +341,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         if (destinationHoverArea.isHovered(leftPos, topPos, mouseX, mouseY)) {
             drawHoverSlot(guiGraphics, leftPos + 8, topPos + 83);
         }
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        super.render(guiGraphics, x, y, partialTicks);
+        drawHoverAreas(guiGraphics, x, y);
     }
 
     private MutableComponent number(int num) {

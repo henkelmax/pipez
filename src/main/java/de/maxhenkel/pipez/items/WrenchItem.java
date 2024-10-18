@@ -14,8 +14,8 @@ public class WrenchItem extends Item {
 
     public static final Component WRENCH_TOOLTIP = Component.translatable("tooltip.pipez.wrench").withStyle(ChatFormatting.GRAY);
 
-    public WrenchItem() {
-        super(new Properties().stacksTo(1));
+    public WrenchItem(Properties properties) {
+        super(properties.stacksTo(1));
     }
 
     @Override

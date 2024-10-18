@@ -19,10 +19,10 @@ dependencies {
     compileOnly "maven.modrinth:jade:${jade_version}"
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
-    runtimeOnly "mekanism:Mekanism:${mekanism_version}"
-    runtimeOnly "mekanism:Mekanism:${mekanism_version}:additions"
-    runtimeOnly "mekanism:Mekanism:${mekanism_version}:generators"
-    runtimeOnly "mekanism:Mekanism:${mekanism_version}:tools"
+    //runtimeOnly "mekanism:Mekanism:${mekanism_version}"
+    //runtimeOnly "mekanism:Mekanism:${mekanism_version}:additions"
+    //runtimeOnly "mekanism:Mekanism:${mekanism_version}:generators"
+    //runtimeOnly "mekanism:Mekanism:${mekanism_version}:tools"
 
     shadow "de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}:api"
     runtimeOnly "de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}"

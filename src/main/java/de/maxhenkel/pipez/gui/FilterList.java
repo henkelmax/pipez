@@ -18,7 +18,7 @@ import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -153,15 +153,14 @@ public class FilterList extends WidgetBase {
 
         List<Filter<?, ?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
             int startY = guiTop + pos * columnHeight;
             Filter<?, ?> filter = f.get(i);
             if (i == getSelected()) {
-                guiGraphics.blit(BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
+                guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
             } else {
-                guiGraphics.blit(BACKGROUND, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
+                guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
             }
 
             AbstractStack<?> stack = getStack(filter);
@@ -197,16 +196,15 @@ public class FilterList extends WidgetBase {
             }
         }
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         if (f.size() > columnCount) {
             float h = 66 - 17;
             float perc = (float) getOffset() / (float) (f.size() - columnCount);
             int posY = guiTop + (int) (h * perc);
-            guiGraphics.blit(BACKGROUND, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
+            guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
         } else {
-            guiGraphics.blit(BACKGROUND, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
+            guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
         }
     }
 

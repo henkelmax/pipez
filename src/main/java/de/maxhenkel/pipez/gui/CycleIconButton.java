@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -29,9 +29,8 @@ public class CycleIconButton extends AbstractButton {
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         Icon icon = icons.get(index.get());
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        guiGraphics.blit(icon.texture, getX() + 2, getY() + 2, icon.offsetX, icon.offsetY, 16, 16);
+        guiGraphics.blit(RenderType::guiTextured, icon.texture, getX() + 2, getY() + 2, icon.offsetX, icon.offsetY, 16, 16, 256, 256);
     }
 
     @Override

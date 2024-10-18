@@ -13,8 +13,8 @@ import java.util.List;
 
 public class FilterDestinationToolItem extends Item {
 
-    public FilterDestinationToolItem() {
-        super(new Properties().stacksTo(1));
+    public FilterDestinationToolItem(Properties properties) {
+        super(properties.stacksTo(1));
     }
 
     @Override

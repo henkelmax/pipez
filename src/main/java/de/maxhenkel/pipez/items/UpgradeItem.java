@@ -24,8 +24,8 @@ public class UpgradeItem extends Item {
 
     private final Upgrade tier;
 
-    public UpgradeItem(Upgrade tier) {
-        super(new Properties());
+    public UpgradeItem(Upgrade tier, Properties properties) {
+        super(properties);
         this.tier = tier;
     }
 
