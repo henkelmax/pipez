@@ -1,11 +1,7 @@
 {
   "type": "pipez:copy_components",
-  "source": {
-    "tag": "pipez:upgrades"
-  },
-  "target": {
-    "item": "pipez:basic_upgrade"
-  },
+  "source": "#pipez:upgrades",
+  "target": "pipez:basic_upgrade",
   "components": [
     "pipez:item",
     "pipez:fluid",

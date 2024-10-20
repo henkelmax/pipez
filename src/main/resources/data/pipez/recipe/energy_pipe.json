@@ -6,15 +6,9 @@
     "III"
   ],
   "key": {
-    "B": {
-      "tag": "c:storage_blocks/redstone"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "B": "#c:storage_blocks/redstone",
+    "I": "#c:ingots/iron",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "pipez:energy_pipe",

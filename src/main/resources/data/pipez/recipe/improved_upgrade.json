@@ -6,15 +6,9 @@
     "GRG"
   ],
   "key": {
-    "U": {
-      "item": "pipez:basic_upgrade"
-    },
-    "G": {
-      "tag": "c:ingots/gold"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "U": "pipez:basic_upgrade",
+    "G": "#c:ingots/gold",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "pipez:improved_upgrade",

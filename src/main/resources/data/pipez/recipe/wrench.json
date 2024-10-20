@@ -6,12 +6,8 @@
     "S  "
   ],
   "key": {
-    "F": {
-      "item": "minecraft:flint"
-    },
-    "S": {
-      "tag": "c:rods"
-    }
+    "F": "minecraft:flint",
+    "S": "#c:rods"
   },
   "result": {
     "id": "pipez:wrench",
