@@ -130,7 +130,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         itemHoverArea = new HoverArea(8, 18, 16, 16, () -> {
             List<Component> tooltip = new ArrayList<>();
 
-            AbstractStack<?> stack = FilterList.getStack(filter);
+            AbstractStack<?> stack = filter.getStack();
             if (stack != null) {
                 tooltip = stack.getTooltip();
                 if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
@@ -321,7 +321,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
 
-        AbstractStack<?> stack = FilterList.getStack(filter);
+        AbstractStack<?> stack = filter.getStack();
         if (stack != null) {
             stack.render(guiGraphics, leftPos + 8, topPos + 18);
         }

@@ -72,6 +72,7 @@
   "message.pipez.direction.up": "Up",
   "message.pipez.direction.down": "Down",
   "message.pipez.filter.add": "Add",
+  "message.pipez.filter.destination_distance": "%s",
   "message.pipez.filter.edit": "Edit",
   "message.pipez.filter.remove": "Remove",
   "message.pipez.filter.cancel": "Cancel",

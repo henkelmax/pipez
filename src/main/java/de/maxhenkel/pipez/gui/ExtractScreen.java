@@ -58,16 +58,16 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
     public ExtractScreen(ExtractContainer container, Inventory playerInventory, Component title) {
         super(BACKGROUND, container, playerInventory, title);
-        imageWidth = 176;
-        imageHeight = 196;
+        this.imageWidth = 176;
+        this.imageHeight = 196;
 
-        pipeTypes = container.getPipe().getPipeTypes();
-        if (pipeTypes.length > 1) {
-            tabs = new HoverArea[pipeTypes.length];
+        this.pipeTypes = container.getPipe().getPipeTypes();
+        if (this.pipeTypes.length > 1) {
+            this.tabs = new HoverArea[pipeTypes.length];
         }
-        currentindex = container.getIndex();
-        if (currentindex < 0) {
-            currentindex = getMenu().getPipe().getPreferredPipeIndex(getMenu().getSide());
+        this.currentindex = container.getIndex();
+        if (this.currentindex < 0) {
+            this.currentindex = getMenu().getPipe().getPreferredPipeIndex(getMenu().getSide());
         }
     }
 
