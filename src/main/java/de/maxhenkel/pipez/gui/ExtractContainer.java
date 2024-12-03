@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.gui;
 
 import de.maxhenkel.corelib.inventory.ContainerBase;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
+import de.maxhenkel.pipez.gui.sprite.ExtractUISprite;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +19,7 @@ public class ExtractContainer extends ContainerBase implements IPipeContainer {
         this.side = side;
         this.index = index;
 
-        addSlot(new UpgradeSlot(pipe.getUpgradeInventory(), side.get3DDataValue(), 9, 81));
+        addSlot(new UpgradeSlot(pipe.getUpgradeInventory(), side.get3DDataValue(), ExtractUISprite.UPGRADE_SLOT.x, ExtractUISprite.UPGRADE_SLOT.y));
 
         addPlayerInventorySlots();
     }
@@ -49,7 +50,7 @@ public class ExtractContainer extends ContainerBase implements IPipeContainer {
 
     @Override
     public int getInvOffset() {
-        return 30;
+        return ExtractUISprite.INVENTORY_OFFSET;
     }
 
     @Override

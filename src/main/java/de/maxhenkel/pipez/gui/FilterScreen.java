@@ -73,17 +73,17 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         hoverAreas.clear();
         clearWidgets();
 
-        List<CycleIconButton.Icon> nbtIcons = Arrays.asList(
-                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.NBT_MODE_NOT_EXACT),
-                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.NBT_MODE_EXACT)
+        List<IconButton.Icon> nbtIcons = Arrays.asList(
+                new IconButton.Icon(FilterSprite.IMAGE, FilterSprite.NBT_MODE_NOT_EXACT),
+                new IconButton.Icon(FilterSprite.IMAGE, FilterSprite.NBT_MODE_EXACT)
         );
         nbtButton = new CycleIconButton(leftPos + 125, topPos + 81, nbtIcons, () -> filter.isExactMetadata() ? 1 : 0, button -> {
             filter.setExactMetadata(!filter.isExactMetadata());
         });
         addRenderableWidget(nbtButton);
-        List<CycleIconButton.Icon> invertIcons = Arrays.asList(
-                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.INVERT_NO),
-                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.INVERT_YES)
+        List<IconButton.Icon> invertIcons = Arrays.asList(
+                new IconButton.Icon(FilterSprite.IMAGE, FilterSprite.INVERT_NO),
+                new IconButton.Icon(FilterSprite.IMAGE, FilterSprite.INVERT_YES)
         );
         invertButton = new CycleIconButton(leftPos + 149, topPos + 81, invertIcons, () -> filter.isInvert() ? 1 : 0, button -> {
             filter.setInvert(!filter.isInvert());
