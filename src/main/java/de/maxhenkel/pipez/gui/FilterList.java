@@ -8,14 +8,14 @@ import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.gui.sprite.ExtractSprite;
+import de.maxhenkel.pipez.gui.sprite.SpriteRect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,9 +28,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class FilterList extends WidgetBase {
-
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/extract.png");
-
     protected Supplier<List<Filter<?, ?>>> filters;
     protected int offset;
     protected int selected;
@@ -69,8 +66,8 @@ public class FilterList extends WidgetBase {
 
             return f;
         };
-        columnHeight = 22;
-        columnCount = 3;
+        columnHeight = ExtractSprite.ROW_HEIGHT;
+        columnCount = ExtractSprite.VISIBLE_ROW_COUNT;
         selected = -1;
 
         hoverAreas = new ScreenBase.HoverArea[columnCount];
@@ -140,13 +137,14 @@ public class FilterList extends WidgetBase {
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
             int startY = guiTop + pos * columnHeight;
-            Filter<?, ?> filter = f.get(i);
-            if (i == getSelected()) {
-                guiGraphics.blit(BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
-            } else {
-                guiGraphics.blit(BACKGROUND, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
-            }
 
+            SpriteRect entryImageSpriteRect = ExtractSprite.FILTER_LIST_ENTRY;
+            if (i == getSelected()) {
+                entryImageSpriteRect = ExtractSprite.FILTER_LIST_ENTRY_SELECTED;
+            }
+            guiGraphics.blit(ExtractSprite.IMAGE, guiLeft, startY, entryImageSpriteRect.x, entryImageSpriteRect.y, entryImageSpriteRect.w, entryImageSpriteRect.h);
+
+            Filter<?, ?> filter = f.get(i);
             AbstractStack<?> stack = filter.getStack();
             if (stack != null && !stack.isEmpty()) {
                 stack.render(guiGraphics, guiLeft + 3, startY + 3);
@@ -188,14 +186,15 @@ public class FilterList extends WidgetBase {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
+        SpriteRect scrollerImageSpriteRect = ExtractSprite.FILTER_LIST_SCROLLER_INACTIVE;
+        int posY = guiTop;
         if (f.size() > columnCount) {
             float h = 66 - 17;
             float perc = (float) getOffset() / (float) (f.size() - columnCount);
-            int posY = guiTop + (int) (h * perc);
-            guiGraphics.blit(BACKGROUND, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
-        } else {
-            guiGraphics.blit(BACKGROUND, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
+            posY = guiTop + (int) (h * perc);
+            scrollerImageSpriteRect = ExtractSprite.FILTER_LIST_SCROLLER_ACTIVE;
         }
+        guiGraphics.blit(ExtractSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h);
     }
 
     private Pair<BlockState, ItemStack> getBlockAt(DirectionalPosition destination) {

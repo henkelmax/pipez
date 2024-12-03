@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import de.maxhenkel.pipez.gui.sprite.SpriteRect;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -31,7 +32,7 @@ public class CycleIconButton extends AbstractButton {
         Icon icon = icons.get(index.get());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        guiGraphics.blit(icon.texture, getX() + 2, getY() + 2, icon.offsetX, icon.offsetY, 16, 16);
+        guiGraphics.blit(icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h);
     }
 
     @Override
@@ -46,12 +47,11 @@ public class CycleIconButton extends AbstractButton {
 
     public static class Icon {
         private ResourceLocation texture;
-        private int offsetX, offsetY;
+        private SpriteRect spriteRect;
 
-        public Icon(ResourceLocation texture, int offsetX, int offsetY) {
+        public Icon(ResourceLocation texture, SpriteRect spriteRect) {
             this.texture = texture;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
+            this.spriteRect = spriteRect;
         }
     }
 

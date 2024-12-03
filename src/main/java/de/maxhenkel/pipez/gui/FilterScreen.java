@@ -8,6 +8,7 @@ import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.corelib.tag.TagUtils;
 import de.maxhenkel.pipez.*;
+import de.maxhenkel.pipez.gui.sprite.FilterSprite;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
@@ -39,8 +40,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FilterScreen extends ScreenBase<FilterContainer> {
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/filter.png");
-
     private EditBox item;
     private EditBox nbt;
 
@@ -61,9 +60,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     private Filter<?, ?> filter;
 
     public FilterScreen(FilterContainer container, Inventory playerInventory, Component title) {
-        super(BACKGROUND, container, playerInventory, title);
-        imageWidth = 176;
-        imageHeight = 222;
+        super(FilterSprite.IMAGE, container, playerInventory, title);
+        imageWidth = FilterSprite.SCREEN.w;
+        imageHeight = FilterSprite.SCREEN.h;
 
         filter = getMenu().getFilter();
     }
@@ -74,12 +73,18 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         hoverAreas.clear();
         clearWidgets();
 
-        List<CycleIconButton.Icon> nbtIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 16), new CycleIconButton.Icon(BACKGROUND, 192, 16));
+        List<CycleIconButton.Icon> nbtIcons = Arrays.asList(
+                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.NBT_MODE_NOT_EXACT),
+                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.NBT_MODE_EXACT)
+        );
         nbtButton = new CycleIconButton(leftPos + 125, topPos + 81, nbtIcons, () -> filter.isExactMetadata() ? 1 : 0, button -> {
             filter.setExactMetadata(!filter.isExactMetadata());
         });
         addRenderableWidget(nbtButton);
-        List<CycleIconButton.Icon> invertIcons = Arrays.asList(new CycleIconButton.Icon(BACKGROUND, 176, 32), new CycleIconButton.Icon(BACKGROUND, 192, 32));
+        List<CycleIconButton.Icon> invertIcons = Arrays.asList(
+                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.INVERT_NO),
+                new CycleIconButton.Icon(FilterSprite.IMAGE, FilterSprite.INVERT_YES)
+        );
         invertButton = new CycleIconButton(leftPos + 149, topPos + 81, invertIcons, () -> filter.isInvert() ? 1 : 0, button -> {
             filter.setInvert(!filter.isInvert());
         });
