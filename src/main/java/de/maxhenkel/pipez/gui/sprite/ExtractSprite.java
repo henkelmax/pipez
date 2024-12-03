@@ -4,13 +4,14 @@ import de.maxhenkel.pipez.Main;
 import net.minecraft.resources.ResourceLocation;
 
 public class ExtractSprite {
-    public static ResourceLocation IMAGE = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/extract-2.png");
+    public static ResourceLocation IMAGE = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/extract.png");
 
-    public static SpriteRect SCREEN = new SpriteRect(0, 0, 176,196);
+    public static SpriteRect SCREEN = new SpriteRect(0, 0, 176, 196);
 
     public static int ROW_HEIGHT = 22;
-    public static int VISIBLE_ROW_COUNT = 9;
+    public static int VISIBLE_ROW_COUNT = 3;
 
+    public static SpriteRect FILTER_LIST = new SpriteRect(32, 8, 136, ROW_HEIGHT * VISIBLE_ROW_COUNT);
     public static SpriteRect FILTER_LIST_ENTRY = new SpriteRect(0, 196, 125, ROW_HEIGHT);
     public static SpriteRect FILTER_LIST_ENTRY_SELECTED = new SpriteRect(0, 218, 125, ROW_HEIGHT);
 
@@ -33,6 +34,6 @@ public class ExtractSprite {
     public static SpriteRect FILTER_MODE_ICON_WHITELIST = new SpriteRect(176, 32, ICON_BUTTON_WIDTH, ICON_BUTTON_HEIGHT);
     public static SpriteRect FILTER_MODE_ICON_BLACKLIST = new SpriteRect(192, 32, ICON_BUTTON_WIDTH, ICON_BUTTON_HEIGHT);
 
-    public static SpriteRect TAB_ACTIVE = new SpriteRect(176,48,26,24);
-    public static SpriteRect TAB_INACTIVE = new SpriteRect(176,72,26,24);
+    public static SpriteRect TAB_ACTIVE = new SpriteRect(176, 48, 26, 24);
+    public static SpriteRect TAB_INACTIVE = new SpriteRect(176, 72, 26, 24);
 }

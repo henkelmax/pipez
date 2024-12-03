@@ -34,12 +34,16 @@ public class FilterList extends WidgetBase {
     private ScreenBase.HoverArea[] hoverAreas;
     private ScreenBase.HoverArea[] itemHoverAreas;
     private ScreenBase.HoverArea[] blockHoverAreas;
-    private int columnHeight;
-    private int columnCount;
+    private int rowHeight;
+    private int rowCount;
     private CachedMap<DirectionalPosition, Pair<BlockState, ItemStack>> filterPosCache;
 
-    public FilterList(ExtractScreen screen, int posX, int posY, int xSize, int ySize, Supplier<List<Filter<?, ?>>> filters) {
-        super(screen, posX, posY, xSize, ySize);
+    public FilterList(ExtractScreen screen, SpriteRect rect, int rowHeight, int rowCount, Supplier<List<Filter<?, ?>>> filters) {
+        super(screen, rect.x, rect.y, rect.w, rect.h);
+
+        this.rowHeight = rowHeight;
+        this.rowCount = rowCount;
+        this.selected = -1;
         this.filters = () -> {
             List<Filter<?, ?>> f = filters.get();
 
@@ -66,17 +70,14 @@ public class FilterList extends WidgetBase {
 
             return f;
         };
-        columnHeight = ExtractSprite.ROW_HEIGHT;
-        columnCount = ExtractSprite.VISIBLE_ROW_COUNT;
-        selected = -1;
 
-        hoverAreas = new ScreenBase.HoverArea[columnCount];
-        itemHoverAreas = new ScreenBase.HoverArea[columnCount];
-        blockHoverAreas = new ScreenBase.HoverArea[columnCount];
+        hoverAreas = new ScreenBase.HoverArea[this.rowCount];
+        itemHoverAreas = new ScreenBase.HoverArea[this.rowCount];
+        blockHoverAreas = new ScreenBase.HoverArea[this.rowCount];
         for (int i = 0; i < hoverAreas.length; i++) {
-            hoverAreas[i] = new ScreenBase.HoverArea(0, i * columnHeight, xSize, columnHeight);
-            itemHoverAreas[i] = new ScreenBase.HoverArea(3, 3 + i * columnHeight, 16, 16);
-            blockHoverAreas[i] = new ScreenBase.HoverArea(xSize - 3 - 16 - 11, 3 + i * columnHeight, 16, 16);
+            hoverAreas[i] = new ScreenBase.HoverArea(0, i * this.rowHeight, rect.w, this.rowHeight);
+            itemHoverAreas[i] = new ScreenBase.HoverArea(3, 3 + i * this.rowHeight, 16, 16);
+            blockHoverAreas[i] = new ScreenBase.HoverArea(rect.w - 3 - 16 - 11, 3 + i * this.rowHeight, 16, 16);
         }
 
         filterPosCache = new CachedMap<>(1000);
@@ -132,11 +133,11 @@ public class FilterList extends WidgetBase {
         super.drawGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
         List<Filter<?, ?>> f = filters.get();
-        for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
+        for (int i = getOffset(); i < f.size() && i < getOffset() + this.rowCount; i++) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
-            int startY = guiTop + pos * columnHeight;
+            int startY = guiTop + pos * this.rowHeight;
 
             SpriteRect entryImageSpriteRect = ExtractSprite.FILTER_LIST_ENTRY;
             if (i == getSelected()) {
@@ -188,9 +189,9 @@ public class FilterList extends WidgetBase {
 
         SpriteRect scrollerImageSpriteRect = ExtractSprite.FILTER_LIST_SCROLLER_INACTIVE;
         int posY = guiTop;
-        if (f.size() > columnCount) {
+        if (f.size() > this.rowCount) {
             float h = 66 - 17;
-            float perc = (float) getOffset() / (float) (f.size() - columnCount);
+            float perc = (float) getOffset() / (float) (f.size() - this.rowCount);
             posY = guiTop + (int) (h * perc);
             scrollerImageSpriteRect = ExtractSprite.FILTER_LIST_SCROLLER_ACTIVE;
         }
@@ -220,10 +221,10 @@ public class FilterList extends WidgetBase {
 
     public int getOffset() {
         List<Filter<?, ?>> f = filters.get();
-        if (f.size() <= columnCount) {
+        if (f.size() <= this.rowCount) {
             offset = 0;
-        } else if (offset > f.size() - columnCount) {
-            offset = f.size() - columnCount;
+        } else if (offset > f.size() - this.rowCount) {
+            offset = f.size() - this.rowCount;
         }
         return offset;
     }
@@ -246,9 +247,9 @@ public class FilterList extends WidgetBase {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
         List<Filter<?, ?>> f = filters.get();
-        if (f.size() > columnCount) {
+        if (f.size() > this.rowCount) {
             if (deltaY < 0D) {
-                offset = Math.min(getOffset() + 1, f.size() - columnCount);
+                offset = Math.min(getOffset() + 1, f.size() - this.rowCount);
             } else {
                 offset = Math.max(getOffset() - 1, 0);
             }

@@ -78,7 +78,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         PipeLogicTileEntity pipe = getMenu().getPipe();
         Direction side = getMenu().getSide();
 
-        filterList = new FilterList(this, 32, 8, 136, 66, () -> pipe.getFilters(side, pipeTypes[currentindex]));
+        filterList = new FilterList(this, ExtractSprite.FILTER_LIST, ExtractSprite.ROW_HEIGHT, ExtractSprite.VISIBLE_ROW_COUNT, () -> pipe.getFilters(side, pipeTypes[currentindex]));
 
         Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
         List<CycleIconButton.Icon> redstoneModeIcons = Arrays.asList(
