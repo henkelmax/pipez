@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "pipez:item/fluid_pipe"
+  }
+}

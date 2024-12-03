@@ -3,7 +3,6 @@ package de.maxhenkel.pipez.blocks.tileentity.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import de.maxhenkel.corelib.CachedValue;
 import de.maxhenkel.pipez.ModelRegistry.Model;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import net.minecraft.client.Minecraft;
@@ -18,22 +17,26 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Quaternionf;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity> {
 
     protected Minecraft minecraft;
     protected BlockEntityRendererProvider.Context renderer;
-    protected CachedValue<BakedModel> cachedModel;
+    protected AtomicReference<BakedModel> cachedModel;
 
     public PipeRenderer(BlockEntityRendererProvider.Context renderer) {
         this.renderer = renderer;
         minecraft = Minecraft.getInstance();
-        cachedModel = getModel().getCachedModel();
+        cachedModel = getModel().getModel();
     }
 
     @Override
     public void render(PipeTileEntity pipe, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         BakedModel iBakedModel = cachedModel.get();
+        if (iBakedModel == null) {
+            return;
+        }
         List<BakedQuad> quads = iBakedModel.getQuads(null, null, minecraft.level.random, ModelData.EMPTY, RenderType.solid());
         VertexConsumer b = buffer.getBuffer(RenderType.solid());
 
