@@ -9,6 +9,7 @@ import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.gui.sprite.ExtractElementsSprite;
+import de.maxhenkel.pipez.gui.sprite.ExtractUISprite;
 import de.maxhenkel.pipez.gui.sprite.SpriteRect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -44,36 +45,7 @@ public class FilterList extends WidgetBase {
         this.rowHeight = rowHeight;
         this.rowCount = rowCount;
         this.selected = -1;
-        this.filters = () -> {
-            List<Filter<?, ?>> f = filters.get();
-
-            f.sort((filterA, filterB) -> {
-                // compare by name
-                int r = filterA.getTranslatedName().toString().compareTo(filterB.getTranslatedName().toString());
-                if (r != 0) {
-                    return r;
-                }
-
-                if (filterA.hasDestination() == false || filterB.hasDestination() == false) {
-                    return 0;
-                }
-
-                // if name identical, compare by distance
-                int distanceA = filterA.getDistanceTo(getContainer().getPipe().getBlockPos());
-                int distanceB = filterB.getDistanceTo(getContainer().getPipe().getBlockPos());
-                if (distanceA < distanceB) {
-                    return -1;
-                }
-                if (distanceA > distanceB) {
-                    return 1;
-                }
-
-                // if name and distance identical, then compare by direction
-                return filterA.getDestination().getDirection().getName().toString().compareTo(filterB.getDestination().getDirection().getName().toString());
-            });
-
-            return f;
-        };
+        this.filters = filters;
 
         // TODO
         hoverAreas = new ScreenBase.HoverArea[this.rowCount];
@@ -196,7 +168,7 @@ public class FilterList extends WidgetBase {
         SpriteRect scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_INACTIVE;
         int posY = guiTop;
         if (f.size() > this.rowCount) {
-            float h = ExtractElementsSprite.ROW_HEIGHT * ExtractElementsSprite.VISIBLE_ROW_COUNT - ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE.h;
+            float h = ExtractUISprite.ROW_HEIGHT * ExtractUISprite.VISIBLE_ROW_COUNT - ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE.h;
             float perc = (float) getOffset() / (float) (f.size() - this.rowCount);
             posY = guiTop + (int) (h * perc);
             scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE;

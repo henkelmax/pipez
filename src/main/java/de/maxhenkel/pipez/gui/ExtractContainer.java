@@ -6,6 +6,7 @@ import de.maxhenkel.pipez.gui.sprite.ExtractUISprite;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 
 public class ExtractContainer extends ContainerBase implements IPipeContainer {
 
@@ -49,8 +50,23 @@ public class ExtractContainer extends ContainerBase implements IPipeContainer {
     }
 
     @Override
+    protected void addPlayerInventorySlots() {
+        if (playerInventory != null) {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 9; j++) {
+                    addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18 + ExtractUISprite.INVENTORY_OFFSET.x, 84 + i * 18 + ExtractUISprite.INVENTORY_OFFSET.y));
+                }
+            }
+
+            for (int k = 0; k < 9; k++) {
+                addSlot(new Slot(playerInventory, k, 8 + k * 18 + ExtractUISprite.INVENTORY_OFFSET.x, 142 + ExtractUISprite.INVENTORY_OFFSET.y));
+            }
+        }
+    }
+
+    @Override
     public int getInvOffset() {
-        return ExtractUISprite.INVENTORY_OFFSET;
+        return ExtractUISprite.INVENTORY_OFFSET.y;
     }
 
     @Override

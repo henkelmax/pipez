@@ -13,7 +13,6 @@ import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.NbtUtils;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -29,24 +28,27 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class ExtractScreen extends ScreenBase<ExtractContainer> {
+    protected static enum SORT_FILTER_LIST_TYPE {
+        NAME_ASC, NAME_DESC, DISTANCE_ASC, DISTANCE_DESC;
+    }
+
     private CycleIconButton redstoneButton;
     private CycleIconButton distributionButton;
     private CycleIconButton filterButton;
+    private CycleIconButton sortFilterButton;
 
     private IconButton addFilterButton;
     private IconButton editFilterButton;
     private IconButton removeFilterButton;
 
     private HoverArea redstoneArea;
-    private HoverArea sortArea;
+    private HoverArea distributionArea;
     private HoverArea filterArea;
+    private HoverArea sortFilterArea;
     private HoverArea addFilterArea;
     private HoverArea editFilterArea;
     private HoverArea deleteFilterArea;
@@ -54,6 +56,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     private HoverArea[] tabs;
     private PipeType<?, ?>[] pipeTypes;
     private int currentindex;
+    private int currentSortFilterListType;
 
     private FilterList filterList;
 
@@ -61,6 +64,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         super(ExtractUISprite.IMAGE, container, playerInventory, title);
         this.imageWidth = ExtractUISprite.SCREEN.w;
         this.imageHeight = ExtractUISprite.SCREEN.h;
+        this.currentSortFilterListType = 0;
 
         this.pipeTypes = container.getPipe().getPipeTypes();
         if (this.pipeTypes.length > 1) {
@@ -81,7 +85,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         PipeLogicTileEntity pipe = getMenu().getPipe();
         Direction side = getMenu().getSide();
 
-        filterList = new FilterList(this, ExtractUISprite.FILTER_LIST, ExtractElementsSprite.ROW_HEIGHT, ExtractElementsSprite.VISIBLE_ROW_COUNT, () -> pipe.getFilters(side, pipeTypes[currentindex]));
+        filterList = new FilterList(this, ExtractUISprite.FILTER_LIST, ExtractUISprite.ROW_HEIGHT, ExtractUISprite.VISIBLE_ROW_COUNT, this::getSortedList);
 
         // redstone button
         Supplier<Integer> redstoneModeIndex = () -> pipe.getRedstoneMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
@@ -110,6 +114,16 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.FILTER_MODE_ICON_BLACKLIST)
         );
         filterButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.FILTER_MODE_BUTTON.x, this.topPos + ExtractElementsSprite.FILTER_MODE_BUTTON.y, filterModeIcons, filterModeIndex, button -> PacketDistributor.sendToServer(new CycleFilterModeMessage(currentindex)));
+
+        // sort filter list type
+        Supplier<Integer> currentSortFilterListTypeIndex = () -> this.currentSortFilterListType;
+        List<IconButton.Icon> sortFilterIcons = Arrays.asList(
+                new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.SORT_ICON_NAME_ASC),
+                new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.SORT_ICON_NAME_DESC),
+                new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.SORT_ICON_DISTANCE_ASC),
+                new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.SORT_ICON_DISTANCE_DESC)
+        );
+        sortFilterButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.x, this.topPos + ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.y, sortFilterIcons, currentSortFilterListTypeIndex, button -> this.currentSortFilterListType = this.currentSortFilterListType + 1 >= sortFilterIcons.size() ? 0 : this.currentSortFilterListType + 1);
 
         // Filter Entry Action Button
         addFilterButton = new IconButton(
@@ -140,6 +154,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         addRenderableWidget(redstoneButton);
         addRenderableWidget(distributionButton);
         addRenderableWidget(filterButton);
+        addRenderableWidget(sortFilterButton);
         addRenderableWidget(addFilterButton);
         addRenderableWidget(editFilterButton);
         addRenderableWidget(removeFilterButton);
@@ -165,7 +180,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 return Collections.emptyList();
             }
         });
-        sortArea = new HoverArea(ExtractElementsSprite.DISTRIBUTION_BUTTON.x, ExtractElementsSprite.DISTRIBUTION_BUTTON.y, ExtractElementsSprite.DISTRIBUTION_BUTTON.w, ExtractElementsSprite.DISTRIBUTION_BUTTON.h, () -> {
+        distributionArea = new HoverArea(ExtractElementsSprite.DISTRIBUTION_BUTTON.x, ExtractElementsSprite.DISTRIBUTION_BUTTON.y, ExtractElementsSprite.DISTRIBUTION_BUTTON.w, ExtractElementsSprite.DISTRIBUTION_BUTTON.h, () -> {
             if (distributionButton.active) {
                 return Arrays.asList(Component.translatable("tooltip.pipez.distribution", Component.translatable("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
             } else {
@@ -179,6 +194,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 return Collections.emptyList();
             }
         });
+        sortFilterArea = new HoverArea(ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.x, ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.y, ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.w, ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.h,
+                () -> Arrays.asList(Component.translatable("tooltip.pipez.sort_filter_list_mode", Component.translatable("tooltip.pipez.sort_filter_list_mode." + String.valueOf(this.currentSortFilterListType))).getVisualOrderText())
+        );
         addFilterArea = new HoverArea(ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.x, ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.y, ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.w, ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.h, () -> {
             if (filterButton.active) {
                 return Arrays.asList(Component.translatable("message.pipez.filter.add").getVisualOrderText());
@@ -202,8 +220,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         });
 
         hoverAreas.add(redstoneArea);
-        hoverAreas.add(sortArea);
+        hoverAreas.add(distributionArea);
         hoverAreas.add(filterArea);
+        hoverAreas.add(sortFilterArea);
         hoverAreas.add(addFilterArea);
         hoverAreas.add(editFilterArea);
         hoverAreas.add(deleteFilterArea);
@@ -261,6 +280,65 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 }
             }
         }
+    }
+
+    protected List<Filter<?, ?>> getSortedList() {
+        PipeLogicTileEntity pipe = getMenu().getPipe();
+        List<Filter<?, ?>> f = pipe.getFilters(getMenu().getSide(), pipeTypes[currentindex]);
+
+        int sortDirection = this.currentSortFilterListType == SORT_FILTER_LIST_TYPE.NAME_ASC.ordinal() || this.currentSortFilterListType == SORT_FILTER_LIST_TYPE.DISTANCE_ASC.ordinal() ? 1 : -1;
+
+        Comparator<Filter> comparatorName = (filterA, filterB) -> filterA.getTranslatedName().toString().compareTo(filterB.getTranslatedName().toString()) * sortDirection;
+        Comparator<Filter> comparatorDistance = (filterA, filterB) -> {
+            if (filterA.hasDestination() == false && filterB.hasDestination() == false) {
+                return 0;
+            }
+            if (filterA.hasDestination() == true && filterB.hasDestination() == false) {
+                return -1;
+            }
+            if (filterA.hasDestination() == false && filterB.hasDestination() == true) {
+                return 1;
+            }
+
+            // if name identical, compare by distance
+            //noinspection DataFlowIssue
+            int distanceA = filterA.getDistanceTo(pipe.getBlockPos());
+            //noinspection DataFlowIssue
+            int distanceB = filterB.getDistanceTo(pipe.getBlockPos());
+            if (distanceA < distanceB) {
+                return -1 * sortDirection;
+            }
+            if (distanceA > distanceB) {
+                return sortDirection;
+            }
+
+            //noinspection DataFlowIssue
+            return filterA.getDestination().getDirection().getName().compareTo(filterB.getDestination().getDirection().getName()) * sortDirection;
+        };
+
+        List<Comparator<Filter>> comparators;
+        if (this.currentSortFilterListType == SORT_FILTER_LIST_TYPE.DISTANCE_ASC.ordinal() || this.currentSortFilterListType == SORT_FILTER_LIST_TYPE.DISTANCE_DESC.ordinal()) {
+            comparators = Arrays.asList(comparatorDistance, comparatorName);
+        } else {
+            comparators = Arrays.asList(comparatorName, comparatorDistance);
+        }
+
+        f.sort((filterA, filterB) -> {
+            int i = 0;
+            while (i < comparators.size()) {
+                Comparator<Filter> comparator = comparators.get(i);
+                int result = comparator.compare(filterA, filterB);
+
+                if (result != 0) {
+                    return result;
+                }
+                i++;
+            }
+
+            return 0;
+        });
+
+        return f;
     }
 
     public int getTabsX() {
