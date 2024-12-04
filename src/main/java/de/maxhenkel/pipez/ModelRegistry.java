@@ -1,35 +1,34 @@
 package de.maxhenkel.pipez;
 
-import de.maxhenkel.corelib.CachedValue;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ModelEvent;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ModelRegistry {
 
     public enum Model {
-        ENERGY_PIPE_EXTRACT("block/energy_pipe_extract"),
-        FLUID_PIPE_EXTRACT("block/fluid_pipe_extract"),
-        GAS_PIPE_EXTRACT("block/gas_pipe_extract"),
-        ITEM_PIPE_EXTRACT("block/item_pipe_extract"),
-        UNIVERSAL_PIPE_EXTRACT("block/universal_pipe_extract");
+        ENERGY_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/energy_pipe_extract")),
+        FLUID_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/fluid_pipe_extract")),
+        GAS_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/gas_pipe_extract")),
+        ITEM_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/item_pipe_extract")),
+        UNIVERSAL_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/universal_pipe_extract"));
 
-        private final ModelResourceLocation resource;
-        private final CachedValue<BakedModel> cachedModel;
+        private final ResourceLocation resource;
+        private final AtomicReference<BakedModel> model;
 
-        Model(String name) {
-            resource = ModelResourceLocation.standalone(ResourceLocation.fromNamespaceAndPath(Main.MODID, name));
-            cachedModel = new CachedValue<>(() -> Minecraft.getInstance().getModelManager().getModel(resource));
+        Model(ResourceLocation rl) {
+            resource = rl;
+            model = new AtomicReference<>();
         }
 
-        public ModelResourceLocation getResourceLocation() {
+        public ResourceLocation getResourceLocation() {
             return resource;
         }
 
-        public CachedValue<BakedModel> getCachedModel() {
-            return cachedModel;
+        public AtomicReference<BakedModel> getModel() {
+            return model;
         }
     }
 
@@ -41,8 +40,7 @@ public class ModelRegistry {
 
     public static void onModelBake(ModelEvent.BakingCompleted event) {
         for (Model model : Model.values()) {
-            model.getCachedModel().invalidate();
+            model.getModel().set(event.getBakingResult().standaloneModels().get(model.getResourceLocation()));
         }
     }
-
 }

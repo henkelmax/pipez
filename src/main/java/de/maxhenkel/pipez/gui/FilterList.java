@@ -186,7 +186,7 @@ public class FilterList extends WidgetBase {
             BlockState state = null;
             if (mc.level.isAreaLoaded(destination.getPos(), 1)) {
                 state = mc.level.getBlockState(destination.getPos());
-                ItemStack pickBlock = state.getBlock().getCloneItemStack(state, new BlockHitResult(new Vec3(destination.getPos().getX() + 0.5D, destination.getPos().getY() + 0.5D, destination.getPos().getZ() + 0.5D), destination.getDirection(), destination.getPos(), true), mc.level, destination.getPos(), mc.player);
+                ItemStack pickBlock = state.getBlock().getCloneItemStack(mc.level, destination.getPos(), state, true, mc.player);
                 if (pickBlock != null && !pickBlock.isEmpty()) {
                     stack = pickBlock;
                 }

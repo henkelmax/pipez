@@ -1,20 +1,17 @@
 package de.maxhenkel.pipez.utils;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import de.maxhenkel.corelib.client.RenderUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
-import de.maxhenkel.corelib.helpers.WrappedFluidStack;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -39,12 +36,9 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
-        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getChemical().getIcon());
-        RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
+        TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS).getSprite(stack.getChemical().getIcon());
         int chemicalTint = stack.getChemicalTint();
-        RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), 1);
-        RenderSystem.setShaderTexture(0, texture.atlasLocation());
-        WrappedFluidStack.fluidBlit(guiGraphics, x, y, 16, 16, texture, stack.getChemical().getTint());
+        guiGraphics.blitSprite(RenderType::guiTextured, texture, x, y, 16, 16, chemicalTint);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -56,7 +50,6 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
             ResourceLocation registryName = MekanismAPI.CHEMICAL_REGISTRY.getKey(stack.getChemical());
-            ;
             if (registryName != null) {
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
