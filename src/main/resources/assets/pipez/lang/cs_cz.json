@@ -82,5 +82,11 @@
     "message.pipez.filter_destination_tool.destination": "Destinace: %s, %s, %s, %s",
     "message.pipez.filter_destination_tool.destination.any": "Destinace: Různá",
     "message.pipez.filter_destination_tool.destination.set": "Destinace nastavena",
-    "config.jade.plugin_pipez.pipe": "Trubka"
-  }
+    "config.jade.plugin_pipez.pipe": "Trubka",
+    "tooltip.pipez.sort_filter_list_mode": "Řadit podle: %s",
+    "tooltip.pipez.sort_filter_list_mode.0": "Jméno vzestupně",
+    "tooltip.pipez.sort_filter_list_mode.1": "Jméno sestupně",
+    "tooltip.pipez.sort_filter_list_mode.2": "Vzdálenost vzestupně",
+    "tooltip.pipez.sort_filter_list_mode.3": "Vzdálenost klesající",
+    "message.pipez.filter.entry_count": "Příspěvky: %s"
+}
