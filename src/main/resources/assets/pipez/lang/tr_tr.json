@@ -87,5 +87,6 @@
   "tooltip.pipez.sort_filter_list_mode.0": "İsim artan",
   "tooltip.pipez.sort_filter_list_mode.1": "İsim azalan",
   "tooltip.pipez.sort_filter_list_mode.2": "Mesafe artan",
-  "tooltip.pipez.sort_filter_list_mode.3": "Mesafe azalan"
+  "tooltip.pipez.sort_filter_list_mode.3": "Mesafe azalan",
+  "message.pipez.filter.entry_count": "Girişler: %s"
 }

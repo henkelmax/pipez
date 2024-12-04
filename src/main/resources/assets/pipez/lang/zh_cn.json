@@ -87,5 +87,6 @@
   "tooltip.pipez.sort_filter_list_mode.0": "名称升序",
   "tooltip.pipez.sort_filter_list_mode.1": "名称降序",
   "tooltip.pipez.sort_filter_list_mode.2": "距离升序",
-  "tooltip.pipez.sort_filter_list_mode.3": "距离降序"
-  }
+  "tooltip.pipez.sort_filter_list_mode.3": "距离降序",
+  "message.pipez.filter.entry_count": "条目: %s"
+}

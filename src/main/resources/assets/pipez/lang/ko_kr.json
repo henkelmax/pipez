@@ -86,5 +86,6 @@
     "tooltip.pipez.sort_filter_list_mode.0": "이름 오름차순",
     "tooltip.pipez.sort_filter_list_mode.1": "이름 내림차순",
     "tooltip.pipez.sort_filter_list_mode.2": "거리 오름차순",
-    "tooltip.pipez.sort_filter_list_mode.3": "거리 내림차순"
+    "tooltip.pipez.sort_filter_list_mode.3": "거리 내림차순",
+    "message.pipez.filter.entry_count": "항목: %s"
   }

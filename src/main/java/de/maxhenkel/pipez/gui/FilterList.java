@@ -39,13 +39,18 @@ public class FilterList extends WidgetBase {
     private int rowCount;
     private CachedMap<DirectionalPosition, Pair<BlockState, ItemStack>> filterPosCache;
 
+    private static int offsetLast = 0;
+    private static int selectedLast = -1;
+
     public FilterList(ExtractScreen screen, SpriteRect rect, int rowHeight, int rowCount, Supplier<List<Filter<?, ?>>> filters) {
         super(screen, rect.x, rect.y, rect.w, rect.h);
 
         this.rowHeight = rowHeight;
         this.rowCount = rowCount;
-        this.selected = -1;
         this.filters = filters;
+
+        this.offset = FilterList.offsetLast;
+        this.selected = FilterList.selectedLast;
 
         // TODO
         hoverAreas = new ScreenBase.HoverArea[this.rowCount];
@@ -65,7 +70,6 @@ public class FilterList extends WidgetBase {
         super.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
         List<Filter<?, ?>> f = filters.get();
 
-        // TODO
         for (int i = 0; i < hoverAreas.length; i++) {
             if (getOffset() + i >= f.size()) {
                 break;
@@ -162,6 +166,8 @@ public class FilterList extends WidgetBase {
             }
         }
 
+        drawStringSmall(guiGraphics, this.guiLeft + ExtractUISprite.ENTRY_COUNT_TEXT.x, this.guiTop + ExtractUISprite.ENTRY_COUNT_TEXT.y, Component.translatable("message.pipez.filter.entry_count", number(f.size())));
+
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
@@ -204,6 +210,7 @@ public class FilterList extends WidgetBase {
         } else if (offset > f.size() - this.rowCount) {
             offset = f.size() - this.rowCount;
         }
+        FilterList.offsetLast = offset;
         return offset;
     }
 
@@ -211,6 +218,7 @@ public class FilterList extends WidgetBase {
         if (selected >= filters.get().size()) {
             selected = -1;
         }
+        FilterList.selectedLast = selected;
         return selected;
     }
 
@@ -231,6 +239,7 @@ public class FilterList extends WidgetBase {
             } else {
                 offset = Math.max(getOffset() - 1, 0);
             }
+            FilterList.offsetLast = offset;
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, deltaX, deltaY);
@@ -247,6 +256,7 @@ public class FilterList extends WidgetBase {
                 continue;
             }
             selected = getOffset() + i;
+            FilterList.selectedLast = selected;
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

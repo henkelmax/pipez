@@ -12,6 +12,7 @@ import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.NbtUtils;
 import mekanism.api.chemical.ChemicalStack;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -32,7 +33,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class ExtractScreen extends ScreenBase<ExtractContainer> {
-    protected static enum SORT_FILTER_LIST_TYPE {
+    protected enum SORT_FILTER_LIST_TYPE {
         NAME_ASC, NAME_DESC, DISTANCE_ASC, DISTANCE_DESC;
     }
 
@@ -58,13 +59,14 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     private int currentindex;
     private int currentSortFilterListType;
 
+    private static int currentSortFilterListTypeLast = 0;
+
     private FilterList filterList;
 
     public ExtractScreen(ExtractContainer container, Inventory playerInventory, Component title) {
         super(ExtractUISprite.IMAGE, container, playerInventory, title);
         this.imageWidth = ExtractUISprite.SCREEN.w;
         this.imageHeight = ExtractUISprite.SCREEN.h;
-        this.currentSortFilterListType = 0;
 
         this.pipeTypes = container.getPipe().getPipeTypes();
         if (this.pipeTypes.length > 1) {
@@ -74,6 +76,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         if (this.currentindex < 0) {
             this.currentindex = getMenu().getPipe().getPreferredPipeIndex(getMenu().getSide());
         }
+
+        this.currentSortFilterListType = ExtractScreen.currentSortFilterListTypeLast;
     }
 
     @Override
@@ -123,7 +127,16 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.SORT_ICON_DISTANCE_ASC),
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.SORT_ICON_DISTANCE_DESC)
         );
-        sortFilterButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.x, this.topPos + ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.y, sortFilterIcons, currentSortFilterListTypeIndex, button -> this.currentSortFilterListType = this.currentSortFilterListType + 1 >= sortFilterIcons.size() ? 0 : this.currentSortFilterListType + 1);
+        sortFilterButton = new CycleIconButton(
+                this.leftPos + ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.x,
+                this.topPos + ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.y,
+                sortFilterIcons,
+                currentSortFilterListTypeIndex,
+                button -> {
+                    this.currentSortFilterListType = this.currentSortFilterListType + 1 >= sortFilterIcons.size() ? 0 : this.currentSortFilterListType + 1;
+                    ExtractScreen.currentSortFilterListTypeLast = this.currentSortFilterListType;
+                }
+        );
 
         // Filter Entry Action Button
         addFilterButton = new IconButton(
@@ -288,7 +301,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
         int sortDirection = this.currentSortFilterListType == SORT_FILTER_LIST_TYPE.NAME_ASC.ordinal() || this.currentSortFilterListType == SORT_FILTER_LIST_TYPE.DISTANCE_ASC.ordinal() ? 1 : -1;
 
-        Comparator<Filter> comparatorName = (filterA, filterB) -> filterA.getTranslatedName().toString().compareTo(filterB.getTranslatedName().toString()) * sortDirection;
+        Comparator<Filter> comparatorName = (filterA, filterB) -> filterA.getTranslatedName().withStyle(ChatFormatting.RESET).toString().compareTo(filterB.getTranslatedName().toString()) * sortDirection;
         Comparator<Filter> comparatorDistance = (filterA, filterB) -> {
             if (filterA.hasDestination() == false && filterB.hasDestination() == false) {
                 return 0;

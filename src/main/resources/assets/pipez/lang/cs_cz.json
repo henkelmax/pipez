@@ -87,5 +87,6 @@
     "tooltip.pipez.sort_filter_list_mode.0": "Jméno vzestupně",
     "tooltip.pipez.sort_filter_list_mode.1": "Jméno sestupně",
     "tooltip.pipez.sort_filter_list_mode.2": "Vzdálenost vzestupně",
-    "tooltip.pipez.sort_filter_list_mode.3": "Vzdálenost klesající"
+    "tooltip.pipez.sort_filter_list_mode.3": "Vzdálenost klesající",
+    "message.pipez.filter.entry_count": "Příspěvky: %s"
 }

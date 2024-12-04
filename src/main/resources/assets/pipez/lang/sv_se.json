@@ -86,5 +86,6 @@
   "tooltip.pipez.sort_filter_list_mode.0": "Namn stigande",
   "tooltip.pipez.sort_filter_list_mode.1": "Namn fallande",
   "tooltip.pipez.sort_filter_list_mode.2": "Avstånd stigande",
-  "tooltip.pipez.sort_filter_list_mode.3": "Avståndet faller"
+  "tooltip.pipez.sort_filter_list_mode.3": "Avståndet faller",
+  "message.pipez.filter.entry_count": "Inlägg: %s"
 }

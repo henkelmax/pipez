@@ -87,5 +87,6 @@
   "tooltip.pipez.sort_filter_list_mode.0": "名前昇順",
   "tooltip.pipez.sort_filter_list_mode.1": "名前降順",
   "tooltip.pipez.sort_filter_list_mode.2": "距離昇順",
-  "tooltip.pipez.sort_filter_list_mode.3": "距離降順"
+  "tooltip.pipez.sort_filter_list_mode.3": "距離降順",
+  "message.pipez.filter.entry_count": "エントリー: %s"
 }

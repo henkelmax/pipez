@@ -87,5 +87,6 @@
   "tooltip.pipez.sort_filter_list_mode.0": "Nome ascendente",
   "tooltip.pipez.sort_filter_list_mode.1": "Nome descendente",
   "tooltip.pipez.sort_filter_list_mode.2": "Distância ascendente",
-  "tooltip.pipez.sort_filter_list_mode.3": "Distância descendente"
+  "tooltip.pipez.sort_filter_list_mode.3": "Distância descendente",
+  "message.pipez.filter.entry_count": "Entradas: %s"
 }

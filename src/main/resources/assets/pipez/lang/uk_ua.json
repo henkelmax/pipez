@@ -87,5 +87,6 @@
   "tooltip.pipez.sort_filter_list_mode.0": "Назва за зростанням",
   "tooltip.pipez.sort_filter_list_mode.1": "Назва за спаданням",
   "tooltip.pipez.sort_filter_list_mode.2": "Відстань по зростанню",
-  "tooltip.pipez.sort_filter_list_mode.3": "Відстань зниження"
+  "tooltip.pipez.sort_filter_list_mode.3": "Відстань зниження",
+  "message.pipez.filter.entry_count": "Записи: %s"
 }
