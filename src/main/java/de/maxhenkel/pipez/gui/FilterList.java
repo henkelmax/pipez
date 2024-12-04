@@ -177,7 +177,7 @@ public class FilterList extends WidgetBase {
             posY = guiTop + (int) (h * perc);
             scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE;
         }
-        guiGraphics.blit(enderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h, 256, 256);
+        guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h, 256, 256);
     }
 
     private Pair<BlockState, ItemStack> getBlockAt(DirectionalPosition destination) {

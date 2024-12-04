@@ -5,7 +5,7 @@ import de.maxhenkel.pipez.gui.sprite.SpriteRect;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -25,9 +25,8 @@ public class IconButton extends AbstractButton {
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        guiGraphics.blit(icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h);
+        guiGraphics.blit(RenderType::guiTextured, icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h, 256, 256);
     }
 
     @Override

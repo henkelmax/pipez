@@ -30,7 +30,7 @@ public class CycleIconButton extends AbstractButton {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         IconButton.Icon icon = icons.get(index.get());
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        guiGraphics.blit(RenderType::guiTextured, icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h);
+        guiGraphics.blit(RenderType::guiTextured, icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h, 256, 256);
     }
 
     @Override
