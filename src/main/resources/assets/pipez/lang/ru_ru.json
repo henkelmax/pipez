@@ -82,5 +82,10 @@
   "message.pipez.filter_destination_tool.destination": "Место назначения: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Место назначения: Любое",
   "message.pipez.filter_destination_tool.destination.set": "Место назначения установлено",
-  "config.jade.plugin_pipez.pipe": "Труба"
+  "config.jade.plugin_pipez.pipe": "Труба",
+  "tooltip.pipez.sort_filter_list_mode": "Сортировать по: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "Имя по возрастанию",
+  "tooltip.pipez.sort_filter_list_mode.1": "Имя по убыванию",
+  "tooltip.pipez.sort_filter_list_mode.2": "Расстояние по возрастанию",
+  "tooltip.pipez.sort_filter_list_mode.3": "Расстояние по убыванию"
 }

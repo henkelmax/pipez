@@ -81,6 +81,11 @@
   "message.pipez.filter.destination": "Destinazione",
   "message.pipez.filter_destination_tool.destination": "Destinazione: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Qualsiasi destinazione",
-  "message.pipez.filter_destination_tool.destination.set": "Destinazione impostata"
-  "config.jade.plugin_pipez.pipe": "Tubo"
+  "message.pipez.filter_destination_tool.destination.set": "Destinazione impostata",
+  "config.jade.plugin_pipez.pipe": "Tubo",
+  "tooltip.pipez.sort_filter_list_mode": "Ordina per: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "Nome crescente",
+  "tooltip.pipez.sort_filter_list_mode.1": "Nome decrescente",
+  "tooltip.pipez.sort_filter_list_mode.2": "Distanza crescente",
+  "tooltip.pipez.sort_filter_list_mode.3": "Distanza decrescente"
 }

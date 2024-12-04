@@ -81,5 +81,10 @@
   "message.pipez.filter.destination": "Ziel",
   "message.pipez.filter_destination_tool.destination": "Ziel: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Ziel: alle",
-  "message.pipez.filter_destination_tool.destination.set": "Ziel gesetzt"
+  "message.pipez.filter_destination_tool.destination.set": "Ziel gesetzt",
+  "tooltip.pipez.sort_filter_list_mode": "Sortierung nach: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "Name aufsteigend",
+  "tooltip.pipez.sort_filter_list_mode.1": "Name absteigend",
+  "tooltip.pipez.sort_filter_list_mode.2": "Entfernung aufsteigend",
+  "tooltip.pipez.sort_filter_list_mode.3": "Entfernung absteigend"
 }

@@ -82,5 +82,10 @@
   "message.pipez.filter_destination_tool.destination": "目的地：%s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "目的地：任意",
   "message.pipez.filter_destination_tool.destination.set": "目的地を設定しました",
-  "config.jade.plugin_pipez.pipe": "パイプ"
+  "config.jade.plugin_pipez.pipe": "パイプ",
+  "tooltip.pipez.sort_filter_list_mode": "並べ替え: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "名前昇順",
+  "tooltip.pipez.sort_filter_list_mode.1": "名前降順",
+  "tooltip.pipez.sort_filter_list_mode.2": "距離昇順",
+  "tooltip.pipez.sort_filter_list_mode.3": "距離降順"
 }
