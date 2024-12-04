@@ -13,7 +13,7 @@ import de.maxhenkel.pipez.gui.sprite.ExtractUISprite;
 import de.maxhenkel.pipez.gui.sprite.SpriteRect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -116,7 +116,6 @@ public class FilterList extends WidgetBase {
 
         List<Filter<?, ?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + this.rowCount; i++) {
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
             int startY = guiTop + pos * this.rowHeight;
@@ -125,7 +124,7 @@ public class FilterList extends WidgetBase {
             if (i == getSelected()) {
                 entryImageSpriteRect = ExtractElementsSprite.FILTER_LIST_ENTRY_SELECTED;
             }
-            guiGraphics.blit(ExtractElementsSprite.IMAGE, guiLeft, startY, entryImageSpriteRect.x, entryImageSpriteRect.y, entryImageSpriteRect.w, entryImageSpriteRect.h);
+            guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft, startY, entryImageSpriteRect.x, entryImageSpriteRect.y, entryImageSpriteRect.w, entryImageSpriteRect.h, 256, 256);
 
             Filter<?, ?> filter = f.get(i);
             AbstractStack<?> stack = filter.getStack();
@@ -168,7 +167,6 @@ public class FilterList extends WidgetBase {
 
         drawStringSmall(guiGraphics, this.guiLeft + ExtractUISprite.ENTRY_COUNT_TEXT.x, this.guiTop + ExtractUISprite.ENTRY_COUNT_TEXT.y, Component.translatable("message.pipez.filter.entry_count", number(f.size())));
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         SpriteRect scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_INACTIVE;
@@ -179,7 +177,7 @@ public class FilterList extends WidgetBase {
             posY = guiTop + (int) (h * perc);
             scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE;
         }
-        guiGraphics.blit(ExtractElementsSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h);
+        guiGraphics.blit(enderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h, 256, 256);
     }
 
     private Pair<BlockState, ItemStack> getBlockAt(DirectionalPosition destination) {

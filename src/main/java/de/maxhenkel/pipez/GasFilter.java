@@ -6,8 +6,10 @@ import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.utils.ChemicalTag;
 import de.maxhenkel.pipez.utils.GasUtils;
+import de.maxhenkel.pipez.utils.MekanismUtils;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -35,9 +37,12 @@ public class GasFilter extends Filter<GasFilter, Chemical> {
     );
 
     private static final Codec<Tag<Chemical>> TAG_CODEC = TAG_DATA_CODEC.xmap(data -> {
+        if (!MekanismUtils.isMekanismInstalled()) {
+            return null;
+        }
         if (data.isSingle()) {
             if (MekanismAPI.CHEMICAL_REGISTRY.containsKey(data.location)) {
-                return new SingleElementTag<>(data.location, MekanismAPI.CHEMICAL_REGISTRY.get(data.location));
+                return new SingleElementTag<>(data.location, MekanismAPI.CHEMICAL_REGISTRY.get(data.location).map(Holder.Reference::value).orElse(MekanismAPI.EMPTY_CHEMICAL));
             }
             return null;
         } else {
@@ -56,7 +61,7 @@ public class GasFilter extends Filter<GasFilter, Chemical> {
     public static final StreamCodec<RegistryFriendlyByteBuf, Tag<Chemical>> STREAM_TAG_CODEC = TAG_DATA_STREAM_CODEC.map(data -> {
         if (data.isSingle()) {
             if (MekanismAPI.CHEMICAL_REGISTRY.containsKey(data.location)) {
-                return new SingleElementTag<>(data.location, MekanismAPI.CHEMICAL_REGISTRY.get(data.location));
+                return new SingleElementTag<>(data.location, MekanismAPI.CHEMICAL_REGISTRY.get(data.location).map(Holder.Reference::value).orElse(MekanismAPI.EMPTY_CHEMICAL));
             }
             return null;
         } else {

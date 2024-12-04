@@ -1,8 +1,6 @@
 {
   "type": "pipez:clear_components",
-  "item": {
-    "tag": "pipez:upgrades"
-  },
+  "item": "#pipez:upgrades",
   "components": [
     "pipez:item",
     "pipez:fluid",

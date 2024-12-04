@@ -6,15 +6,9 @@
     "DRD"
   ],
   "key": {
-    "D": {
-      "tag": "c:gems/diamond"
-    },
-    "R": {
-      "tag": "c:storage_blocks/redstone"
-    },
-    "U": {
-      "item": "pipez:improved_upgrade"
-    }
+    "D": "#c:gems/diamond",
+    "R": "#c:storage_blocks/redstone",
+    "U": "pipez:improved_upgrade"
   },
   "result": {
     "id": "pipez:advanced_upgrade",

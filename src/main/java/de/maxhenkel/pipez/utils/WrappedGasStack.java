@@ -10,7 +10,7 @@ import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +40,7 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(stack.getChemical().getIcon());
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
         int chemicalTint = stack.getChemicalTint();
         RenderSystem.setShaderColor(RenderUtils.getRedFloat(chemicalTint), RenderUtils.getGreenFloat(chemicalTint), RenderUtils.getBlueFloat(chemicalTint), 1);
         RenderSystem.setShaderTexture(0, texture.atlasLocation());
@@ -55,7 +55,8 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
         tooltip.add(getDisplayName());
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
-            ResourceLocation registryName = MekanismAPI.CHEMICAL_REGISTRY.getKey(stack.getChemical());;
+            ResourceLocation registryName = MekanismAPI.CHEMICAL_REGISTRY.getKey(stack.getChemical());
+            ;
             if (registryName != null) {
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }

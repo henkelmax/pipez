@@ -10,6 +10,7 @@ import de.maxhenkel.pipez.datacomponents.GasData;
 import de.maxhenkel.pipez.datacomponents.ItemData;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -17,21 +18,21 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModItems {
 
-    private static final DeferredRegister<Item> ITEM_REGISTER = DeferredRegister.create(BuiltInRegistries.ITEM, Main.MODID);
+    private static final DeferredRegister.Items ITEM_REGISTER = DeferredRegister.createItems(Main.MODID);
 
-    public static final DeferredHolder<Item, UpgradeItem> BASIC_UPGRADE = ITEM_REGISTER.register(Upgrade.BASIC.getName() + "_upgrade", () -> new UpgradeItem(Upgrade.BASIC));
-    public static final DeferredHolder<Item, UpgradeItem> IMPROVED_UPGRADE = ITEM_REGISTER.register(Upgrade.IMPROVED.getName() + "_upgrade", () -> new UpgradeItem(Upgrade.IMPROVED));
-    public static final DeferredHolder<Item, UpgradeItem> ADVANCED_UPGRADE = ITEM_REGISTER.register(Upgrade.ADVANCED.getName() + "_upgrade", () -> new UpgradeItem(Upgrade.ADVANCED));
-    public static final DeferredHolder<Item, UpgradeItem> ULTIMATE_UPGRADE = ITEM_REGISTER.register(Upgrade.ULTIMATE.getName() + "_upgrade", () -> new UpgradeItem(Upgrade.ULTIMATE));
-    public static final DeferredHolder<Item, UpgradeItem> INFINITY_UPGRADE = ITEM_REGISTER.register(Upgrade.INFINITY.getName() + "_upgrade", () -> new UpgradeItem(Upgrade.INFINITY));
-    public static final DeferredHolder<Item, WrenchItem> WRENCH = ITEM_REGISTER.register("wrench", WrenchItem::new);
-    public static final DeferredHolder<Item, FilterDestinationToolItem> FILTER_DESTINATION_TOOL = ITEM_REGISTER.register("filter_destination_tool", FilterDestinationToolItem::new);
+    public static final DeferredHolder<Item, UpgradeItem> BASIC_UPGRADE = ITEM_REGISTER.registerItem(Upgrade.BASIC.getName() + "_upgrade", p -> new UpgradeItem(Upgrade.BASIC, p));
+    public static final DeferredHolder<Item, UpgradeItem> IMPROVED_UPGRADE = ITEM_REGISTER.registerItem(Upgrade.IMPROVED.getName() + "_upgrade", p -> new UpgradeItem(Upgrade.IMPROVED, p));
+    public static final DeferredHolder<Item, UpgradeItem> ADVANCED_UPGRADE = ITEM_REGISTER.registerItem(Upgrade.ADVANCED.getName() + "_upgrade", p -> new UpgradeItem(Upgrade.ADVANCED, p));
+    public static final DeferredHolder<Item, UpgradeItem> ULTIMATE_UPGRADE = ITEM_REGISTER.registerItem(Upgrade.ULTIMATE.getName() + "_upgrade", p -> new UpgradeItem(Upgrade.ULTIMATE, p));
+    public static final DeferredHolder<Item, UpgradeItem> INFINITY_UPGRADE = ITEM_REGISTER.registerItem(Upgrade.INFINITY.getName() + "_upgrade", p -> new UpgradeItem(Upgrade.INFINITY, p));
+    public static final DeferredHolder<Item, WrenchItem> WRENCH = ITEM_REGISTER.registerItem("wrench", WrenchItem::new);
+    public static final DeferredHolder<Item, FilterDestinationToolItem> FILTER_DESTINATION_TOOL = ITEM_REGISTER.registerItem("filter_destination_tool", FilterDestinationToolItem::new);
 
-    public static final DeferredHolder<Item, Item> ITEM_PIPE = ITEM_REGISTER.register("item_pipe", () -> ModBlocks.ITEM_PIPE.get().toItem());
-    public static final DeferredHolder<Item, Item> FLUID_PIPE = ITEM_REGISTER.register("fluid_pipe", () -> ModBlocks.FLUID_PIPE.get().toItem());
-    public static final DeferredHolder<Item, Item> ENERGY_PIPE = ITEM_REGISTER.register("energy_pipe", () -> ModBlocks.ENERGY_PIPE.get().toItem());
-    public static final DeferredHolder<Item, Item> UNIVERSAL_PIPE = ITEM_REGISTER.register("universal_pipe", () -> ModBlocks.UNIVERSAL_PIPE.get().toItem());
-    public static final DeferredHolder<Item, Item> GAS_PIPE = ITEM_REGISTER.register("gas_pipe", () -> ModBlocks.GAS_PIPE.get().toItem());
+    public static final DeferredHolder<Item, BlockItem> ITEM_PIPE = ITEM_REGISTER.registerSimpleBlockItem(ModBlocks.ITEM_PIPE);
+    public static final DeferredHolder<Item, BlockItem> FLUID_PIPE = ITEM_REGISTER.registerSimpleBlockItem(ModBlocks.FLUID_PIPE);
+    public static final DeferredHolder<Item, BlockItem> ENERGY_PIPE = ITEM_REGISTER.registerSimpleBlockItem(ModBlocks.ENERGY_PIPE);
+    public static final DeferredHolder<Item, BlockItem> UNIVERSAL_PIPE = ITEM_REGISTER.registerSimpleBlockItem(ModBlocks.UNIVERSAL_PIPE);
+    public static final DeferredHolder<Item, BlockItem> GAS_PIPE = ITEM_REGISTER.registerSimpleBlockItem(ModBlocks.GAS_PIPE);
 
     private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, Main.MODID);
 

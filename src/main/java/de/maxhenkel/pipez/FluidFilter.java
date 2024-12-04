@@ -4,11 +4,13 @@ import com.mojang.serialization.Codec;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.corelib.tag.TagUtils;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -17,7 +19,7 @@ public class FluidFilter extends Filter<FluidFilter, Fluid> {
 
     private static final TagConverter<Fluid> TAG_CONVERTER = (single, location) -> {
         if (single) {
-            return new SingleElementTag<>(location, BuiltInRegistries.FLUID.get(location));
+            return new SingleElementTag<>(location, BuiltInRegistries.FLUID.get(location).map(Holder.Reference::value).orElse(Fluids.EMPTY));
         } else {
             return TagUtils.getFluidTag(location);
         }

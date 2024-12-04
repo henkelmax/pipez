@@ -78,25 +78,15 @@ public class ClearComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return ModRecipes.CLEAR_NBT.get();
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider provider) {
-        return ItemStack.EMPTY;
     }
 
     public static class Serializer implements RecipeSerializer<ClearComponentsRecipe> {
 
         private static final MapCodec<ClearComponentsRecipe> CODEC = RecordCodecBuilder.mapCodec((builder) -> builder
                 .group(
-                        Ingredient.CODEC_NONEMPTY
+                        Ingredient.CODEC
                                 .fieldOf("item")
                                 .forGetter((recipe) -> recipe.ingredient),
                         Codec.list(ResourceLocation.CODEC)

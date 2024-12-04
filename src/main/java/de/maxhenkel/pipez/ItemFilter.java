@@ -4,11 +4,13 @@ import com.mojang.serialization.Codec;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.corelib.tag.TagUtils;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -17,7 +19,7 @@ public class ItemFilter extends Filter<ItemFilter, Item> {
 
     private static final TagConverter<Item> TAG_CONVERTER = (single, location) -> {
         if (single) {
-            return new SingleElementTag<>(location, BuiltInRegistries.ITEM.get(location));
+            return new SingleElementTag<>(location, BuiltInRegistries.ITEM.get(location).map(Holder.Reference::value).orElse(Items.AIR));
         } else {
             return TagUtils.getItemTag(location);
         }

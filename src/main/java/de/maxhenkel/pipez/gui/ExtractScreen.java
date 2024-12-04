@@ -17,6 +17,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -266,8 +267,6 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), (float) ExtractUISprite.INVENTORY_TITLE.x, (float) ExtractUISprite.INVENTORY_TITLE.y, FONT_COLOR, false);
 
         filterList.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
-
-        drawHoverAreas(guiGraphics, mouseX, mouseY);
     }
 
     @Override
@@ -281,7 +280,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 if (i == currentindex) {
                     tabSpriteRect = ExtractElementsSprite.TAB_ACTIVE;
                 }
-                guiGraphics.blit(ExtractElementsSprite.IMAGE, this.leftPos + ExtractElementsSprite.TAB_BUTTON.x, this.topPos + ExtractElementsSprite.TAB_BUTTON.y + (ExtractElementsSprite.TAB_BUTTON.h + ExtractElementsSprite.TAB_BUTTON_MARGIN) * i, tabSpriteRect.x, tabSpriteRect.y, tabSpriteRect.w, tabSpriteRect.h);
+                guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, this.leftPos + ExtractElementsSprite.TAB_BUTTON.x, this.topPos + ExtractElementsSprite.TAB_BUTTON.y + (ExtractElementsSprite.TAB_BUTTON.h + ExtractElementsSprite.TAB_BUTTON_MARGIN) * i, tabSpriteRect.x, tabSpriteRect.y, tabSpriteRect.w, tabSpriteRect.h, 256, 256);
             }
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
@@ -352,6 +351,12 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         });
 
         return f;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        super.render(guiGraphics, x, y, partialTicks);
+        drawHoverAreas(guiGraphics, x, y);
     }
 
     public int getTabsX() {

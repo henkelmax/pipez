@@ -6,15 +6,9 @@
     "NRN"
   ],
   "key": {
-    "N": {
-      "tag": "c:ingots/netherite"
-    },
-    "R": {
-      "tag": "c:storage_blocks/redstone"
-    },
-    "U": {
-      "item": "pipez:advanced_upgrade"
-    }
+    "N": "#c:ingots/netherite",
+    "R": "#c:storage_blocks/redstone",
+    "U": "pipez:advanced_upgrade"
   },
   "result": {
     "id": "pipez:ultimate_upgrade",

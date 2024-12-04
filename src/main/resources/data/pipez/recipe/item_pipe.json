@@ -6,15 +6,9 @@
     "III"
   ],
   "key": {
-    "D": {
-      "item": "minecraft:dropper"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "D": "minecraft:dropper",
+    "I": "#c:ingots/iron",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "pipez:item_pipe",

@@ -6,7 +6,7 @@ import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -18,7 +18,8 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 
 public class FluidPipeBlock extends PipeBlock {
 
-    protected FluidPipeBlock() {
+    protected FluidPipeBlock(Properties properties) {
+        super(properties);
     }
 
     @Override
@@ -38,15 +39,15 @@ public class FluidPipeBlock extends PipeBlock {
     }
 
     @Override
-    public ItemInteractionResult onPipeSideActivated(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
+    public InteractionResult onPipeSideActivated(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
         BlockEntity tileEntity = worldIn.getBlockEntity(pos);
         if (tileEntity instanceof FluidPipeTileEntity && isExtracting(worldIn, pos, direction)) {
             if (worldIn.isClientSide) {
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             FluidPipeTileEntity pipe = (FluidPipeTileEntity) tileEntity;
             PipeContainerProvider.openGui(player, pipe, direction, -1, (i, playerInventory, playerEntity) -> new ExtractContainer(i, playerInventory, pipe, direction, -1));
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         return super.onPipeSideActivated(stack, state, worldIn, pos, player, handIn, hit, direction);
     }

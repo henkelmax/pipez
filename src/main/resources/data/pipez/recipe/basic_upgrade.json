@@ -6,15 +6,9 @@
     "INI"
   ],
   "key": {
-    "N": {
-      "tag": "c:nuggets/iron"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    }
+    "N": "#c:nuggets/iron",
+    "I": "#c:ingots/iron",
+    "R": "#c:dusts/redstone"
   },
   "result": {
     "id": "pipez:basic_upgrade",

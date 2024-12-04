@@ -13,7 +13,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -141,28 +140,18 @@ public class CopyComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return ModRecipes.COPY_NBT.get();
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width >= 2 && height >= 2;
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider provider) {
-        return ItemStack.EMPTY;
     }
 
     public static class Serializer implements RecipeSerializer<CopyComponentsRecipe> {
 
         private static final MapCodec<CopyComponentsRecipe> CODEC = RecordCodecBuilder.mapCodec((builder) -> builder
                 .group(
-                        Ingredient.CODEC_NONEMPTY
+                        Ingredient.CODEC
                                 .fieldOf("source")
                                 .forGetter((recipe) -> recipe.sourceIngredient),
-                        Ingredient.CODEC_NONEMPTY
+                        Ingredient.CODEC
                                 .fieldOf("target")
                                 .forGetter((recipe) -> recipe.targetIngredient),
                         Codec.list(ResourceLocation.CODEC)

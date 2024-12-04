@@ -19,19 +19,19 @@ public class ModTileEntities {
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_REGISTER = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Main.MODID);
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemPipeTileEntity>> ITEM_PIPE = BLOCK_ENTITY_REGISTER.register("item_pipe", () ->
-            BlockEntityType.Builder.of(ItemPipeTileEntity::new, ModBlocks.ITEM_PIPE.get()).build(null)
+            new BlockEntityType<>(ItemPipeTileEntity::new, ModBlocks.ITEM_PIPE.get())
     );
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FluidPipeTileEntity>> FLUID_PIPE = BLOCK_ENTITY_REGISTER.register("fluid_pipe", () ->
-            BlockEntityType.Builder.of(FluidPipeTileEntity::new, ModBlocks.FLUID_PIPE.get()).build(null)
+            new BlockEntityType<>(FluidPipeTileEntity::new, ModBlocks.FLUID_PIPE.get())
     );
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EnergyPipeTileEntity>> ENERGY_PIPE = BLOCK_ENTITY_REGISTER.register("energy_pipe", () ->
-            BlockEntityType.Builder.of(EnergyPipeTileEntity::new, ModBlocks.ENERGY_PIPE.get()).build(null)
+            new BlockEntityType<>(EnergyPipeTileEntity::new, ModBlocks.ENERGY_PIPE.get())
     );
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GasPipeTileEntity>> GAS_PIPE = BLOCK_ENTITY_REGISTER.register("gas_pipe", () ->
-            BlockEntityType.Builder.of(GasPipeTileEntity::new, ModBlocks.GAS_PIPE.get()).build(null)
+            new BlockEntityType<>(GasPipeTileEntity::new, ModBlocks.GAS_PIPE.get())
     );
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<UniversalPipeTileEntity>> UNIVERSAL_PIPE = BLOCK_ENTITY_REGISTER.register("universal_pipe", () ->
-            BlockEntityType.Builder.of(UniversalPipeTileEntity::new, ModBlocks.UNIVERSAL_PIPE.get()).build(null)
+            new BlockEntityType<>(UniversalPipeTileEntity::new, ModBlocks.UNIVERSAL_PIPE.get())
     );
 
     public static void init(IEventBus eventBus) {

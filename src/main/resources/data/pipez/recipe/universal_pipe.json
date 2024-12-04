@@ -6,21 +6,11 @@
     "IEF"
   ],
   "key": {
-    "I": {
-      "item": "pipez:item_pipe"
-    },
-    "E": {
-      "item": "pipez:energy_pipe"
-    },
-    "F": {
-      "item": "pipez:fluid_pipe"
-    },
-    "R": {
-      "tag": "c:storage_blocks/redstone"
-    },
-    "M": {
-      "tag": "c:ingots/iron"
-    }
+    "I": "pipez:item_pipe",
+    "E": "pipez:energy_pipe",
+    "F": "pipez:fluid_pipe",
+    "R": "#c:storage_blocks/redstone",
+    "M": "#c:ingots/iron"
   },
   "result": {
     "id": "pipez:universal_pipe",
