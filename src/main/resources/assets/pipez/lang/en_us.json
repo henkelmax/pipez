@@ -72,6 +72,7 @@
   "message.pipez.direction.up": "Up",
   "message.pipez.direction.down": "Down",
   "message.pipez.filter.add": "Add",
+  "message.pipez.filter.destination_distance": "%s",
   "message.pipez.filter.edit": "Edit",
   "message.pipez.filter.remove": "Remove",
   "message.pipez.filter.cancel": "Cancel",
@@ -82,5 +83,11 @@
   "message.pipez.filter_destination_tool.destination": "Destination: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Destination: Any",
   "message.pipez.filter_destination_tool.destination.set": "Destination set",
-  "config.jade.plugin_pipez.pipe": "Pipe"
+  "config.jade.plugin_pipez.pipe": "Pipe",
+  "tooltip.pipez.sort_filter_list_mode": "Sort by: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "Name ascending",
+  "tooltip.pipez.sort_filter_list_mode.1": "Name descending",
+  "tooltip.pipez.sort_filter_list_mode.2": "Distance ascending",
+  "tooltip.pipez.sort_filter_list_mode.3": "Distance descending",
+  "message.pipez.filter.entry_count": "Entries: %s"
 }

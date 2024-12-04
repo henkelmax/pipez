@@ -81,5 +81,11 @@
     "message.pipez.filter.destination": "목적지",
     "message.pipez.filter_destination_tool.destination": "목적지: %s, %s, %s, %s",
     "message.pipez.filter_destination_tool.destination.any": "목적지: 아무데나",
-    "message.pipez.filter_destination_tool.destination.set": "목적지 설정"
+    "message.pipez.filter_destination_tool.destination.set": "목적지 설정",
+    "tooltip.pipez.sort_filter_list_mode": "정렬 기준: %s",
+    "tooltip.pipez.sort_filter_list_mode.0": "이름 오름차순",
+    "tooltip.pipez.sort_filter_list_mode.1": "이름 내림차순",
+    "tooltip.pipez.sort_filter_list_mode.2": "거리 오름차순",
+    "tooltip.pipez.sort_filter_list_mode.3": "거리 내림차순",
+    "message.pipez.filter.entry_count": "항목: %s"
   }

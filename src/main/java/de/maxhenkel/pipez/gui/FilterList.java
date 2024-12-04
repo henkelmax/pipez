@@ -4,68 +4,62 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.maxhenkel.corelib.CachedMap;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.Pair;
-import de.maxhenkel.corelib.helpers.WrappedFluidStack;
-import de.maxhenkel.corelib.helpers.WrappedItemStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import de.maxhenkel.corelib.tag.SingleElementTag;
-import de.maxhenkel.corelib.tag.Tag;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.utils.ComponentUtils;
-import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.utils.MekanismUtils;
-import de.maxhenkel.pipez.utils.WrappedGasStack;
+import de.maxhenkel.pipez.gui.sprite.ExtractElementsSprite;
+import de.maxhenkel.pipez.gui.sprite.ExtractUISprite;
+import de.maxhenkel.pipez.gui.sprite.SpriteRect;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.fluids.FluidStack;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class FilterList extends WidgetBase {
-
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/extract.png");
-
     protected Supplier<List<Filter<?, ?>>> filters;
     protected int offset;
     protected int selected;
     private ScreenBase.HoverArea[] hoverAreas;
     private ScreenBase.HoverArea[] itemHoverAreas;
     private ScreenBase.HoverArea[] blockHoverAreas;
-    private int columnHeight;
-    private int columnCount;
+    private int rowHeight;
+    private int rowCount;
     private CachedMap<DirectionalPosition, Pair<BlockState, ItemStack>> filterPosCache;
 
-    public FilterList(ExtractScreen screen, int posX, int posY, int xSize, int ySize, Supplier<List<Filter<?, ?>>> filters) {
-        super(screen, posX, posY, xSize, ySize);
-        this.filters = filters;
-        columnHeight = 22;
-        columnCount = 3;
-        selected = -1;
+    private static int offsetLast = 0;
+    private static int selectedLast = -1;
 
-        hoverAreas = new ScreenBase.HoverArea[columnCount];
-        itemHoverAreas = new ScreenBase.HoverArea[columnCount];
-        blockHoverAreas = new ScreenBase.HoverArea[columnCount];
+    public FilterList(ExtractScreen screen, SpriteRect rect, int rowHeight, int rowCount, Supplier<List<Filter<?, ?>>> filters) {
+        super(screen, rect.x, rect.y, rect.w, rect.h);
+
+        this.rowHeight = rowHeight;
+        this.rowCount = rowCount;
+        this.filters = filters;
+
+        this.offset = FilterList.offsetLast;
+        this.selected = FilterList.selectedLast;
+
+        // TODO
+        hoverAreas = new ScreenBase.HoverArea[this.rowCount];
+        itemHoverAreas = new ScreenBase.HoverArea[this.rowCount];
+        blockHoverAreas = new ScreenBase.HoverArea[this.rowCount];
         for (int i = 0; i < hoverAreas.length; i++) {
-            hoverAreas[i] = new ScreenBase.HoverArea(0, i * columnHeight, xSize, columnHeight);
-            itemHoverAreas[i] = new ScreenBase.HoverArea(3, 3 + i * columnHeight, 16, 16);
-            blockHoverAreas[i] = new ScreenBase.HoverArea(xSize - 3 - 16 - 11, 3 + i * columnHeight, 16, 16);
+            hoverAreas[i] = new ScreenBase.HoverArea(0, i * this.rowHeight, rect.w, this.rowHeight);
+            itemHoverAreas[i] = new ScreenBase.HoverArea(3, 3 + i * this.rowHeight, 16, 16);
+            blockHoverAreas[i] = new ScreenBase.HoverArea(rect.w - 3 - 16 - 11, 3 + i * this.rowHeight, 16, 16);
         }
 
         filterPosCache = new CachedMap<>(1000);
@@ -75,13 +69,14 @@ public class FilterList extends WidgetBase {
     protected void drawGuiContainerForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
         List<Filter<?, ?>> f = filters.get();
+
         for (int i = 0; i < hoverAreas.length; i++) {
             if (getOffset() + i >= f.size()) {
                 break;
             }
             Filter<?, ?> filter = f.get(getOffset() + i);
             if (itemHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
-                AbstractStack<?> stack = getStack(filter);
+                AbstractStack<?> stack = filter.getStack();
                 if (stack != null && !stack.isEmpty()) {
                     List<Component> tooltip = stack.getTooltip();
                     if (filter.isInvert()) {
@@ -93,7 +88,7 @@ public class FilterList extends WidgetBase {
                     guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
                 }
             } else if (blockHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
-                if (filter.getDestination() != null) {
+                if (filter.hasDestination()) {
                     List<Component> tooltip = new ArrayList<>();
                     Pair<BlockState, ItemStack> destPair = getBlockAt(filter.getDestination());
                     if (destPair.getKey() == null) {
@@ -103,7 +98,7 @@ public class FilterList extends WidgetBase {
                     }
                     BlockPos pos = filter.getDestination().getPos();
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
-                    tooltip.add(Component.translatable("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
+                    tooltip.add(Component.translatable("tooltip.pipez.filter.destination_distance", number(filter.getDistanceTo(getContainer().getPipe().getBlockPos()))));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_side", Component.translatable("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
                     guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
                 }
@@ -115,55 +110,24 @@ public class FilterList extends WidgetBase {
         return Component.literal(String.valueOf(num)).withStyle(ChatFormatting.DARK_GREEN);
     }
 
-    @Nullable
-    public static AbstractStack<?> getStack(Filter<?, ?> filter) {
-        Object o = null;
-
-        if (filter.getTag() != null) {
-            o = get(filter.getTag());
-        }
-
-        if (o instanceof Item) {
-            ItemStack stack = new ItemStack((Item) o);
-            if (filter.getMetadata() != null) {
-                stack.applyComponents(ComponentUtils.getPatch(Minecraft.getInstance().level.registryAccess(), filter.getMetadata().copy()));
-            }
-            return new WrappedItemStack(stack);
-        } else if (o instanceof Fluid) {
-            FluidStack stack = new FluidStack((Fluid) o, 1000);
-            if (filter.getMetadata() != null) {
-                stack.applyComponents(ComponentUtils.getPatch(Minecraft.getInstance().level.registryAccess(), filter.getMetadata().copy()));
-            }
-            return new WrappedFluidStack(stack);
-        }
-
-        if (MekanismUtils.isMekanismInstalled()) {
-            AbstractStack<?> gasStack = WrappedGasStack.dummyStack(o);
-            if (gasStack != null) {
-                return gasStack;
-            }
-        }
-
-        return null;
-    }
-
     @Override
     protected void drawGuiContainerBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
         List<Filter<?, ?>> f = filters.get();
-        for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
+        for (int i = getOffset(); i < f.size() && i < getOffset() + this.rowCount; i++) {
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
-            int startY = guiTop + pos * columnHeight;
-            Filter<?, ?> filter = f.get(i);
-            if (i == getSelected()) {
-                guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
-            } else {
-                guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
-            }
+            int startY = guiTop + pos * this.rowHeight;
 
-            AbstractStack<?> stack = getStack(filter);
+            SpriteRect entryImageSpriteRect = ExtractElementsSprite.FILTER_LIST_ENTRY;
+            if (i == getSelected()) {
+                entryImageSpriteRect = ExtractElementsSprite.FILTER_LIST_ENTRY_SELECTED;
+            }
+            guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft, startY, entryImageSpriteRect.x, entryImageSpriteRect.y, entryImageSpriteRect.w, entryImageSpriteRect.h, 256, 256);
+
+            Filter<?, ?> filter = f.get(i);
+            AbstractStack<?> stack = filter.getStack();
             if (stack != null && !stack.isEmpty()) {
                 stack.render(guiGraphics, guiLeft + 3, startY + 3);
                 if (filter.getTag() != null) {
@@ -189,23 +153,31 @@ public class FilterList extends WidgetBase {
                 drawStringSmall(guiGraphics, guiLeft + 22, startY + 15, Component.translatable("message.pipez.filter.inverted").withStyle(ChatFormatting.DARK_RED));
             }
 
-            if (filter.getDestination() != null) {
+            if (filter.hasDestination()) {
                 Pair<BlockState, ItemStack> dstPair = getBlockAt(filter.getDestination());
                 guiGraphics.renderItem(dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, 0);
-                guiGraphics.renderItemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
+
+                String distanceText = Component.translatable("message.pipez.filter.destination_distance", number(filter.getDistanceTo(getContainer().getPipe().getBlockPos()))).getString();
+                guiGraphics.renderItemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY - 7, distanceText);
+
+                String directionText = Component.translatable("message.pipez.direction." + filter.getDestination().getDirection().getName()).getString();
+                guiGraphics.renderItemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(directionText.charAt(0)));
             }
         }
 
+        drawStringSmall(guiGraphics, this.guiLeft + ExtractUISprite.ENTRY_COUNT_TEXT.x, this.guiTop + ExtractUISprite.ENTRY_COUNT_TEXT.y, Component.translatable("message.pipez.filter.entry_count", number(f.size())));
+
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
-        if (f.size() > columnCount) {
-            float h = 66 - 17;
-            float perc = (float) getOffset() / (float) (f.size() - columnCount);
-            int posY = guiTop + (int) (h * perc);
-            guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
-        } else {
-            guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
+        SpriteRect scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_INACTIVE;
+        int posY = guiTop;
+        if (f.size() > this.rowCount) {
+            float h = ExtractUISprite.ROW_HEIGHT * ExtractUISprite.VISIBLE_ROW_COUNT - ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE.h;
+            float perc = (float) getOffset() / (float) (f.size() - this.rowCount);
+            posY = guiTop + (int) (h * perc);
+            scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE;
         }
+        guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h, 256, 256);
     }
 
     private Pair<BlockState, ItemStack> getBlockAt(DirectionalPosition destination) {
@@ -231,11 +203,12 @@ public class FilterList extends WidgetBase {
 
     public int getOffset() {
         List<Filter<?, ?>> f = filters.get();
-        if (f.size() <= columnCount) {
+        if (f.size() <= this.rowCount) {
             offset = 0;
-        } else if (offset > f.size() - columnCount) {
-            offset = f.size() - columnCount;
+        } else if (offset > f.size() - this.rowCount) {
+            offset = f.size() - this.rowCount;
         }
+        FilterList.offsetLast = offset;
         return offset;
     }
 
@@ -243,6 +216,7 @@ public class FilterList extends WidgetBase {
         if (selected >= filters.get().size()) {
             selected = -1;
         }
+        FilterList.selectedLast = selected;
         return selected;
     }
 
@@ -254,21 +228,16 @@ public class FilterList extends WidgetBase {
         guiGraphics.pose().popPose();
     }
 
-    public static <T> T get(Tag<T> tag) {
-        long time = Minecraft.getInstance().level.getGameTime();
-        List<T> allElements = tag.getAll().stream().toList();
-        return allElements.get((int) (time / 20L % allElements.size()));
-    }
-
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
         List<Filter<?, ?>> f = filters.get();
-        if (f.size() > columnCount) {
+        if (f.size() > this.rowCount) {
             if (deltaY < 0D) {
-                offset = Math.min(getOffset() + 1, f.size() - columnCount);
+                offset = Math.min(getOffset() + 1, f.size() - this.rowCount);
             } else {
                 offset = Math.max(getOffset() - 1, 0);
             }
+            FilterList.offsetLast = offset;
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, deltaX, deltaY);
@@ -285,6 +254,7 @@ public class FilterList extends WidgetBase {
                 continue;
             }
             selected = getOffset() + i;
+            FilterList.selectedLast = selected;
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
