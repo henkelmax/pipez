@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.inventory.ScreenBase;
@@ -249,7 +248,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
         nbtButton.active = true;
         try {
-            filter.setMetadata(TagParser.parseTag(text));
+            filter.setMetadata(TagParser.parseCompoundFully(text));
             nbt.setTextColor(ChatFormatting.WHITE.getColor());
         } catch (CommandSyntaxException e) {
             nbt.setTextColor(ChatFormatting.DARK_RED.getColor());
@@ -354,11 +353,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     private void drawHoverSlot(GuiGraphics guiGraphics, int posX, int posY) {
-        RenderSystem.disableDepthTest();
-        RenderSystem.colorMask(true, true, true, false);
         guiGraphics.fillGradient(posX, posY, posX + 16, posY + 16, slotColor, -2130706433);
-        RenderSystem.colorMask(true, true, true, true);
-        RenderSystem.enableDepthTest();
     }
 
     @Override

@@ -7,9 +7,10 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class FilterDestinationToolItem extends Item {
 
@@ -18,13 +19,13 @@ public class FilterDestinationToolItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(Component.translatable("tooltip.pipez.filter_destination_tool").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag flag) {
+        consumer.accept(Component.translatable("tooltip.pipez.filter_destination_tool").withStyle(ChatFormatting.GRAY));
         DirectionalPosition dst = getDestination(stack);
         if (dst != null) {
-            tooltip.add(Component.translatable("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.translatable("message.pipez.direction." + dst.getDirection().getName()).withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.translatable("message.pipez.direction." + dst.getDirection().getName()).withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
         }
-        super.appendHoverText(stack, context, tooltip, flagIn);
+        super.appendHoverText(stack, context, tooltipDisplay, consumer, flag);
     }
 
     private MutableComponent number(int num) {
