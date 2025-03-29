@@ -1,1 +1,3 @@
-- Added Turkish translation
+- Added Spanish translation
+- Added Argentinian Spanish translation
+- Added Mexican Spanish translation
