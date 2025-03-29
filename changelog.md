@@ -1,4 +1,6 @@
-- Fixed Mekanism machines not accepting energy
+- Added Spanish translation
+- Added Argentinian Spanish translation
+- Added Mexican Spanish translation
 
 **NOTE**
 
