@@ -1,4 +1,6 @@
-- Updated to 1.21.5
+- Added Spanish translation
+- Added Argentinian Spanish translation
+- Added Mexican Spanish translation
 
 **NOTE**
 
