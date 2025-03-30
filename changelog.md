@@ -1,3 +1,1 @@
-- Added Spanish translation
-- Added Argentinian Spanish translation
-- Added Mexican Spanish translation
+- Fixed invalid translations
