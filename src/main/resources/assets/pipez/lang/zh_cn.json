@@ -81,6 +81,5 @@
   "message.pipez.filter.destination": "目标",
   "message.pipez.filter_destination_tool.destination": "目标：%s，%s，%s，%s",
   "message.pipez.filter_destination_tool.destination.any": "目标：任何",
-  "message.pipez.filter_destination_tool.destination.set": "目标已设定",
-  "config.jade.plugin_pipez.pipe": "管道"
-  }
+  "message.pipez.filter_destination_tool.destination.set": "目标已设定"
+}
