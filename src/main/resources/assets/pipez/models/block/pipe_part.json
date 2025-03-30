@@ -6,12 +6,12 @@
 			"to": [11, 11, 5],
 			"shade": false,
 			"faces": {
-				"north": {"uv": [10, 0, 16, 6], "texture": "#0"},
-				"east": {"uv": [0, 0, 5, 6], "texture": "#0"},
-				"south": {"uv": [10, 0, 16, 6], "texture": "#0"},
-				"west": {"uv": [0, 0, 5, 6], "texture": "#0"},
-				"up": {"uv": [0, 0, 5, 6], "rotation": 90, "texture": "#0"},
-				"down": {"uv": [0, 0, 5, 6], "rotation": 90, "texture": "#0"}
+				"north": {"texture": "#0"},
+				"east":  {"texture": "#0"},
+				"south": {"texture": "#0"},
+				"west":  {"texture": "#0"},
+				"up":    {"texture": "#0"},
+				"down":  {"texture": "#0"}
 			}
 		}
 	]

@@ -1,7 +1,7 @@
 {
 	"parent": "pipez:block/pipe_extract",
 	"textures": {
-		"0": "pipez:block/fluid_pipe",
-		"particle": "pipez:block/fluid_pipe"
+		"0": "pipez:block/fluid_pipe_extract",
+		"particle": "pipez:block/fluid_pipe_extract"
 	}
 }

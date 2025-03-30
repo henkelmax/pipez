@@ -2,16 +2,16 @@
 	"parent": "block/block",
 	"elements": [
 		{
-			"from": [4, 4, 0],
+			"from": [4, 4, -0.001],
 			"to": [12, 12, 1],
 			"shade": false,
 			"faces": {
-				"north": {"uv": [8, 6, 16, 14], "texture": "#0"},
-				"east": {"uv": [0, 6, 1, 14], "texture": "#0"},
-				"south": {"uv": [8, 6, 16, 14], "texture": "#0"},
-				"west": {"uv": [0, 6, 1, 14], "texture": "#0"},
-				"up": {"uv": [0, 6, 1, 14], "rotation": 90, "texture": "#0"},
-				"down": {"uv": [0, 6, 1, 14], "rotation": 90, "texture": "#0"}
+				"north": {"texture": "#0"},
+				"east" : {"texture": "#0"},
+				"south": {"texture": "#0"},
+				"west" : {"texture": "#0"},
+				"up"   : {"texture": "#0"},
+				"down" : {"texture": "#0"}
 			}
 		}
 	]

@@ -1,1 +1,6 @@
-- Added Turkish translation
+- Fixed argentinian spanish translatios
+- Fixed mexican spanish translatios
+- Fixed spain spanish translatios
+- New pipez textures
+- New upgrades textures
+- New filter destination tool texture
