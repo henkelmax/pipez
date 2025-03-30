@@ -80,7 +80,6 @@
   "message.pipez.filter.nbt_string": "Данные NBT",
   "message.pipez.filter.destination": "Место назначения",
   "message.pipez.filter_destination_tool.destination": "Место назначения: %s, %s, %s, %s",
-  "message.pipez.filter_destination_tool.destination.any": "Место назначения: Любой",
-  "message.pipez.filter_destination_tool.destination.set": "Место назначения установлено",
-  "config.jade.plugin_pipez.pipe": "Труба"
+  "message.pipez.filter_destination_tool.destination.any": "Место назначения: Любое",
+  "message.pipez.filter_destination_tool.destination.set": "Место назначения установлено"
 }
