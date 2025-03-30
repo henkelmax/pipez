@@ -82,5 +82,4 @@
   "message.pipez.filter_destination_tool.destination": "Destinazione: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Qualsiasi destinazione",
   "message.pipez.filter_destination_tool.destination.set": "Destinazione impostata"
-  "config.jade.plugin_pipez.pipe": "Tubo"
 }

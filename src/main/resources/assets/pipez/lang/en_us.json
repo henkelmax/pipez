@@ -81,6 +81,5 @@
   "message.pipez.filter.destination": "Destination",
   "message.pipez.filter_destination_tool.destination": "Destination: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Destination: Any",
-  "message.pipez.filter_destination_tool.destination.set": "Destination set",
-  "config.jade.plugin_pipez.pipe": "Pipe"
+  "message.pipez.filter_destination_tool.destination.set": "Destination set"
 }
