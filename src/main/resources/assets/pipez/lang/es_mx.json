@@ -82,5 +82,5 @@
     "message.pipez.filter_destination_tool.destination": "Destino: %s, %s, %s, %s",
     "message.pipez.filter_destination_tool.destination.any": "Destino: Cualquiera",
     "message.pipez.filter_destination_tool.destination.set": "Destino establecido",
-    "config.jade.plugin_pipez.pipe": "Tubería",
+    "config.jade.plugin_pipez.pipe": "Tubería"
 }
