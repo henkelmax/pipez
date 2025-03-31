@@ -82,7 +82,6 @@
   "message.pipez.filter_destination_tool.destination": "Destination: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Destination: toute",
   "message.pipez.filter_destination_tool.destination.set": "Destination définie",
-  "config.jade.plugin_pipez.pipe": "Pipe",
   "tooltip.pipez.sort_filter_list_mode": "Trier par : %s",
   "tooltip.pipez.sort_filter_list_mode.0": "Nom croissant",
   "tooltip.pipez.sort_filter_list_mode.1": "Nom décroissant",

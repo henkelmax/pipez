@@ -1,4 +1,4 @@
-- Updated to 1.21.4
+- Fixed invalid translations
 
 **NOTE**
 

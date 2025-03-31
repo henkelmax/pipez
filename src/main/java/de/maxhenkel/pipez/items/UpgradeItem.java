@@ -11,9 +11,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class UpgradeItem extends Item {
 
@@ -34,9 +36,8 @@ public class UpgradeItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, tooltip, flagIn);
-
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltipDisplay, consumer, flag);
         List<MutableComponent> list = new ArrayList<>();
 
         ItemData itemData = stack.get(ModItems.ITEM_DATA_COMPONENT);
@@ -60,7 +61,7 @@ public class UpgradeItem extends Item {
 
         if (!list.isEmpty()) {
             MutableComponent types = list.stream().reduce((text1, text2) -> text1.append(", ").append(text2)).get();
-            tooltip.add(Component.translatable("tooltip.pipez.upgrade.configured", types.withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW));
+            consumer.accept(Component.translatable("tooltip.pipez.upgrade.configured", types.withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW));
         }
     }
 

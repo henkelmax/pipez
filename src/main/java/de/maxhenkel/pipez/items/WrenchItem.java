@@ -3,12 +3,14 @@ package de.maxhenkel.pipez.items;
 import de.maxhenkel.pipez.tags.ModItemTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class WrenchItem extends Item {
 
@@ -19,9 +21,9 @@ public class WrenchItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(WRENCH_TOOLTIP);
-        super.appendHoverText(stack, context, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag flag) {
+        consumer.accept(WRENCH_TOOLTIP);
+        super.appendHoverText(stack, context, tooltipDisplay, consumer, flag);
     }
 
     public static boolean isWrench(ItemStack stack) {
@@ -29,7 +31,8 @@ public class WrenchItem extends Item {
     }
 
     public static boolean isHoldingWrench(Player player) {
-        for (ItemStack stack : player.getHandSlots()) {
+        for (InteractionHand hand : InteractionHand.values()) {
+            ItemStack stack = player.getItemInHand(hand);
             if (isWrench(stack)) {
                 return true;
             }

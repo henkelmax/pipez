@@ -11,9 +11,9 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
 
     protected Minecraft minecraft;
     protected BlockEntityRendererProvider.Context renderer;
-    protected AtomicReference<BakedModel> cachedModel;
+    protected AtomicReference<QuadCollection> cachedModel;
 
     public PipeRenderer(BlockEntityRendererProvider.Context renderer) {
         this.renderer = renderer;
@@ -32,12 +32,12 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
     }
 
     @Override
-    public void render(PipeTileEntity pipe, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
-        BakedModel iBakedModel = cachedModel.get();
-        if (iBakedModel == null) {
+    public void render(PipeTileEntity pipe, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay, Vec3 vec) {
+        QuadCollection model = cachedModel.get();
+        if (model == null) {
             return;
         }
-        List<BakedQuad> quads = iBakedModel.getQuads(null, null, minecraft.level.random, ModelData.EMPTY, RenderType.solid());
+        List<BakedQuad> quads = model.getQuads(null);
         VertexConsumer b = buffer.getBuffer(RenderType.solid());
 
         for (Direction side : Direction.values()) {

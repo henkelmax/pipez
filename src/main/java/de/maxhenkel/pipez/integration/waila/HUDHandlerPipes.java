@@ -9,7 +9,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -22,6 +21,7 @@ import snownee.jade.api.config.IPluginConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
 
@@ -32,9 +32,11 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
         CompoundTag compound = blockAccessor.getServerData();
-        if (compound.contains("Upgrade", Tag.TAG_STRING)) {
-            iTooltip.add(Component.Serializer.fromJson(compound.getString("Upgrade"), blockAccessor.getLevel().registryAccess()));
-        }
+
+        compound.getString("Upgrade").ifPresent(s -> {
+            iTooltip.add(Component.Serializer.fromJson(s, blockAccessor.getLevel().registryAccess()));
+        });
+
         iTooltip.addAll(getTooltips(blockAccessor, compound));
     }
 
@@ -84,12 +86,13 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
 
     public List<Component> getTooltips(BlockAccessor blockAccessor, CompoundTag compound) {
         List<Component> tooltips = new ArrayList<>();
-        if (!compound.contains("Tooltips", Tag.TAG_LIST)) {
+        Optional<ListTag> optionalList = compound.getList("Tooltips");
+        if (optionalList.isEmpty()) {
             return tooltips;
         }
-        ListTag list = compound.getList("Tooltips", Tag.TAG_STRING);
+        ListTag list = optionalList.get();
         for (int i = 0; i < list.size(); i++) {
-            tooltips.add(Component.Serializer.fromJson(list.getString(i), blockAccessor.getLevel().registryAccess()));
+            list.getString(i).ifPresent(s -> tooltips.add(Component.Serializer.fromJson(s, blockAccessor.getLevel().registryAccess())));
         }
         return tooltips;
     }

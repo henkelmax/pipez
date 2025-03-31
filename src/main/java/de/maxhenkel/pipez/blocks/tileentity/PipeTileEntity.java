@@ -12,7 +12,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -285,20 +284,29 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
         super.loadAdditional(compound, provider);
         extractingSides = new boolean[Direction.values().length];
-        ListTag extractingList = compound.getList("ExtractingSides", Tag.TAG_BYTE);
-        if (extractingList.size() >= extractingSides.length) {
-            for (int i = 0; i < extractingSides.length; i++) {
-                ByteTag b = (ByteTag) extractingList.get(i);
-                extractingSides[i] = b.getAsByte() != 0;
+        Optional<ListTag> extractingList = compound.getList("ExtractingSides");
+        if (extractingList.isPresent()) {
+            if (extractingList.get().size() >= extractingSides.length) {
+                for (int i = 0; i < extractingSides.length; i++) {
+                    Optional<Byte> optionalByte = extractingList.get().get(i).asByte();
+                    if (optionalByte.isPresent()) {
+                        extractingSides[i] = optionalByte.get() != (byte) 0;
+                    }
+                }
             }
         }
 
+
         disconnectedSides = new boolean[Direction.values().length];
-        ListTag disconnectedList = compound.getList("DisconnectedSides", Tag.TAG_BYTE);
-        if (disconnectedList.size() >= disconnectedSides.length) {
-            for (int i = 0; i < disconnectedSides.length; i++) {
-                ByteTag b = (ByteTag) disconnectedList.get(i);
-                disconnectedSides[i] = b.getAsByte() != 0;
+        Optional<ListTag> disconnectedList = compound.getList("DisconnectedSides");
+        if (disconnectedList.isPresent()) {
+            if (disconnectedList.get().size() >= disconnectedSides.length) {
+                for (int i = 0; i < disconnectedSides.length; i++) {
+                    Optional<Byte> optionalByte = disconnectedList.get().get(i).asByte();
+                    if (optionalByte.isPresent()) {
+                        disconnectedSides[i] = optionalByte.get() != (byte) 0;
+                    }
+                }
             }
         }
         invalidateCountdown = 10;

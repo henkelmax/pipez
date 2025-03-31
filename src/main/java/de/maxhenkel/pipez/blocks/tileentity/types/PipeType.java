@@ -75,8 +75,8 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
             CompoundTag c = (CompoundTag) meta;
             CompoundTag i = (CompoundTag) item;
             Set<String> allKeys = new HashSet<>();
-            allKeys.addAll(c.getAllKeys());
-            allKeys.addAll(i.getAllKeys());
+            allKeys.addAll(c.keySet());
+            allKeys.addAll(i.keySet());
             for (String key : allKeys) {
                 if (c.contains(key)) {
                     if (i.contains(key)) {
@@ -117,10 +117,11 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
             }
             CompoundTag c = (CompoundTag) meta;
             CompoundTag i = (CompoundTag) item;
-            for (String key : c.getAllKeys()) {
+            for (String key : c.keySet()) {
                 Tag nbt = c.get(key);
-                if (i.contains(key, nbt.getId())) {
-                    if (!deepFuzzyCompare(nbt, i.get(key))) {
+                Tag iNbt = i.get(key);
+                if (nbt != null && iNbt != null && iNbt.getId() == nbt.getId()) {
+                    if (!deepFuzzyCompare(nbt, iNbt)) {
                         return false;
                     }
                 } else {

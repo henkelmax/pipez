@@ -10,6 +10,7 @@ import de.maxhenkel.pipez.items.UpgradeItem;
 import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
@@ -191,7 +192,7 @@ public abstract class PipeBlock extends Block implements SimpleWaterloggedBlock,
         BlockState blockState = world.getBlockState(pos);
         world.setBlockAndUpdate(pos, blockState.setValue(HAS_DATA, hasData));
         if (!hasData) {
-//            world.removeBlockEntity(pos);
+            world.removeBlockEntity(pos);
         }
     }
 
@@ -499,19 +500,14 @@ public abstract class PipeBlock extends Block implements SimpleWaterloggedBlock,
         return blockRayTraceResult.getLocation().distanceTo(start);
     }
 
+    // TODO Put logic into block entity using preRemoveSideEffects
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.is(newState.getBlock())) {
-            if (!newState.getValue(HAS_DATA)) {
-                level.removeBlockEntity(pos);
-            }
-        } else {
-            BlockEntity blockentity = level.getBlockEntity(pos);
-            if (blockentity instanceof UpgradeTileEntity upgrade) {
-                Containers.dropContents(level, pos, upgrade.getUpgradeInventory());
-            }
-            super.onRemove(state, level, pos, newState, isMoving);
+    protected void affectNeighborsAfterRemoval(BlockState blockState, ServerLevel level, BlockPos pos, boolean moving) {
+        BlockEntity blockentity = level.getBlockEntity(pos);
+        if (blockentity instanceof UpgradeTileEntity upgrade) {
+            Containers.dropContents(level, pos, upgrade.getUpgradeInventory());
         }
+        super.affectNeighborsAfterRemoval(blockState, level, pos, moving);
     }
 
     @Override
