@@ -1,4 +1,4 @@
-- Fixed Mekanism machines not accepting energy
+- Fixed invalid translations
 
 **NOTE**
 

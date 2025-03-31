@@ -83,7 +83,6 @@
   "message.pipez.filter_destination_tool.destination": "Destination: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Destination: Any",
   "message.pipez.filter_destination_tool.destination.set": "Destination set",
-  "config.jade.plugin_pipez.pipe": "Pipe",
   "tooltip.pipez.sort_filter_list_mode": "Sort by: %s",
   "tooltip.pipez.sort_filter_list_mode.0": "Name ascending",
   "tooltip.pipez.sort_filter_list_mode.1": "Name descending",
