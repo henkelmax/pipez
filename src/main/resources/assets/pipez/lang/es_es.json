@@ -80,6 +80,6 @@
   "message.pipez.filter.nbt_string": "Datos NBT",
   "message.pipez.filter.destination": "Destino",
   "message.pipez.filter_destination_tool.destination": "Destino: %s, %s, %s, %s",
-  "message.pipez.filter_destination_tool.destination.any": "Cualquiera",
+  "message.pipez.filter_destination_tool.destination.any": "Destino: Cualquiera",
   "message.pipez.filter_destination_tool.destination.set": "Destino establecido"
 }
