@@ -1,1 +1,1 @@
-- Fixed invalid translations
+- Updated Spanish and Mexican Spanish translation
