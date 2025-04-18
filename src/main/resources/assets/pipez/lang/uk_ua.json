@@ -81,5 +81,11 @@
   "message.pipez.filter.destination": "Точка Призначення",
   "message.pipez.filter_destination_tool.destination": "Призначення: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Призначення: Будь-яке",
-  "message.pipez.filter_destination_tool.destination.set": "Призначення встановлене"
+  "message.pipez.filter_destination_tool.destination.set": "Призначення встановлене",
+  "tooltip.pipez.sort_filter_list_mode": "Сортувати за: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "Назва за зростанням",
+  "tooltip.pipez.sort_filter_list_mode.1": "Назва за спаданням",
+  "tooltip.pipez.sort_filter_list_mode.2": "Відстань по зростанню",
+  "tooltip.pipez.sort_filter_list_mode.3": "Відстань зниження",
+  "message.pipez.filter.entry_count": "Записи: %s"
 }
