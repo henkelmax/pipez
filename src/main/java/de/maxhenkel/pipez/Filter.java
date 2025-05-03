@@ -2,15 +2,30 @@ package de.maxhenkel.pipez;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import de.maxhenkel.corelib.helpers.AbstractStack;
+import de.maxhenkel.corelib.helpers.WrappedFluidStack;
+import de.maxhenkel.corelib.helpers.WrappedItemStack;
 import de.maxhenkel.corelib.tag.SingleElementTag;
 import de.maxhenkel.corelib.tag.Tag;
+import de.maxhenkel.pipez.utils.ComponentUtils;
+import de.maxhenkel.pipez.utils.MekanismUtils;
 import de.maxhenkel.pipez.utils.NbtUtils;
+import de.maxhenkel.pipez.utils.WrappedGasStack;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
@@ -247,4 +262,69 @@ public abstract class Filter<F extends Filter<F, T>, T> {
         }
     }
 
+    public static <T> T get(Tag<T> tag) {
+        long time = Minecraft.getInstance().level.getGameTime();
+        List<T> allElements = tag.getAll().stream().toList();
+        return allElements.get((int) (time / 20L % allElements.size()));
+    }
+
+    @Nullable
+    public AbstractStack<?> getStack() {
+        Object o = null;
+
+        if (this.getTag() != null) {
+            o = get(this.getTag());
+        }
+
+        if (o instanceof Item) {
+            ItemStack stack = new ItemStack((Item) o);
+            if (this.getMetadata() != null) {
+                stack.applyComponents(ComponentUtils.getPatch(Minecraft.getInstance().level.registryAccess(), this.getMetadata().copy()));
+            }
+            return new WrappedItemStack(stack);
+        } else if (o instanceof Fluid) {
+            FluidStack stack = new FluidStack((Fluid) o, 1000);
+            if (this.getMetadata() != null) {
+                stack.applyComponents(ComponentUtils.getPatch(Minecraft.getInstance().level.registryAccess(), this.getMetadata().copy()));
+            }
+            return new WrappedFluidStack(stack);
+        }
+
+        if (MekanismUtils.isMekanismInstalled()) {
+            AbstractStack<?> gasStack = WrappedGasStack.dummyStack(o);
+            if (gasStack != null) {
+                return gasStack;
+            }
+        }
+
+        return null;
+    }
+
+    public MutableComponent getTranslatedName() {
+        AbstractStack<?> stack = this.getStack();
+        if (stack != null && !stack.isEmpty() && this.getTag() != null) {
+            if (this.getTag() instanceof SingleElementTag) {
+                return Component.translatable(stack.getDisplayName().getString());
+            } else {
+                return Component.literal(this.getTag().getName().toString());
+            }
+        }
+        return Component.translatable("message.pipez.filter.any_item").withStyle(ChatFormatting.WHITE);
+    }
+
+    public boolean hasDestination() {
+        return this.destination != null;
+    }
+
+    @Nullable
+    public Integer getDistanceTo(BlockPos pos) {
+        DirectionalPosition destination = this.getDestination();
+        if (destination == null) {
+            return null;
+        }
+
+        BlockPos posFilter = destination.getPos();
+
+        return posFilter.distManhattan(pos);
+    }
 }
