@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.integration.waila;
 
+import de.maxhenkel.corelib.codec.CodecUtils;
 import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -33,9 +35,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
         CompoundTag compound = blockAccessor.getServerData();
 
-        compound.getString("Upgrade").ifPresent(s -> {
-            iTooltip.add(Component.Serializer.fromJson(s, blockAccessor.getLevel().registryAccess()));
-        });
+        compound.getString("Upgrade").flatMap(s -> CodecUtils.fromJson(ComponentSerialization.CODEC, s)).ifPresent(iTooltip::add);
 
         iTooltip.addAll(getTooltips(blockAccessor, compound));
     }
@@ -61,9 +61,9 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
             ItemStack upgrade = pipeTile.getUpgradeItem(selectedSide);
 
             if (upgrade.isEmpty()) {
-                compound.putString("Upgrade", Component.Serializer.toJson(Component.translatable("tooltip.pipez.no_upgrade"), blockAccessor.getLevel().registryAccess()));
+                CodecUtils.toJsonString(ComponentSerialization.CODEC, Component.translatable("tooltip.pipez.no_upgrade")).ifPresent(s -> compound.putString("Upgrade", s));
             } else {
-                compound.putString("Upgrade", Component.Serializer.toJson(upgrade.getHoverName(), blockAccessor.getLevel().registryAccess()));
+                CodecUtils.toJsonString(ComponentSerialization.CODEC, upgrade.getHoverName()).ifPresent(s -> compound.putString("Upgrade", s));
             }
 
             List<Component> tooltips = new ArrayList<>();
@@ -79,7 +79,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
     public void putTooltips(BlockAccessor blockAccessor, CompoundTag compound, List<Component> tooltips) {
         ListTag list = new ListTag();
         for (Component tooltip : tooltips) {
-            list.add(StringTag.valueOf(Component.Serializer.toJson(tooltip, blockAccessor.getLevel().registryAccess())));
+            CodecUtils.toJsonString(ComponentSerialization.CODEC, tooltip).ifPresent(s -> list.add(StringTag.valueOf(s)));
         }
         compound.put("Tooltips", list);
     }
@@ -92,7 +92,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
         }
         ListTag list = optionalList.get();
         for (int i = 0; i < list.size(); i++) {
-            list.getString(i).ifPresent(s -> tooltips.add(Component.Serializer.fromJson(s, blockAccessor.getLevel().registryAccess())));
+            list.getString(i).flatMap(s -> CodecUtils.fromJson(ComponentSerialization.CODEC, s)).ifPresent(tooltips::add);
         }
         return tooltips;
     }

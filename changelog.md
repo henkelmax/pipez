@@ -1,4 +1,4 @@
-- Updated Spanish and Mexican Spanish translation
+- Updated to 1.21.6
 
 **NOTE**
 

@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.maxhenkel.corelib.CachedMap;
+import de.maxhenkel.corelib.FontColorUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.helpers.WrappedFluidStack;
@@ -18,7 +18,7 @@ import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -28,8 +28,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
@@ -90,7 +88,7 @@ public class FilterList extends WidgetBase {
                     if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                         tooltip.add(Component.translatable("tooltip.pipez.filter.accepts_tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                     }
-                    guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
+                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
                 }
             } else if (blockHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 if (filter.getDestination() != null) {
@@ -105,7 +103,7 @@ public class FilterList extends WidgetBase {
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_side", Component.translatable("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
-                    guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
+                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
                 }
             }
         }
@@ -153,14 +151,13 @@ public class FilterList extends WidgetBase {
 
         List<Filter<?, ?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
-            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
             int startY = guiTop + pos * columnHeight;
             Filter<?, ?> filter = f.get(i);
             if (i == getSelected()) {
-                guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, guiLeft, startY, 0, 218, 125, columnHeight, 256, 256);
             } else {
-                guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, guiLeft, startY, 0, 196, 125, columnHeight, 256, 256);
             }
 
             AbstractStack<?> stack = getStack(filter);
@@ -196,15 +193,13 @@ public class FilterList extends WidgetBase {
             }
         }
 
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-
         if (f.size() > columnCount) {
             float h = 66 - 17;
             float perc = (float) getOffset() / (float) (f.size() - columnCount);
             int posY = guiTop + (int) (h * perc);
-            guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, guiLeft + xSize - 10, posY, 125, 196, 10, 17, 256, 256);
         } else {
-            guiGraphics.blit(RenderType::guiTextured, BACKGROUND, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, guiLeft + xSize - 10, guiTop, 135, 196, 10, 17, 256, 256);
         }
     }
 
@@ -247,11 +242,11 @@ public class FilterList extends WidgetBase {
     }
 
     private void drawStringSmall(GuiGraphics guiGraphics, int x, int y, Component text) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(x, y, 0);
-        guiGraphics.pose().scale(0.5F, 0.5F, 1F);
-        guiGraphics.drawString(mc.font, text, 0, 0, 0, false);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(x, y);
+        guiGraphics.pose().scale(0.5F, 0.5F);
+        guiGraphics.drawString(mc.font, text, 0, 0, FontColorUtils.BLACK, false);
+        guiGraphics.pose().popMatrix();
     }
 
     public static <T> T get(Tag<T> tag) {

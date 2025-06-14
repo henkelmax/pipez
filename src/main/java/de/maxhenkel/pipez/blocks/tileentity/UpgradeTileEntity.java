@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.corelib.codec.ValueInputOutputUtils;
 import de.maxhenkel.corelib.inventory.ItemListInventory;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
@@ -17,6 +18,8 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -116,17 +119,20 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-        super.loadAdditional(compound, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
         upgradeInventory.clear();
-        ItemUtils.readInventory(provider, compound, "Upgrades", upgradeInventory);
+        CompoundTag tag = ValueInputOutputUtils.getTag(valueInput);
+        ItemUtils.readInventory(tag, "Upgrades", upgradeInventory);
         invalidateAllCaches();
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-        super.saveAdditional(compound, provider);
-        ItemUtils.saveInventory(provider, compound, "Upgrades", upgradeInventory);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
+        CompoundTag compound = new CompoundTag();
+        ItemUtils.saveInventory(compound, "Upgrades", upgradeInventory);
+        valueOutput.store(compound);
     }
 
     @Nullable

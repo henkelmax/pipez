@@ -1,17 +1,11 @@
 package de.maxhenkel.pipez.gui;
 
-import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.items.UpgradeItem;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class UpgradeSlot extends Slot {
-
-    public static final ResourceLocation UPGRADE_SLOT = ResourceLocation.fromNamespaceAndPath(Main.MODID, "item/upgrade_slot");
 
     public UpgradeSlot(Container inventoryIn, int index, int xPosition, int yPosition) {
         super(inventoryIn, index, xPosition, yPosition);
@@ -25,12 +19,6 @@ public class UpgradeSlot extends Slot {
     @Override
     public int getMaxStackSize() {
         return 1;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public ResourceLocation getNoItemIcon() {
-        return UPGRADE_SLOT;
     }
 
 }

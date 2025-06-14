@@ -14,14 +14,13 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -123,8 +122,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             for (int i = 0; i < pipeTypes.length; i++) {
                 int tabIndex = i;
                 tabs[i] = new HoverArea(-26 + 3, 5 + 25 * i, 24, 24, () -> {
-                    List<FormattedCharSequence> tooltip = new ArrayList<>();
-                    tooltip.add(Component.translatable(pipeTypes[tabIndex].getTranslationKey()).getVisualOrderText());
+                    List<Component> tooltip = new ArrayList<>();
+                    tooltip.add(Component.translatable(pipeTypes[tabIndex].getTranslationKey()));
                     return tooltip;
                 });
                 hoverAreas.add(tabs[i]);
@@ -133,21 +132,21 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
         redstoneArea = new HoverArea(7, 7, 20, 20, () -> {
             if (redstoneButton.active) {
-                return Arrays.asList(Component.translatable("tooltip.pipez.redstone_mode", Component.translatable("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.redstone_mode", Component.translatable("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())));
             } else {
                 return Collections.emptyList();
             }
         });
         sortArea = new HoverArea(7, 31, 20, 20, () -> {
             if (sortButton.active) {
-                return Arrays.asList(Component.translatable("tooltip.pipez.distribution", Component.translatable("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.distribution", Component.translatable("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())));
             } else {
                 return Collections.emptyList();
             }
         });
         filterArea = new HoverArea(7, 55, 20, 20, () -> {
             if (filterButton.active) {
-                return Arrays.asList(Component.translatable("tooltip.pipez.filter_mode", Component.translatable("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.filter_mode", Component.translatable("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())));
             } else {
                 return Collections.emptyList();
             }
@@ -179,7 +178,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
-        guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), 8F, (float) (imageHeight - 96 + 3), FONT_COLOR, false);
+        guiGraphics.drawString(font, playerInventoryTitle, 8, imageHeight - 96 + 3, FONT_COLOR, false);
 
         filterList.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
     }
@@ -192,9 +191,9 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         if (hasTabs()) {
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    guiGraphics.blit(RenderType::guiTextured, BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 48, 26, 24, 256, 256);
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 48, 26, 24, 256, 256);
                 } else {
-                    guiGraphics.blit(RenderType::guiTextured, BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 72, 26, 24, 256, 256);
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, leftPos - 26 + 3, topPos + 5 + 25 * i, 176, 72, 26, 24, 256, 256);
                 }
             }
             for (int i = 0; i < pipeTypes.length; i++) {
