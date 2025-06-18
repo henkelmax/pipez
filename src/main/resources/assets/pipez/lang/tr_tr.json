@@ -81,5 +81,11 @@
   "message.pipez.filter.destination": "Hedef",
   "message.pipez.filter_destination_tool.destination": "Hedef: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Hedef: Herhangi",
-  "message.pipez.filter_destination_tool.destination.set": "Hedef girildi"
+  "message.pipez.filter_destination_tool.destination.set": "Hedef girildi",
+  "tooltip.pipez.sort_filter_list_mode": "Sıralama: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "İsim artan",
+  "tooltip.pipez.sort_filter_list_mode.1": "İsim azalan",
+  "tooltip.pipez.sort_filter_list_mode.2": "Mesafe artan",
+  "tooltip.pipez.sort_filter_list_mode.3": "Mesafe azalan",
+  "message.pipez.filter.entry_count": "Girişler: %s"
 }
