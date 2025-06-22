@@ -1,11 +1,10 @@
 package de.maxhenkel.pipez;
 
 import net.minecraft.client.renderer.block.model.TextureSlots;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.QuadCollection;
-import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,7 +24,7 @@ public class ModelRegistry {
 
         Model(ResourceLocation rl) {
             resource = rl;
-            modelKey = new StandaloneModelKey<>(rl);
+            modelKey = new StandaloneModelKey<>(rl::toString);
             model = new AtomicReference<>();
         }
 
@@ -44,11 +43,11 @@ public class ModelRegistry {
 
     public static void onModelRegister(ModelEvent.RegisterStandalone event) {
         for (Model model : Model.values()) {
-            event.register(model.getModelKey(), (resolvedModel, baker) -> {
+            event.register(model.getModelKey(), new SimpleUnbakedStandaloneModel<>(model.resource, (resolvedModel, baker) -> {
                 ResolvedModel resolvedmodel = baker.getModel(model.getResourceLocation());
                 TextureSlots textureslots = resolvedmodel.getTopTextureSlots();
                 return resolvedModel.bakeTopGeometry(textureslots, baker, BlockModelRotation.X0_Y0);
-            });
+            }));
         }
     }
 

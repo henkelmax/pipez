@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
-import de.maxhenkel.corelib.codec.ValueInputOutputUtils;
 import de.maxhenkel.corelib.inventory.ItemListInventory;
 import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.Filter;
@@ -12,7 +11,6 @@ import de.maxhenkel.pipez.blocks.tileentity.configuration.RedstoneModeCache;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.items.UpgradeItem;
 import net.minecraft.core.*;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
@@ -122,17 +120,14 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     protected void loadAdditional(ValueInput valueInput) {
         super.loadAdditional(valueInput);
         upgradeInventory.clear();
-        CompoundTag tag = ValueInputOutputUtils.getTag(valueInput);
-        ItemUtils.readInventory(tag, "Upgrades", upgradeInventory);
+        ItemUtils.readInventory(valueInput, "Upgrades", upgradeInventory);
         invalidateAllCaches();
     }
 
     @Override
     protected void saveAdditional(ValueOutput valueOutput) {
         super.saveAdditional(valueOutput);
-        CompoundTag compound = new CompoundTag();
-        ItemUtils.saveInventory(compound, "Upgrades", upgradeInventory);
-        valueOutput.store(compound);
+        ItemUtils.saveInventory(valueOutput, "Upgrades", upgradeInventory);
     }
 
     @Nullable

@@ -1,4 +1,5 @@
-- Updated to 1.21.6
+- Fixed issues storing items
+- Update to latest NeoForge version
 
 **NOTE**
 
