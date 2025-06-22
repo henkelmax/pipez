@@ -17,6 +17,6 @@ public class PluginPipes implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        registration.registerBlockDataProvider(HUDHandlerPipes.INSTANCE, UpgradeTileEntity.class);
+        registration.registerBlockDataProvider(DataProviderPipes.INSTANCE, UpgradeTileEntity.class);
     }
 }

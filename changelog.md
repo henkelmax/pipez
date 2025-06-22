@@ -1,5 +1,4 @@
-- Fixed issues storing items
-- Update to latest NeoForge version
+- Fixed Jade compatibility
 
 **NOTE**
 

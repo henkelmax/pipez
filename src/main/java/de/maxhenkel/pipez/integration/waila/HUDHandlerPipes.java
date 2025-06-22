@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
+public class HUDHandlerPipes implements IBlockComponentProvider {
 
     static final HUDHandlerPipes INSTANCE = new HUDHandlerPipes();
 
@@ -38,50 +38,6 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
         compound.getString("Upgrade").flatMap(s -> CodecUtils.fromJson(ComponentSerialization.CODEC, s)).ifPresent(iTooltip::add);
 
         iTooltip.addAll(getTooltips(blockAccessor, compound));
-    }
-
-    @Override
-    public void appendServerData(CompoundTag compound, BlockAccessor blockAccessor) {
-        if (blockAccessor.getBlockState().getBlock() instanceof PipeBlock pipe) {
-            BlockEntity te = blockAccessor.getBlockEntity();
-            Direction selectedSide = pipe.getSelection(te.getBlockState(), blockAccessor.getLevel(), te.getBlockPos(), blockAccessor.getPlayer()).getKey();
-            if (selectedSide == null) {
-                return;
-            }
-            if (!(te instanceof UpgradeTileEntity)) {
-                return;
-            }
-
-            PipeLogicTileEntity pipeTile = (PipeLogicTileEntity) te;
-
-            if (!pipeTile.isExtracting(selectedSide)) {
-                return;
-            }
-
-            ItemStack upgrade = pipeTile.getUpgradeItem(selectedSide);
-
-            if (upgrade.isEmpty()) {
-                CodecUtils.toJsonString(ComponentSerialization.CODEC, Component.translatable("tooltip.pipez.no_upgrade")).ifPresent(s -> compound.putString("Upgrade", s));
-            } else {
-                CodecUtils.toJsonString(ComponentSerialization.CODEC, upgrade.getHoverName()).ifPresent(s -> compound.putString("Upgrade", s));
-            }
-
-            List<Component> tooltips = new ArrayList<>();
-            for (PipeType<?, ?> pipeType : pipeTile.getPipeTypes()) {
-                if (pipeTile.isEnabled(selectedSide, pipeType)) {
-                    tooltips.add(pipeType.getTransferText(pipeTile.getUpgrade(selectedSide)));
-                }
-            }
-            putTooltips(blockAccessor, compound, tooltips);
-        }
-    }
-
-    public void putTooltips(BlockAccessor blockAccessor, CompoundTag compound, List<Component> tooltips) {
-        ListTag list = new ListTag();
-        for (Component tooltip : tooltips) {
-            CodecUtils.toJsonString(ComponentSerialization.CODEC, tooltip).ifPresent(s -> list.add(StringTag.valueOf(s)));
-        }
-        compound.put("Tooltips", list);
     }
 
     public List<Component> getTooltips(BlockAccessor blockAccessor, CompoundTag compound) {
