@@ -28,9 +28,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -85,12 +85,12 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         addRenderableWidget(invertButton);
 
         cancelButton = Button.builder(Component.translatable("message.pipez.filter.cancel"), button -> {
-            PacketDistributor.sendToServer(new OpenExtractMessage(getMenu().getIndex()));
+            ClientPacketDistributor.sendToServer(new OpenExtractMessage(getMenu().getIndex()));
         }).bounds(leftPos + 25, topPos + 105, 60, 20).build();
         addRenderableWidget(cancelButton);
 
         submitButton = Button.builder(Component.translatable("message.pipez.filter.submit"), button -> {
-            PacketDistributor.sendToServer(new UpdateFilterMessage(filter, menu.getIndex()));
+            ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, menu.getIndex()));
         }).bounds(leftPos + 91, topPos + 105, 60, 20).build();
         addRenderableWidget(submitButton);
 
