@@ -3,7 +3,7 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 import de.maxhenkel.corelib.energy.EnergyUtils;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
@@ -248,17 +248,17 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.energyPipeAmount.get();
+            return PipezMod.SERVER_CONFIG.energyPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.energyPipeAmountBasic.get();
+                return PipezMod.SERVER_CONFIG.energyPipeAmountBasic.get();
             case IMPROVED:
-                return Main.SERVER_CONFIG.energyPipeAmountImproved.get();
+                return PipezMod.SERVER_CONFIG.energyPipeAmountImproved.get();
             case ADVANCED:
-                return Main.SERVER_CONFIG.energyPipeAmountAdvanced.get();
+                return PipezMod.SERVER_CONFIG.energyPipeAmountAdvanced.get();
             case ULTIMATE:
-                return Main.SERVER_CONFIG.energyPipeAmountUltimate.get();
+                return PipezMod.SERVER_CONFIG.energyPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;

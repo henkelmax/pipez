@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.render.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -14,7 +14,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModTileEntities {
 
-    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_REGISTER = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Main.MODID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_REGISTER = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, PipezMod.MODID);
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemPipeTileEntity>> ITEM_PIPE = BLOCK_ENTITY_REGISTER.register("item_pipe", () ->
             new BlockEntityType<>(ItemPipeTileEntity::new, ModBlocks.ITEM_PIPE.get())

@@ -1,23 +1,14 @@
 package de.maxhenkel.pipez.integration.waila;
 
 import de.maxhenkel.corelib.codec.CodecUtils;
-import de.maxhenkel.pipez.Main;
-import de.maxhenkel.pipez.blocks.PipeBlock;
-import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
-import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
-import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
-import net.minecraft.core.Direction;
+import de.maxhenkel.pipez.PipezMod;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
-import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
@@ -29,7 +20,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider {
 
     static final HUDHandlerPipes INSTANCE = new HUDHandlerPipes();
 
-    private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(Main.MODID, "pipe");
+    private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "pipe");
 
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {

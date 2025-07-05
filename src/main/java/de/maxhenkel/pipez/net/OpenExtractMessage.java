@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.net;
 
 import de.maxhenkel.corelib.net.Message;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.FilterContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class OpenExtractMessage implements Message<OpenExtractMessage> {
 
-    public static final CustomPacketPayload.Type<OpenExtractMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "open_extract"));
+    public static final CustomPacketPayload.Type<OpenExtractMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "open_extract"));
 
     private int index;
 

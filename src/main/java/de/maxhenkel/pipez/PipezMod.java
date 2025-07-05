@@ -10,19 +10,20 @@ import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(Main.MODID)
-public class Main {
+@Mod(PipezMod.MODID)
+@EventBusSubscriber(modid = PipezMod.MODID)
+public class PipezMod {
 
     public static final String MODID = "pipez";
 
@@ -31,20 +32,11 @@ public class Main {
     public static ServerConfig SERVER_CONFIG;
     public static ClientConfig CLIENT_CONFIG;
 
-    public Main(IEventBus eventBus) {
-        eventBus.addListener(this::commonSetup);
-        eventBus.addListener(this::onRegisterPayloadHandler);
+    public PipezMod(IEventBus eventBus) {
         eventBus.addListener(IMC::enqueueIMC);
 
         SERVER_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.SERVER, ServerConfig.class);
         CLIENT_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.CLIENT, ClientConfig.class);
-
-        if (FMLEnvironment.dist.isClient()) {
-            eventBus.addListener(Main.this::clientSetup);
-            eventBus.addListener(ModelRegistry::onModelRegister);
-            eventBus.addListener(ModelRegistry::onModelBake);
-            Containers.initClient(eventBus);
-        }
 
         ModBlocks.init(eventBus);
         ModItems.init(eventBus);
@@ -54,15 +46,13 @@ public class Main {
         ModCreativeTabs.init(eventBus);
     }
 
-    public void commonSetup(FMLCommonSetupEvent event) {
+    @SubscribeEvent
+    static void commonSetup(FMLCommonSetupEvent event) {
         NeoForge.EVENT_BUS.register(new BlockEvents());
     }
 
-    public void clientSetup(FMLClientSetupEvent event) {
-        ModTileEntities.clientSetup();
-    }
-
-    public void onRegisterPayloadHandler(RegisterPayloadHandlersEvent event) {
+    @SubscribeEvent
+    static void onRegisterPayloadHandler(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(MODID).versioned("1");
         CommonRegistry.registerMessage(registrar, CycleDistributionMessage.class);
         CommonRegistry.registerMessage(registrar, CycleRedstoneModeMessage.class);

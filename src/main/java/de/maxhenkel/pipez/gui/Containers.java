@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.gui;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.gui.containerfactory.FilterContainerFactory;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerFactory;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class Containers {
 
-    private static final DeferredRegister<MenuType<?>> MENU_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.MENU, Main.MODID);
+    private static final DeferredRegister<MenuType<?>> MENU_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.MENU, PipezMod.MODID);
 
     public static final DeferredHolder<MenuType<?>, MenuType<ExtractContainer>> EXTRACT = MENU_TYPE_REGISTER.register("extract", () ->
             IMenuTypeExtension.create(new PipeContainerFactory<>(ExtractContainer::new))

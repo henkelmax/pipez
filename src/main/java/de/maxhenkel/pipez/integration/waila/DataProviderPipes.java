@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.integration.waila;
 
 import de.maxhenkel.corelib.codec.CodecUtils;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
@@ -25,7 +25,7 @@ public class DataProviderPipes implements IServerDataProvider<BlockAccessor> {
 
     static final DataProviderPipes INSTANCE = new DataProviderPipes();
 
-    private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(Main.MODID, "pipe_data");
+    private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "pipe_data");
 
     @Override
     public void appendServerData(CompoundTag compound, BlockAccessor blockAccessor) {

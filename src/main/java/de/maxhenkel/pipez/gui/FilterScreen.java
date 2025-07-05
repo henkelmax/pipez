@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FilterScreen extends ScreenBase<FilterContainer> {
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/filter.png");
+    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/filter.png");
 
     private EditBox item;
     private EditBox nbt;

@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.integration.theoneprobe;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileInfoProvider implements IProbeInfoProvider {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Main.MODID, "probeinfoprovider");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "probeinfoprovider");
 
     @Override
     public ResourceLocation getID() {

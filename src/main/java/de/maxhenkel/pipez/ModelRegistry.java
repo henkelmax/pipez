@@ -12,11 +12,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ModelRegistry {
 
     public enum Model {
-        ENERGY_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/energy_pipe_extract")),
-        FLUID_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/fluid_pipe_extract")),
-        GAS_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/gas_pipe_extract")),
-        ITEM_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/item_pipe_extract")),
-        UNIVERSAL_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(Main.MODID, "block/universal_pipe_extract"));
+        ENERGY_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/energy_pipe_extract")),
+        FLUID_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/fluid_pipe_extract")),
+        GAS_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/gas_pipe_extract")),
+        ITEM_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/item_pipe_extract")),
+        UNIVERSAL_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/universal_pipe_extract"));
 
         private final ResourceLocation resource;
         private final StandaloneModelKey<QuadCollection> modelKey;

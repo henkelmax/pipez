@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.blocks;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModBlocks {
 
-    private static final DeferredRegister.Blocks BLOCK_REGISTER = DeferredRegister.createBlocks(Main.MODID);
+    private static final DeferredRegister.Blocks BLOCK_REGISTER = DeferredRegister.createBlocks(PipezMod.MODID);
 
     public static final DeferredHolder<Block, ItemPipeBlock> ITEM_PIPE = BLOCK_REGISTER.registerBlock("item_pipe", ItemPipeBlock::new, BlockBehaviour.Properties.of());
     public static final DeferredHolder<Block, FluidPipeBlock> FLUID_PIPE = BLOCK_REGISTER.registerBlock("fluid_pipe", FluidPipeBlock::new, BlockBehaviour.Properties.of());

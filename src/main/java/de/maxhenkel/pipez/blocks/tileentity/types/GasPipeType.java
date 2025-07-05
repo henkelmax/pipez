@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity.types;
 
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.GasFilter;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.Upgrade;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
@@ -200,17 +200,17 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.gasPipeAmount.get();
+            return PipezMod.SERVER_CONFIG.gasPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.gasPipeAmountBasic.get();
+                return PipezMod.SERVER_CONFIG.gasPipeAmountBasic.get();
             case IMPROVED:
-                return Main.SERVER_CONFIG.gasPipeAmountImproved.get();
+                return PipezMod.SERVER_CONFIG.gasPipeAmountImproved.get();
             case ADVANCED:
-                return Main.SERVER_CONFIG.gasPipeAmountAdvanced.get();
+                return PipezMod.SERVER_CONFIG.gasPipeAmountAdvanced.get();
             case ULTIMATE:
-                return Main.SERVER_CONFIG.gasPipeAmountUltimate.get();
+                return PipezMod.SERVER_CONFIG.gasPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;

@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/extract.png");
+    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/extract.png");
 
     private CycleIconButton redstoneButton;
     private CycleIconButton sortButton;
