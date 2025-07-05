@@ -9,8 +9,6 @@ import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -60,7 +58,6 @@ public class Main {
         NeoForge.EVENT_BUS.register(new BlockEvents());
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void clientSetup(FMLClientSetupEvent event) {
         ModTileEntities.clientSetup();
     }

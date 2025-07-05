@@ -88,7 +88,7 @@ public class FilterList extends WidgetBase {
                     if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                         tooltip.add(Component.translatable("tooltip.pipez.filter.accepts_tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                     }
-                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
+                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX, mouseY);
                 }
             } else if (blockHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 if (filter.getDestination() != null) {
@@ -103,7 +103,7 @@ public class FilterList extends WidgetBase {
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_distance", number(pos.distManhattan(getContainer().getPipe().getBlockPos()))));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_side", Component.translatable("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
-                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
+                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX, mouseY);
                 }
             }
         }

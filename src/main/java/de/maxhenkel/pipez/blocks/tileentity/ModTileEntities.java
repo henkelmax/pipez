@@ -6,8 +6,6 @@ import de.maxhenkel.pipez.blocks.tileentity.render.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -39,7 +37,6 @@ public class ModTileEntities {
         eventBus.addListener(ModTileEntities::onRegisterCapabilities);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void clientSetup() {
         BlockEntityRenderers.register(ITEM_PIPE.get(), ItemPipeRenderer::new);
         BlockEntityRenderers.register(FLUID_PIPE.get(), FluidPipeRenderer::new);
