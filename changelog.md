@@ -1,5 +1,4 @@
-- Updated to latest NeoForge version
-- Fixed misaligned tooltips
+- Updated to 1.21.8
 
 **NOTE**
 
