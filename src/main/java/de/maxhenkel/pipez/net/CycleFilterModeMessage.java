@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.net;
 
 import de.maxhenkel.corelib.net.Message;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class CycleFilterModeMessage implements Message<CycleFilterModeMessage> {
 
-    public static final CustomPacketPayload.Type<CycleFilterModeMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "cycle_filter_mode"));
+    public static final CustomPacketPayload.Type<CycleFilterModeMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "cycle_filter_mode"));
 
     private int index;
 

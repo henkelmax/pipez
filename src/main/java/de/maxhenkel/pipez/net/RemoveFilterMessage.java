@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.net;
 
 import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class RemoveFilterMessage implements Message<RemoveFilterMessage> {
 
-    public static final CustomPacketPayload.Type<RemoveFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "remove_filter"));
+    public static final CustomPacketPayload.Type<RemoveFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "remove_filter"));
 
     private UUID filter;
     private int index;

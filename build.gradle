@@ -3,7 +3,7 @@ plugins {
     id 'net.neoforged.gradle.mixin' version "${neogradle_mixin_version}"
     id 'com.matthewprenger.cursegradle' version "${cursegradle_version}"
     id 'com.modrinth.minotaur' version "${minotaur_version}"
-    id 'com.github.johnrengelman.shadow' version "${shadow_version}"
+    id 'com.gradleup.shadow' version "${shadow_version}"
     id 'mod-update' version "${mod_update_version}"
 }
 
@@ -16,7 +16,7 @@ repositories {
 dependencies {
     compileOnly "maven.modrinth:jei:${jei_version}"
     compileOnly "maven.modrinth:the-one-probe:${theoneprobe_version}"
-    compileOnly "maven.modrinth:jade:${jade_version}"
+    implementation "maven.modrinth:jade:${jade_version}"
 
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
     //runtimeOnly "mekanism:Mekanism:${mekanism_version}"

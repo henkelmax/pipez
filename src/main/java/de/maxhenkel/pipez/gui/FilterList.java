@@ -1,7 +1,7 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.maxhenkel.corelib.CachedMap;
+import de.maxhenkel.corelib.FontColorUtils;
 import de.maxhenkel.corelib.helpers.AbstractStack;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.corelib.inventory.ScreenBase;
@@ -11,18 +11,27 @@ import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.gui.sprite.ExtractElementsSprite;
 import de.maxhenkel.pipez.gui.sprite.ExtractUISprite;
 import de.maxhenkel.pipez.gui.sprite.SpriteRect;
+import de.maxhenkel.pipez.utils.ComponentUtils;
+import de.maxhenkel.pipez.PipezMod;
+import de.maxhenkel.pipez.utils.MekanismUtils;
+import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.FluidStack;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -85,7 +94,7 @@ public class FilterList extends WidgetBase {
                     if (filter.getTag() != null && !(filter.getTag() instanceof SingleElementTag)) {
                         tooltip.add(Component.translatable("tooltip.pipez.filter.accepts_tag", Component.literal(filter.getTag().getName().toString()).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                     }
-                    guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
+                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX, mouseY);
                 }
             } else if (blockHoverAreas[i].isHovered(guiLeft, guiTop, mouseX, mouseY)) {
                 if (filter.hasDestination()) {
@@ -100,7 +109,7 @@ public class FilterList extends WidgetBase {
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_location", number(pos.getX()), number(pos.getY()), number(pos.getZ())));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_distance", number(filter.getDistanceTo(getContainer().getPipe().getBlockPos()))));
                     tooltip.add(Component.translatable("tooltip.pipez.filter.destination_side", Component.translatable("message.pipez.direction." + filter.getDestination().getDirection().getName()).withStyle(ChatFormatting.DARK_GREEN)));
-                    guiGraphics.renderTooltip(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX - screen.getGuiLeft(), mouseY - screen.getGuiTop());
+                    guiGraphics.setTooltipForNextFrame(mc.font, tooltip.stream().map(Component::getVisualOrderText).collect(Collectors.toList()), mouseX, mouseY);
                 }
             }
         }
@@ -124,7 +133,7 @@ public class FilterList extends WidgetBase {
             if (i == getSelected()) {
                 entryImageSpriteRect = ExtractElementsSprite.FILTER_LIST_ENTRY_SELECTED;
             }
-            guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft, startY, entryImageSpriteRect.x, entryImageSpriteRect.y, entryImageSpriteRect.w, entryImageSpriteRect.h, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ExtractElementsSprite.IMAGE, guiLeft, startY, entryImageSpriteRect.x, entryImageSpriteRect.y, entryImageSpriteRect.w, entryImageSpriteRect.h, 256, 256);
 
             Filter<?, ?> filter = f.get(i);
             AbstractStack<?> stack = filter.getStack();
@@ -177,7 +186,7 @@ public class FilterList extends WidgetBase {
             posY = guiTop + (int) (h * perc);
             scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_ACTIVE;
         }
-        guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ExtractElementsSprite.IMAGE, guiLeft + xSize - 10, posY, scrollerImageSpriteRect.x, scrollerImageSpriteRect.y, scrollerImageSpriteRect.w, scrollerImageSpriteRect.h, 256, 256);
     }
 
     private Pair<BlockState, ItemStack> getBlockAt(DirectionalPosition destination) {
@@ -221,11 +230,11 @@ public class FilterList extends WidgetBase {
     }
 
     private void drawStringSmall(GuiGraphics guiGraphics, int x, int y, Component text) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(x, y, 0);
-        guiGraphics.pose().scale(0.5F, 0.5F, 1F);
-        guiGraphics.drawString(mc.font, text, 0, 0, 0, false);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(x, y);
+        guiGraphics.pose().scale(0.5F, 0.5F);
+        guiGraphics.drawString(mc.font, text, 0, 0, FontColorUtils.BLACK, false);
+        guiGraphics.pose().popMatrix();
     }
 
     @Override

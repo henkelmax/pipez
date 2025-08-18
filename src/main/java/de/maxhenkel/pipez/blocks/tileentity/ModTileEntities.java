@@ -1,13 +1,11 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.render.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -16,7 +14,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModTileEntities {
 
-    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_REGISTER = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Main.MODID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_REGISTER = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, PipezMod.MODID);
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemPipeTileEntity>> ITEM_PIPE = BLOCK_ENTITY_REGISTER.register("item_pipe", () ->
             new BlockEntityType<>(ItemPipeTileEntity::new, ModBlocks.ITEM_PIPE.get())
@@ -39,7 +37,6 @@ public class ModTileEntities {
         eventBus.addListener(ModTileEntities::onRegisterCapabilities);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void clientSetup() {
         BlockEntityRenderers.register(ITEM_PIPE.get(), ItemPipeRenderer::new);
         BlockEntityRenderers.register(FLUID_PIPE.get(), FluidPipeRenderer::new);

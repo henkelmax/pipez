@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.net;
 
 import de.maxhenkel.corelib.net.Message;
 import de.maxhenkel.pipez.Filter;
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.IPipeContainer;
@@ -20,7 +20,7 @@ import java.util.Optional;
 
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
-    public static final CustomPacketPayload.Type<UpdateFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Main.MODID, "update_filter"));
+    public static final CustomPacketPayload.Type<UpdateFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "update_filter"));
 
     private Filter filter;
     private CompoundTag filterTag;

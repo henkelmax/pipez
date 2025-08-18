@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.corelib.blockentity.ITickableBlockEntity;
+import de.maxhenkel.corelib.codec.ValueInputOutputUtils;
 import de.maxhenkel.pipez.DirectionalPosition;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
@@ -24,6 +25,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -281,10 +285,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     @Override
-    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-        super.loadAdditional(compound, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
         extractingSides = new boolean[Direction.values().length];
-        Optional<ListTag> extractingList = compound.getList("ExtractingSides");
+        CompoundTag tag = ValueInputOutputUtils.getTag(valueInput);
+        Optional<ListTag> extractingList = tag.getList("ExtractingSides");
         if (extractingList.isPresent()) {
             if (extractingList.get().size() >= extractingSides.length) {
                 for (int i = 0; i < extractingSides.length; i++) {
@@ -298,7 +303,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
 
         disconnectedSides = new boolean[Direction.values().length];
-        Optional<ListTag> disconnectedList = compound.getList("DisconnectedSides");
+        Optional<ListTag> disconnectedList = tag.getList("DisconnectedSides");
         if (disconnectedList.isPresent()) {
             if (disconnectedList.get().size() >= disconnectedSides.length) {
                 for (int i = 0; i < disconnectedSides.length; i++) {
@@ -313,20 +318,23 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-        super.saveAdditional(compound, provider);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
 
+        CompoundTag tag = new CompoundTag();
         ListTag extractingList = new ListTag();
         for (boolean extractingSide : extractingSides) {
             extractingList.add(ByteTag.valueOf(extractingSide));
         }
-        compound.put("ExtractingSides", extractingList);
+        tag.put("ExtractingSides", extractingList);
 
         ListTag disconnectedList = new ListTag();
         for (boolean disconnected : disconnectedSides) {
             disconnectedList.add(ByteTag.valueOf(disconnected));
         }
-        compound.put("DisconnectedSides", disconnectedList);
+        tag.put("DisconnectedSides", disconnectedList);
+
+        valueOutput.store(tag);
     }
 
     @Override
@@ -349,7 +357,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         CompoundTag updateTag = super.getUpdateTag(provider);
-        saveAdditional(updateTag, provider);
+        TagValueOutput valueOutput = ValueInputOutputUtils.createValueOutput(this, provider);
+        saveAdditional(valueOutput);
+        updateTag.merge(ValueInputOutputUtils.toTag(valueOutput));
         return updateTag;
     }
 

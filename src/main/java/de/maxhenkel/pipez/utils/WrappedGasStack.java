@@ -7,13 +7,11 @@ import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -33,15 +31,13 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
         return null;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
         TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS).getSprite(stack.getChemical().getIcon());
         int chemicalTint = stack.getChemicalTint();
-        guiGraphics.blitSprite(RenderType::guiTextured, texture, x, y, 16, 16, chemicalTint);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, chemicalTint);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public List<Component> getTooltip() {
         List<Component> tooltip = new ArrayList<>();

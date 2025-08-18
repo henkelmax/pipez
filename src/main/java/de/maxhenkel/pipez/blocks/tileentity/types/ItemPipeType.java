@@ -237,17 +237,17 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
 
     public int getSpeed(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.itemPipeSpeed.get();
+            return PipezMod.SERVER_CONFIG.itemPipeSpeed.get();
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.itemPipeSpeedBasic.get();
+                return PipezMod.SERVER_CONFIG.itemPipeSpeedBasic.get();
             case IMPROVED:
-                return Main.SERVER_CONFIG.itemPipeSpeedImproved.get();
+                return PipezMod.SERVER_CONFIG.itemPipeSpeedImproved.get();
             case ADVANCED:
-                return Main.SERVER_CONFIG.itemPipeSpeedAdvanced.get();
+                return PipezMod.SERVER_CONFIG.itemPipeSpeedAdvanced.get();
             case ULTIMATE:
-                return Main.SERVER_CONFIG.itemPipeSpeedUltimate.get();
+                return PipezMod.SERVER_CONFIG.itemPipeSpeedUltimate.get();
             case INFINITY:
             default:
                 return 1;
@@ -257,17 +257,17 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.itemPipeAmount.get();
+            return PipezMod.SERVER_CONFIG.itemPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.itemPipeAmountBasic.get();
+                return PipezMod.SERVER_CONFIG.itemPipeAmountBasic.get();
             case IMPROVED:
-                return Main.SERVER_CONFIG.itemPipeAmountImproved.get();
+                return PipezMod.SERVER_CONFIG.itemPipeAmountImproved.get();
             case ADVANCED:
-                return Main.SERVER_CONFIG.itemPipeAmountAdvanced.get();
+                return PipezMod.SERVER_CONFIG.itemPipeAmountAdvanced.get();
             case ULTIMATE:
-                return Main.SERVER_CONFIG.itemPipeAmountUltimate.get();
+                return PipezMod.SERVER_CONFIG.itemPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;

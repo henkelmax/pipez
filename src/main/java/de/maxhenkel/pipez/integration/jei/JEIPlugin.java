@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.integration.jei;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.gui.ExtractScreen;
 import de.maxhenkel.pipez.gui.FilterScreen;
 import mezz.jei.api.IModPlugin;
@@ -13,7 +13,7 @@ public class JEIPlugin implements IModPlugin {
 
     @Override
     public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath(Main.MODID, "pipez");
+        return ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "pipez");
     }
 
     @Override

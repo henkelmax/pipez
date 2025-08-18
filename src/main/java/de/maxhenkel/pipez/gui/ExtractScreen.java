@@ -17,18 +17,17 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -100,7 +99,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.REDSTONE_MODE_ICON_ON_WHEN_POWERED),
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.REDSTONE_MODE_ICON_ALWAYS_OFF)
         );
-        redstoneButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.REDSTONE_BUTTON.x, this.topPos + ExtractElementsSprite.REDSTONE_BUTTON.y, redstoneModeIcons, redstoneModeIndex, button -> PacketDistributor.sendToServer(new CycleRedstoneModeMessage(currentindex)));
+        redstoneButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.REDSTONE_BUTTON.x, this.topPos + ExtractElementsSprite.REDSTONE_BUTTON.y, redstoneModeIcons, redstoneModeIndex, button -> ClientPacketDistributor.sendToServer(new CycleRedstoneModeMessage(currentindex)));
 
         // distribution button
         Supplier<Integer> distributionIndex = () -> pipe.getDistribution(getMenu().getSide(), pipeTypes[currentindex]).ordinal();
@@ -110,7 +109,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.DISTRIBUTION_MODE_ICON_ROUND_ROBIN),
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.DISTRIBUTION_MODE_ICON_RANDOM)
         );
-        distributionButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.DISTRIBUTION_BUTTON.x, this.topPos + ExtractElementsSprite.DISTRIBUTION_BUTTON.y, distributionIcons, distributionIndex, button -> PacketDistributor.sendToServer(new CycleDistributionMessage(currentindex)));
+        distributionButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.DISTRIBUTION_BUTTON.x, this.topPos + ExtractElementsSprite.DISTRIBUTION_BUTTON.y, distributionIcons, distributionIndex, button -> ClientPacketDistributor.sendToServer(new CycleDistributionMessage(currentindex)));
 
         // filter mode button
         Supplier<Integer> filterModeIndex = () -> pipeTypes[currentindex].hasFilter() ? pipe.getFilterMode(getMenu().getSide(), pipeTypes[currentindex]).ordinal() : 0;
@@ -118,7 +117,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.FILTER_MODE_ICON_WHITELIST),
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.FILTER_MODE_ICON_BLACKLIST)
         );
-        filterButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.FILTER_MODE_BUTTON.x, this.topPos + ExtractElementsSprite.FILTER_MODE_BUTTON.y, filterModeIcons, filterModeIndex, button -> PacketDistributor.sendToServer(new CycleFilterModeMessage(currentindex)));
+        filterButton = new CycleIconButton(this.leftPos + ExtractElementsSprite.FILTER_MODE_BUTTON.x, this.topPos + ExtractElementsSprite.FILTER_MODE_BUTTON.y, filterModeIcons, filterModeIndex, button -> ClientPacketDistributor.sendToServer(new CycleFilterModeMessage(currentindex)));
 
         // sort filter list type
         Supplier<Integer> currentSortFilterListTypeIndex = () -> this.currentSortFilterListType;
@@ -189,21 +188,21 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         // define the hover area for tooltips on the buttons
         redstoneArea = new HoverArea(ExtractElementsSprite.REDSTONE_BUTTON.x, ExtractElementsSprite.REDSTONE_BUTTON.y, ExtractElementsSprite.REDSTONE_BUTTON.w, ExtractElementsSprite.REDSTONE_BUTTON.h, () -> {
             if (redstoneButton.active) {
-                return Arrays.asList(Component.translatable("tooltip.pipez.redstone_mode", Component.translatable("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.redstone_mode", Component.translatable("tooltip.pipez.redstone_mode." + pipe.getRedstoneMode(side, pipeTypes[currentindex]).getName())));
             } else {
                 return Collections.emptyList();
             }
         });
         distributionArea = new HoverArea(ExtractElementsSprite.DISTRIBUTION_BUTTON.x, ExtractElementsSprite.DISTRIBUTION_BUTTON.y, ExtractElementsSprite.DISTRIBUTION_BUTTON.w, ExtractElementsSprite.DISTRIBUTION_BUTTON.h, () -> {
             if (distributionButton.active) {
-                return Arrays.asList(Component.translatable("tooltip.pipez.distribution", Component.translatable("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.distribution", Component.translatable("tooltip.pipez.distribution." + pipe.getDistribution(side, pipeTypes[currentindex]).getName())));
             } else {
                 return Collections.emptyList();
             }
         });
         filterArea = new HoverArea(ExtractElementsSprite.FILTER_MODE_BUTTON.x, ExtractElementsSprite.FILTER_MODE_BUTTON.y, ExtractElementsSprite.FILTER_MODE_BUTTON.w, ExtractElementsSprite.FILTER_MODE_BUTTON.h, () -> {
             if (filterButton.active) {
-                return Arrays.asList(Component.translatable("tooltip.pipez.filter_mode", Component.translatable("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())).getVisualOrderText());
+                return Arrays.asList(Component.translatable("tooltip.pipez.filter_mode", Component.translatable("tooltip.pipez.filter_mode." + pipe.getFilterMode(side, pipeTypes[currentindex]).getName())));
             } else {
                 return Collections.emptyList();
             }
@@ -280,7 +279,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 if (i == currentindex) {
                     tabSpriteRect = ExtractElementsSprite.TAB_ACTIVE;
                 }
-                guiGraphics.blit(RenderType::guiTextured, ExtractElementsSprite.IMAGE, this.leftPos + ExtractElementsSprite.TAB_BUTTON.x, this.topPos + ExtractElementsSprite.TAB_BUTTON.y + (ExtractElementsSprite.TAB_BUTTON.h + ExtractElementsSprite.TAB_BUTTON_MARGIN) * i, tabSpriteRect.x, tabSpriteRect.y, tabSpriteRect.w, tabSpriteRect.h, 256, 256);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ExtractElementsSprite.IMAGE, this.leftPos + ExtractElementsSprite.TAB_BUTTON.x, this.topPos + ExtractElementsSprite.TAB_BUTTON.y + (ExtractElementsSprite.TAB_BUTTON.h + ExtractElementsSprite.TAB_BUTTON_MARGIN) * i, tabSpriteRect.x, tabSpriteRect.y, tabSpriteRect.w, tabSpriteRect.h, 256, 256);
             }
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
@@ -425,19 +424,19 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         if (filter instanceof ItemFilter) {
             filter.setTag(new SingleElementTag(BuiltInRegistries.ITEM.getKey(stack.getItem()), stack.getItem()));
             filter.setMetadata(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).orElse(null));
-            PacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
+            ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
         } else if (filter instanceof FluidFilter) {
             FluidUtil.getFluidContained(stack).ifPresent(s -> {
                 filter.setTag(new SingleElementTag(BuiltInRegistries.FLUID.getKey(s.getFluid()), s.getFluid()));
                 filter.setMetadata(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).orElse(null));
-                PacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
+                ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
             });
         } else if (filter instanceof GasFilter) {
             ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 filter.setTag(new SingleElementTag(gas.getChemical().getRegistryName(), gas.getChemical()));
                 filter.setMetadata(null);
-                PacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
+                ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }
         }
     }

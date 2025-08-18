@@ -208,17 +208,17 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
     @Override
     public int getRate(@Nullable Upgrade upgrade) {
         if (upgrade == null) {
-            return Main.SERVER_CONFIG.fluidPipeAmount.get();
+            return PipezMod.SERVER_CONFIG.fluidPipeAmount.get();
         }
         switch (upgrade) {
             case BASIC:
-                return Main.SERVER_CONFIG.fluidPipeAmountBasic.get();
+                return PipezMod.SERVER_CONFIG.fluidPipeAmountBasic.get();
             case IMPROVED:
-                return Main.SERVER_CONFIG.fluidPipeAmountImproved.get();
+                return PipezMod.SERVER_CONFIG.fluidPipeAmountImproved.get();
             case ADVANCED:
-                return Main.SERVER_CONFIG.fluidPipeAmountAdvanced.get();
+                return PipezMod.SERVER_CONFIG.fluidPipeAmountAdvanced.get();
             case ULTIMATE:
-                return Main.SERVER_CONFIG.fluidPipeAmountUltimate.get();
+                return PipezMod.SERVER_CONFIG.fluidPipeAmountUltimate.get();
             case INFINITY:
             default:
                 return Integer.MAX_VALUE;

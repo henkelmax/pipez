@@ -1,10 +1,9 @@
 package de.maxhenkel.pipez.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class CycleIconButton extends AbstractButton {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         IconButton.Icon icon = icons.get(index.get());
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        guiGraphics.blit(RenderType::guiTextured, icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h, 256, 256);
     }
 
     @Override
@@ -42,4 +41,16 @@ public class CycleIconButton extends AbstractButton {
     public void onPress() {
         onPress.accept(this);
     }
+
+    public static class Icon {
+        private ResourceLocation texture;
+        private int offsetX, offsetY;
+
+        public Icon(ResourceLocation texture, int offsetX, int offsetY) {
+            this.texture = texture;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+        }
+    }
+
 }
