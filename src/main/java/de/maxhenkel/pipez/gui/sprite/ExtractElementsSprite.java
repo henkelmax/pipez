@@ -1,10 +1,10 @@
 package de.maxhenkel.pipez.gui.sprite;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import net.minecraft.resources.ResourceLocation;
 
 public class ExtractElementsSprite {
-    public static ResourceLocation IMAGE = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/extract-elements.png");
+    public static ResourceLocation IMAGE = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/extract-elements.png");
 
     public static SpriteRect FILTER_LIST_ENTRY = new SpriteRect(0, 96, 181, ExtractUISprite.ROW_HEIGHT);
     public static SpriteRect FILTER_LIST_ENTRY_SELECTED = new SpriteRect(0, 118, 181, ExtractUISprite.ROW_HEIGHT);

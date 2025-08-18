@@ -1,10 +1,10 @@
 package de.maxhenkel.pipez.gui.sprite;
 
-import de.maxhenkel.pipez.Main;
+import de.maxhenkel.pipez.PipezMod;
 import net.minecraft.resources.ResourceLocation;
 
 public class FilterSprite {
-    public static ResourceLocation IMAGE = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/gui/container/filter.png");
+    public static ResourceLocation IMAGE = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/filter.png");
 
     public static SpriteRect SCREEN = new SpriteRect(0, 0, 176,222);
 
