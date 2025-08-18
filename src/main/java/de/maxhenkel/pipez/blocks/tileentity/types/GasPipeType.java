@@ -202,19 +202,15 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
         if (upgrade == null) {
             return Main.SERVER_CONFIG.gasPipeAmount.get();
         }
-        switch (upgrade) {
-            case BASIC:
-                return Main.SERVER_CONFIG.gasPipeAmountBasic.get();
-            case IMPROVED:
-                return Main.SERVER_CONFIG.gasPipeAmountImproved.get();
-            case ADVANCED:
-                return Main.SERVER_CONFIG.gasPipeAmountAdvanced.get();
-            case ULTIMATE:
-                return Main.SERVER_CONFIG.gasPipeAmountUltimate.get();
-            case INFINITY:
-            default:
-                return Integer.MAX_VALUE;
-        }
+        return switch (upgrade.getId()) {
+            case 0 -> Main.SERVER_CONFIG.gasPipeAmountBasic.get();
+            case 1 -> Main.SERVER_CONFIG.gasPipeAmountImproved.get();
+            case 2 -> Main.SERVER_CONFIG.gasPipeAmountAdvanced.get();
+            case 3 -> Main.SERVER_CONFIG.gasPipeAmountUltimate.get();
+            // HowXu: add kubejs support
+            case -1 -> Integer.MAX_VALUE;
+            default -> upgrade.getKubeJSCustomData().getGasAmount();
+        };
     }
 
     @Override

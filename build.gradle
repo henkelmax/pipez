@@ -10,7 +10,18 @@ plugins {
 apply from: "https://raw.githubusercontent.com/henkelmax/mod-gradle-scripts/${mod_gradle_script_version}/mod.gradle"
 
 repositories {
+    maven {
+        name 'cursemaven'
+        url = "https://www.cursemaven.com"
+    }
     maven { url = 'https://modmaven.dev' }
+    
+    // add kubejs support
+    maven {
+        url = "https://maven.latvian.dev/releases/"
+    }
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
 }
 
 dependencies {
@@ -23,6 +34,12 @@ dependencies {
     runtimeOnly "mekanism:Mekanism:${mekanism_version}:additions"
     runtimeOnly "mekanism:Mekanism:${mekanism_version}:generators"
     runtimeOnly "mekanism:Mekanism:${mekanism_version}:tools"
+
+    // HowXu: add kubejs support
+    runtimeOnly "dev.latvian.mods:kubejs-neoforge:2101.7.1-build.188"
+    runtimeOnly "dev.latvian.mods:rhino:2101.2.5-build.54"
+    // this is dev only
+    runtimeOnly "curse.maven:jade-324717:5427817"
 
     shadow "de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}:api"
     runtimeOnly "de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}"

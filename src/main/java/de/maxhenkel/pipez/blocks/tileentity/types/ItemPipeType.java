@@ -239,19 +239,15 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
         if (upgrade == null) {
             return Main.SERVER_CONFIG.itemPipeSpeed.get();
         }
-        switch (upgrade) {
-            case BASIC:
-                return Main.SERVER_CONFIG.itemPipeSpeedBasic.get();
-            case IMPROVED:
-                return Main.SERVER_CONFIG.itemPipeSpeedImproved.get();
-            case ADVANCED:
-                return Main.SERVER_CONFIG.itemPipeSpeedAdvanced.get();
-            case ULTIMATE:
-                return Main.SERVER_CONFIG.itemPipeSpeedUltimate.get();
-            case INFINITY:
-            default:
-                return 1;
-        }
+        // HowXu: add kubeJS support
+        return switch (upgrade.getId()) {
+            case 0 -> Main.SERVER_CONFIG.itemPipeSpeedBasic.get();
+            case 1 -> Main.SERVER_CONFIG.itemPipeSpeedImproved.get();
+            case 2 -> Main.SERVER_CONFIG.itemPipeSpeedAdvanced.get();
+            case 3 -> Main.SERVER_CONFIG.itemPipeSpeedUltimate.get();
+            case -1 -> 1;
+            default -> upgrade.getKubeJSCustomData().getItemSpeed();
+        };
     }
 
     @Override
@@ -259,19 +255,17 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
         if (upgrade == null) {
             return Main.SERVER_CONFIG.itemPipeAmount.get();
         }
-        switch (upgrade) {
-            case BASIC:
-                return Main.SERVER_CONFIG.itemPipeAmountBasic.get();
-            case IMPROVED:
-                return Main.SERVER_CONFIG.itemPipeAmountImproved.get();
-            case ADVANCED:
-                return Main.SERVER_CONFIG.itemPipeAmountAdvanced.get();
-            case ULTIMATE:
-                return Main.SERVER_CONFIG.itemPipeAmountUltimate.get();
-            case INFINITY:
-            default:
-                return Integer.MAX_VALUE;
-        }
+        // HowXu: add kubeJS support
+        return switch (upgrade.getId()) {
+            case 0 -> Main.SERVER_CONFIG.itemPipeAmountBasic.get();
+            case 1 -> Main.SERVER_CONFIG.itemPipeAmountImproved.get();
+            case 2 -> Main.SERVER_CONFIG.itemPipeAmountAdvanced.get();
+            case 3 -> Main.SERVER_CONFIG.itemPipeAmountUltimate.get();
+            case -1 -> Integer.MAX_VALUE;
+            // HowXu: add kubejs support
+            // for switch there would never be null
+            default -> upgrade.getKubeJSCustomData().getItemAmount();
+        };
     }
 
     @Override

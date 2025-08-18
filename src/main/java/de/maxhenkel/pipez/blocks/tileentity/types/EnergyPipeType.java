@@ -250,19 +250,15 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
         if (upgrade == null) {
             return Main.SERVER_CONFIG.energyPipeAmount.get();
         }
-        switch (upgrade) {
-            case BASIC:
-                return Main.SERVER_CONFIG.energyPipeAmountBasic.get();
-            case IMPROVED:
-                return Main.SERVER_CONFIG.energyPipeAmountImproved.get();
-            case ADVANCED:
-                return Main.SERVER_CONFIG.energyPipeAmountAdvanced.get();
-            case ULTIMATE:
-                return Main.SERVER_CONFIG.energyPipeAmountUltimate.get();
-            case INFINITY:
-            default:
-                return Integer.MAX_VALUE;
-        }
+        return switch (upgrade.getId()) {
+            case 0 -> Main.SERVER_CONFIG.energyPipeAmountBasic.get();
+            case 1 -> Main.SERVER_CONFIG.energyPipeAmountImproved.get();
+            case 2 -> Main.SERVER_CONFIG.energyPipeAmountAdvanced.get();
+            case 3 -> Main.SERVER_CONFIG.energyPipeAmountUltimate.get();
+            // HowXu: add kubejs support
+            case -1 -> Integer.MAX_VALUE;
+            default -> upgrade.getKubeJSCustomData().getEnergyAmount();
+        };
     }
 
     @Override
