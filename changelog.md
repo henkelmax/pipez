@@ -1,4 +1,4 @@
-- Updated Spanish and Mexican Spanish translation
+- Fixed NPE when filtering for tags that don't contain items
 
 **NOTE**
 
