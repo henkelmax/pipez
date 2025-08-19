@@ -249,9 +249,13 @@ public class FilterList extends WidgetBase {
         guiGraphics.pose().popMatrix();
     }
 
+    @Nullable
     public static <T> T get(Tag<T> tag) {
         long time = Minecraft.getInstance().level.getGameTime();
         List<T> allElements = tag.getAll().stream().toList();
+        if (allElements.isEmpty()) {
+            return null;
+        }
         return allElements.get((int) (time / 20L % allElements.size()));
     }
 

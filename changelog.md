@@ -1,4 +1,4 @@
-- Updated to 1.21.8
+- Fixed NPE when filtering for tags that don't contain items
 
 **NOTE**
 
