@@ -1,4 +1,4 @@
-- Fixed NPE when filtering for tags that don't contain items
+- Updated Brazilian Portuguese translation
 
 **NOTE**
 
