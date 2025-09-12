@@ -1,4 +1,4 @@
-- Updated to 1.21.8
+- Updated Brazilian Portuguese translation
 
 **NOTE**
 
