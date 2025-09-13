@@ -81,5 +81,11 @@
   "message.pipez.filter.destination": "目标",
   "message.pipez.filter_destination_tool.destination": "目标：%s，%s，%s，%s",
   "message.pipez.filter_destination_tool.destination.any": "目标：任何",
-  "message.pipez.filter_destination_tool.destination.set": "目标已设定"
+  "message.pipez.filter_destination_tool.destination.set": "目标已设定",
+  "tooltip.pipez.sort_filter_list_mode": "排序依据：%s",
+  "tooltip.pipez.sort_filter_list_mode.0": "名称升序",
+  "tooltip.pipez.sort_filter_list_mode.1": "名称降序",
+  "tooltip.pipez.sort_filter_list_mode.2": "距离升序",
+  "tooltip.pipez.sort_filter_list_mode.3": "距离降序",
+  "message.pipez.filter.entry_count": "条目: %s"
 }

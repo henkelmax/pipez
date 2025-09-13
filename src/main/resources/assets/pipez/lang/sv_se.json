@@ -81,5 +81,11 @@
   "message.pipez.filter.destination": "Destination",
   "message.pipez.filter_destination_tool.destination": "Destination: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Destination: Var som helst",
-  "message.pipez.filter_destination_tool.destination.set": "Destination har angivits"
+  "message.pipez.filter_destination_tool.destination.set": "Destination har angivits",
+  "tooltip.pipez.sort_filter_list_mode": "Sortera efter: %s",
+  "tooltip.pipez.sort_filter_list_mode.0": "Namn stigande",
+  "tooltip.pipez.sort_filter_list_mode.1": "Namn fallande",
+  "tooltip.pipez.sort_filter_list_mode.2": "Avstånd stigande",
+  "tooltip.pipez.sort_filter_list_mode.3": "Avståndet faller",
+  "message.pipez.filter.entry_count": "Inlägg: %s"
 }
