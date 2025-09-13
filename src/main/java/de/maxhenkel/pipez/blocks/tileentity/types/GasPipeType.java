@@ -104,6 +104,7 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
             if (destination != null && !connectionsFull[p]) {
                 for (int j = 0; j < gasHandler.getChemicalTanks(); j++) {
                     ChemicalStack gasInTank = gasHandler.getChemicalInTank(j);
+                    @SuppressWarnings({"deprecation", "removal"})
                     ChemicalStack simulatedExtract = gasHandler.extractChemical(new ChemicalStack(gasInTank.getChemical(), Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer)), Action.SIMULATE);
                     if (simulatedExtract.isEmpty()) {
                         continue;
@@ -143,6 +144,7 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
                     break connectionLoop;
                 }
                 ChemicalStack gasInTank = gasHandler.getChemicalInTank(i);
+                @SuppressWarnings({"deprecation", "removal"})
                 ChemicalStack simulatedExtract = gasHandler.extractChemical(new ChemicalStack(gasInTank.getChemical(), mbToTransfer), Action.SIMULATE);
                 if (simulatedExtract.isEmpty()) {
                     continue;

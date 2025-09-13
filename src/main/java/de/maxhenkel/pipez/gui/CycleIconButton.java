@@ -5,6 +5,7 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -28,7 +29,6 @@ public class CycleIconButton extends AbstractButton {
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         IconButton.Icon icon = icons.get(index.get());
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, icon.texture, getX() + 2, getY() + 2, icon.spriteRect.x, icon.spriteRect.y, icon.spriteRect.w, icon.spriteRect.h, 256, 256);
     }
 

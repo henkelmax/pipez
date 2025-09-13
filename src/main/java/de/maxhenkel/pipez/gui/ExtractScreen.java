@@ -142,14 +142,14 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         addFilterButton = new IconButton(
                 this.leftPos + ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.x, this.topPos + ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.y,
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.FILTER_ENTRY_ICON_ADD),
-                button -> PacketDistributor.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex))
+                button -> ClientPacketDistributor.sendToServer(new EditFilterMessage(pipeTypes[currentindex].createFilter(), currentindex))
         );
         editFilterButton = new IconButton(
                 this.leftPos + ExtractElementsSprite.FILTER_ENTRY_BUTTON_EDIT.x, this.topPos + ExtractElementsSprite.FILTER_ENTRY_BUTTON_EDIT.y,
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.FILTER_ENTRY_ICON_EDIT),
                 button -> {
                     if (filterList.getSelected() >= 0) {
-                        PacketDistributor.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
+                        ClientPacketDistributor.sendToServer(new EditFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()), currentindex));
                     }
                 }
         );
@@ -158,7 +158,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 new IconButton.Icon(ExtractElementsSprite.IMAGE, ExtractElementsSprite.FILTER_ENTRY_ICON_DELETE),
                 button -> {
                     if (filterList.getSelected() >= 0) {
-                        PacketDistributor.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
+                        ClientPacketDistributor.sendToServer(new RemoveFilterMessage(pipe.getFilters(side, pipeTypes[currentindex]).get(filterList.getSelected()).getId(), currentindex));
                     }
                 }
         );
@@ -177,8 +177,8 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             for (int i = 0; i < pipeTypes.length; i++) {
                 int tabIndex = i;
                 tabs[i] = new HoverArea(ExtractElementsSprite.TAB_BUTTON.x, ExtractElementsSprite.TAB_BUTTON.y + (ExtractElementsSprite.TAB_BUTTON.h + ExtractElementsSprite.TAB_BUTTON_MARGIN) * i, ExtractElementsSprite.TAB_BUTTON.w, ExtractElementsSprite.TAB_BUTTON.h, () -> {
-                    List<FormattedCharSequence> tooltip = new ArrayList<>();
-                    tooltip.add(Component.translatable(pipeTypes[tabIndex].getTranslationKey()).getVisualOrderText());
+                    List<Component> tooltip = new ArrayList<>();
+                    tooltip.add(Component.translatable(pipeTypes[tabIndex].getTranslationKey()));
                     return tooltip;
                 });
                 hoverAreas.add(tabs[i]);
@@ -208,25 +208,25 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             }
         });
         sortFilterArea = new HoverArea(ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.x, ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.y, ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.w, ExtractElementsSprite.SORT_FILTER_LIST_BUTTON.h,
-                () -> Arrays.asList(Component.translatable("tooltip.pipez.sort_filter_list_mode", Component.translatable("tooltip.pipez.sort_filter_list_mode." + String.valueOf(this.currentSortFilterListType))).getVisualOrderText())
+                () -> Arrays.asList(Component.translatable("tooltip.pipez.sort_filter_list_mode", Component.translatable("tooltip.pipez.sort_filter_list_mode." + String.valueOf(this.currentSortFilterListType))))
         );
         addFilterArea = new HoverArea(ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.x, ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.y, ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.w, ExtractElementsSprite.FILTER_ENTRY_BUTTON_ADD.h, () -> {
             if (filterButton.active) {
-                return Arrays.asList(Component.translatable("message.pipez.filter.add").getVisualOrderText());
+                return Arrays.asList(Component.translatable("message.pipez.filter.add"));
             } else {
                 return Collections.emptyList();
             }
         });
         editFilterArea = new HoverArea(ExtractElementsSprite.FILTER_ENTRY_BUTTON_EDIT.x, ExtractElementsSprite.FILTER_ENTRY_BUTTON_EDIT.y, ExtractElementsSprite.FILTER_ENTRY_BUTTON_EDIT.w, ExtractElementsSprite.FILTER_ENTRY_BUTTON_EDIT.h, () -> {
             if (filterButton.active) {
-                return Arrays.asList(Component.translatable("message.pipez.filter.edit").getVisualOrderText());
+                return Arrays.asList(Component.translatable("message.pipez.filter.edit"));
             } else {
                 return Collections.emptyList();
             }
         });
         deleteFilterArea = new HoverArea(ExtractElementsSprite.FILTER_ENTRY_BUTTON_DELETE.x, ExtractElementsSprite.FILTER_ENTRY_BUTTON_DELETE.y, ExtractElementsSprite.FILTER_ENTRY_BUTTON_DELETE.w, ExtractElementsSprite.FILTER_ENTRY_BUTTON_DELETE.h, () -> {
             if (filterButton.active) {
-                return Arrays.asList(Component.translatable("message.pipez.filter.remove").getVisualOrderText());
+                return Arrays.asList(Component.translatable("message.pipez.filter.remove"));
             } else {
                 return Collections.emptyList();
             }
@@ -263,7 +263,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
-        guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), (float) ExtractUISprite.INVENTORY_TITLE.x, (float) ExtractUISprite.INVENTORY_TITLE.y, FONT_COLOR, false);
+        guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), (int) ExtractUISprite.INVENTORY_TITLE.x, (int) ExtractUISprite.INVENTORY_TITLE.y, FONT_COLOR, false);
 
         filterList.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
     }

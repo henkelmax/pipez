@@ -11,27 +11,16 @@ import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.gui.sprite.ExtractElementsSprite;
 import de.maxhenkel.pipez.gui.sprite.ExtractUISprite;
 import de.maxhenkel.pipez.gui.sprite.SpriteRect;
-import de.maxhenkel.pipez.utils.ComponentUtils;
-import de.maxhenkel.pipez.PipezMod;
-import de.maxhenkel.pipez.utils.MekanismUtils;
-import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.FluidStack;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -125,7 +114,6 @@ public class FilterList extends WidgetBase {
 
         List<Filter<?, ?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + this.rowCount; i++) {
-            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             int pos = i - getOffset();
             int startY = guiTop + pos * this.rowHeight;
 
@@ -175,8 +163,6 @@ public class FilterList extends WidgetBase {
         }
 
         drawStringSmall(guiGraphics, this.guiLeft + ExtractUISprite.ENTRY_COUNT_TEXT.x, this.guiTop + ExtractUISprite.ENTRY_COUNT_TEXT.y, Component.translatable("message.pipez.filter.entry_count", number(f.size())));
-
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         SpriteRect scrollerImageSpriteRect = ExtractElementsSprite.FILTER_LIST_SCROLLER_INACTIVE;
         int posY = guiTop;
