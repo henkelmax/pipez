@@ -18,6 +18,7 @@ import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -274,19 +275,19 @@ public class FilterList extends WidgetBase {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean b) {
         List<Filter<?, ?>> f = filters.get();
         for (int i = 0; i < hoverAreas.length; i++) {
             if (getOffset() + i >= f.size()) {
                 break;
             }
-            if (!hoverAreas[i].isHovered(guiLeft, guiTop, (int) mouseX, (int) mouseY)) {
+            if (!hoverAreas[i].isHovered(guiLeft, guiTop, (int) event.x(), (int) event.y())) {
                 continue;
             }
             selected = getOffset() + i;
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, b);
     }
 
 }

@@ -347,7 +347,7 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     }
 
     public void syncData() {
-        if (level == null || level.isClientSide) {
+        if (level == null || level.isClientSide()) {
             return;
         }
         LevelChunk chunk = level.getChunkAt(getBlockPos());

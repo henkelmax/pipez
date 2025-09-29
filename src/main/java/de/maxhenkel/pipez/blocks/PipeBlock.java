@@ -387,7 +387,7 @@ public abstract class PipeBlock extends Block implements SimpleWaterloggedBlock,
         if (context instanceof EntityCollisionContext) {
             EntityCollisionContext ctx = (EntityCollisionContext) context;
             if (ctx.getEntity() instanceof Player player) {
-                if (player.level().isClientSide) {
+                if (player.level().isClientSide()) {
                     return getSelectionShape(state, worldIn, pos, player);
                 }
             }

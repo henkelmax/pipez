@@ -47,7 +47,7 @@ public class UniversalPipeBlock extends PipeBlock {
     public InteractionResult onPipeSideActivated(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, Direction direction) {
         BlockEntity tileEntity = worldIn.getBlockEntity(pos);
         if (tileEntity instanceof UniversalPipeTileEntity && isExtracting(worldIn, pos, direction)) {
-            if (worldIn.isClientSide) {
+            if (worldIn.isClientSide()) {
                 return InteractionResult.SUCCESS;
             }
             UniversalPipeTileEntity pipe = (UniversalPipeTileEntity) tileEntity;

@@ -19,6 +19,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -31,7 +33,6 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -357,9 +358,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (itemHoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
-            if (hasShiftDown()) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean b) {
+        if (itemHoverArea.isHovered(leftPos, topPos, (int) event.x(), (int) event.y())) {
+            if (event.hasShiftDown()) {
                 item.setValue("");
                 filter.setTag(null);
             } else {
@@ -367,32 +368,32 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             }
             return true;
         }
-        if (destinationHoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
+        if (destinationHoverArea.isHovered(leftPos, topPos, (int) event.x(), (int) event.y())) {
             onInsertDestination(getMenu().getCarried());
             return true;
         }
 
-        if (hasShiftDown()) {
+        if (event.hasShiftDown()) {
             Slot sl = this.getSlotUnderMouse();
             if (sl != null) {
                 onInsertStack(sl.getItem());
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, b);
     }
 
     @Override
-    public boolean keyPressed(int key, int scanCode, int modifiers) {
-        if (key == GLFW.GLFW_KEY_ESCAPE) {
+    public boolean keyPressed(KeyEvent event) {
+        if (event.isEscape()) {
             minecraft.player.closeContainer();
             return true;
         }
 
-        return item.keyPressed(key, scanCode, modifiers) ||
+        return item.keyPressed(event) ||
                 item.canConsumeInput() ||
-                nbt.keyPressed(key, scanCode, modifiers) ||
-                nbt.canConsumeInput() || super.keyPressed(key, scanCode, modifiers);
+                nbt.keyPressed(event) ||
+                nbt.canConsumeInput() || super.keyPressed(event);
     }
 
     @Override

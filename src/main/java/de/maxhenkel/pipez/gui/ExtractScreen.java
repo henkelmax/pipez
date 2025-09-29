@@ -14,6 +14,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
@@ -239,14 +240,14 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (filterList.mouseClicked(mouseX, mouseY, button)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean b) {
+        if (filterList.mouseClicked(event, b)) {
             return true;
         }
         if (hasTabs()) {
             for (int i = 0; i < tabs.length; i++) {
                 HoverArea hoverArea = tabs[i];
-                if (currentindex != i && hoverArea.isHovered(leftPos, topPos, (int) mouseX, (int) mouseY)) {
+                if (currentindex != i && hoverArea.isHovered(leftPos, topPos, (int) event.x(), (int) event.y())) {
                     minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
                     currentindex = i;
                     init();
@@ -255,14 +256,13 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             }
         }
 
-        if (hasShiftDown()) {
+        if (event.hasShiftDown()) {
             Slot sl = this.getSlotUnderMouse();
             if (sl != null && !(sl instanceof UpgradeSlot)) {
                 addQuickFilter(sl.getItem());
             }
         }
-
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, b);
     }
 
     public void addQuickFilter(ItemStack stack) {
@@ -298,11 +298,11 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (filterList.mouseReleased(mouseX, mouseY, button)) {
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (filterList.mouseReleased(event)) {
             return true;
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     @Override

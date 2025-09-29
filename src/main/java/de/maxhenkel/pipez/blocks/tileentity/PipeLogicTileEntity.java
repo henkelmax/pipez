@@ -127,7 +127,7 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
     public void tick() {
         super.tick();
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
 

@@ -1,25 +1,27 @@
 package de.maxhenkel.pipez.blocks.tileentity.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import de.maxhenkel.pipez.ModelRegistry.Model;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity> {
+public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity, PipeRenderState> {
 
     protected Minecraft minecraft;
     protected BlockEntityRendererProvider.Context renderer;
@@ -32,32 +34,47 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
     }
 
     @Override
-    public void render(PipeTileEntity pipe, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay, Vec3 vec) {
+    public PipeRenderState createRenderState() {
+        return new PipeRenderState();
+    }
+
+    @Override
+    public void extractRenderState(PipeTileEntity entity, PipeRenderState state, float partialTicks, Vec3 pos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        BlockEntityRenderer.super.extractRenderState(entity, state, partialTicks, pos, crumblingOverlay);
+
+        for (Direction side : Direction.values()) {
+            state.extracting[side.ordinal()] = entity.isExtracting(side);
+        }
+    }
+
+    @Override
+    public void submit(PipeRenderState state, PoseStack stack, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
         QuadCollection model = cachedModel.get();
         if (model == null) {
             return;
         }
-        List<BakedQuad> quads = model.getQuads(null);
-        VertexConsumer b = buffer.getBuffer(RenderType.solid());
 
         for (Direction side : Direction.values()) {
-            if (pipe.isExtracting(side)) {
-                renderExtractor(side, matrixStack, b, quads, combinedLight, combinedOverlay);
+            if (state.extracting[side.ordinal()]) {
+                renderExtractor(model, side, stack, collector, state.lightCoords, state.breakProgress != null ? state.breakProgress.progress() : 0);
             }
         }
     }
 
-    private void renderExtractor(Direction direction, PoseStack matrixStack, VertexConsumer b, List<BakedQuad> quads, int combinedLight, int combinedOverlay) {
-        matrixStack.pushPose();
-        matrixStack.translate(direction.getStepX() * 0.001D, direction.getStepY() * 0.001D, direction.getStepZ() * 0.001D);
-        matrixStack.translate(0.5D, 0.5D, 0.5D);
-        matrixStack.mulPose(getRotation(direction));
-        matrixStack.translate(-0.5D, -0.5D, -0.5D);
-        for (BakedQuad quad : quads) {
-            b.putBulkData(matrixStack.last(), quad, 1F, 1F, 1F, 1F, combinedLight, combinedOverlay);
-        }
+    private void renderExtractor(QuadCollection model, Direction direction, PoseStack stack, SubmitNodeCollector collector, int combinedLight, int combinedOverlay) {
+        stack.pushPose();
+        stack.translate(direction.getStepX() * 0.001D, direction.getStepY() * 0.001D, direction.getStepZ() * 0.001D);
+        stack.translate(0.5D, 0.5D, 0.5D);
+        stack.mulPose(getRotation(direction));
+        stack.translate(-0.5D, -0.5D, -0.5D);
+        List<BakedQuad> quads = model.getQuads(null);
+        collector.submitCustomGeometry(stack, RenderType.solid(), (pose, vertexConsumer) -> {
+            for (BakedQuad quad : quads) {
+                vertexConsumer.putBulkData(pose, quad, 1F, 1F, 1F, 1F, combinedLight, combinedOverlay);
+            }
+        });
 
-        matrixStack.popPose();
+        stack.popPose();
     }
 
     private Quaternionf getRotation(Direction direction) {
