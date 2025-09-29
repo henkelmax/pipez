@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
@@ -56,7 +57,7 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
 
         for (Direction side : Direction.values()) {
             if (state.extracting[side.ordinal()]) {
-                renderExtractor(model, side, stack, collector, state.lightCoords, state.breakProgress != null ? state.breakProgress.progress() : 0);
+                renderExtractor(model, side, stack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY);
             }
         }
     }
