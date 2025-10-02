@@ -31,9 +31,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -367,9 +368,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         private final BlockPos pos;
         private final Direction direction;
         private final int distance;
-        private BlockCapabilityCache<IItemHandler, Direction> itemHandler;
-        private BlockCapabilityCache<IEnergyStorage, Direction> energyHandler;
-        private BlockCapabilityCache<IFluidHandler, Direction> fluidHandler;
+        private BlockCapabilityCache<ResourceHandler<ItemResource>, Direction> itemHandler;
+        private BlockCapabilityCache<EnergyHandler, Direction> energyHandler;
+        private BlockCapabilityCache<ResourceHandler<FluidResource>, Direction> fluidHandler;
 
         private Optional<BlockCapabilityCache<IChemicalHandler, Direction>> chemicalHandler;
 
@@ -378,9 +379,9 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             this.direction = direction;
             this.distance = distance;
 
-            itemHandler = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, level, pos, direction);
-            energyHandler = BlockCapabilityCache.create(Capabilities.EnergyStorage.BLOCK, level, pos, direction);
-            fluidHandler = BlockCapabilityCache.create(Capabilities.FluidHandler.BLOCK, level, pos, direction);
+            itemHandler = BlockCapabilityCache.create(Capabilities.Item.BLOCK, level, pos, direction);
+            energyHandler = BlockCapabilityCache.create(Capabilities.Energy.BLOCK, level, pos, direction);
+            fluidHandler = BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, level, pos, direction);
             if (MekanismUtils.isMekanismInstalled()) {
                 chemicalHandler = Optional.of(BlockCapabilityCache.create(ModCapabilities.CHEMICAL_HANDLER_CAPABILITY, level, pos, direction));
             } else {
@@ -410,17 +411,17 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
         }
 
         @Nullable
-        public IItemHandler getItemHandler() {
+        public ResourceHandler<ItemResource> getItemHandler() {
             return itemHandler.getCapability();
         }
 
         @Nullable
-        public IEnergyStorage getEnergyHandler() {
+        public EnergyHandler getEnergyHandler() {
             return energyHandler.getCapability();
         }
 
         @Nullable
-        public IFluidHandler getFluidHandler() {
+        public ResourceHandler<FluidResource> getFluidHandler() {
             return fluidHandler.getCapability();
         }
 
@@ -431,11 +432,11 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
         @Nullable
         public <T> T getCapability(BlockCapability<T, Direction> capability) {
-            if (capability == Capabilities.ItemHandler.BLOCK) {
+            if (capability == Capabilities.Item.BLOCK) {
                 return (T) getItemHandler();
-            } else if (capability == Capabilities.EnergyStorage.BLOCK) {
+            } else if (capability == Capabilities.Energy.BLOCK) {
                 return (T) getEnergyHandler();
-            } else if (capability == Capabilities.FluidHandler.BLOCK) {
+            } else if (capability == Capabilities.Fluid.BLOCK) {
                 return (T) getFluidHandler();
             }
             if (!MekanismUtils.isMekanismInstalled()) {

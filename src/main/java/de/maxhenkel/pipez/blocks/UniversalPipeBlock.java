@@ -26,9 +26,9 @@ public class UniversalPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(Level world, BlockPos pos, Direction facing) {
-        return world.getCapability(Capabilities.ItemHandler.BLOCK, pos.relative(facing), facing.getOpposite()) != null
-                || world.getCapability(Capabilities.FluidHandler.BLOCK, pos.relative(facing), facing.getOpposite()) != null
-                || world.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(facing), facing.getOpposite()) != null
+        return world.getCapability(Capabilities.Item.BLOCK, pos.relative(facing), facing.getOpposite()) != null
+                || world.getCapability(Capabilities.Fluid.BLOCK, pos.relative(facing), facing.getOpposite()) != null
+                || world.getCapability(Capabilities.Energy.BLOCK, pos.relative(facing), facing.getOpposite()) != null
                 || (MekanismUtils.isMekanismInstalled() && GasUtils.hasChemicalCapability(world, pos.relative(facing), facing.getOpposite()));
     }
 

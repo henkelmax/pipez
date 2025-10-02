@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.blocks.tileentity.types;
 
-import de.maxhenkel.corelib.item.ItemUtils;
 import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
@@ -18,11 +17,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
 
     @Override
     public BlockCapability<?, Direction> getCapability() {
-        return Capabilities.ItemHandler.BLOCK;
+        return Capabilities.Item.BLOCK;
     }
 
     @Override
@@ -77,7 +76,7 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
             if (extractingConnection == null) {
                 continue;
             }
-            IItemHandler itemHandler = extractingConnection.getItemHandler();
+            ResourceHandler<ItemResource> itemHandler = extractingConnection.getItemHandler();
             if (itemHandler == null) {
                 continue;
             }
@@ -92,7 +91,7 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
         }
     }
 
-    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
+    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, ResourceHandler<ItemResource> itemHandler) {
         if (connections.isEmpty()) {
             return;
         }
@@ -101,25 +100,15 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (itemsToTransfer > 0 && hasNotInserted(inventoriesFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IItemHandler destination = connection.getItemHandler();
+            ResourceHandler<ItemResource> destination = connection.getItemHandler();
             boolean hasInserted = false;
-            if (destination != null && !inventoriesFull[p] && !isFull(destination)) {
-                for (int j = 0; j < itemHandler.getSlots(); j++) {
-                    ItemStack simulatedExtract = itemHandler.extractItem(j, 1, true);
-                    if (simulatedExtract.isEmpty()) {
-                        continue;
-                    }
-                    if (canInsert(tileEntity.getLevel().registryAccess(), connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
-                        continue;
-                    }
-                    ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
-                    int insertedAmount = simulatedExtract.getCount() - stack.getCount();
-                    if (insertedAmount > 0) {
-                        itemsToTransfer -= insertedAmount;
-                        itemHandler.extractItem(j, insertedAmount, false);
-                        hasInserted = true;
-                        break;
-                    }
+            if (destination != null && !inventoriesFull[p] && !ResourceHandlerUtil.isFull(destination)) {
+                int moved = ResourceHandlerUtil.move(itemHandler, destination, resource -> {
+                    return canInsert(tileEntity.getLevel().registryAccess(), connection, resource.toStack(), tileEntity.getFilters(side, this)) != tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST);
+                }, 1, null);
+                if (moved > 0) {
+                    hasInserted = true;
+                    itemsToTransfer -= moved;
                 }
             }
             if (!hasInserted) {
@@ -131,54 +120,27 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
+    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, ResourceHandler<ItemResource> itemHandler) {
         int itemsToTransfer = getRate(tileEntity, side);
 
-        ArrayList<ItemStack> nonFittingItems = new ArrayList<>();
-
-        connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            nonFittingItems.clear();
-            IItemHandler destination = connection.getItemHandler();
+            ResourceHandler<ItemResource> destination = connection.getItemHandler();
             if (destination == null) {
                 continue;
             }
-            if (isFull(destination)) {
+            if (ResourceHandlerUtil.isFull(destination)) {
                 continue;
             }
-            for (int i = 0; i < itemHandler.getSlots(); i++) {
-                if (itemsToTransfer <= 0) {
-                    break connectionLoop;
-                }
-                ItemStack simulatedExtract = itemHandler.extractItem(i, itemsToTransfer, true);
-                if (simulatedExtract.isEmpty()) {
-                    continue;
-                }
-                if (nonFittingItems.stream().anyMatch(stack -> ItemUtils.isStackable(stack, simulatedExtract))) {
-                    continue;
-                }
-                if (canInsert(tileEntity.getLevel().registryAccess(), connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
-                    continue;
-                }
-                ItemStack stack = ItemHandlerHelper.insertItem(destination, simulatedExtract, false);
-                int insertedAmount = simulatedExtract.getCount() - stack.getCount();
-                if (insertedAmount <= 0) {
-                    nonFittingItems.add(simulatedExtract);
-                }
-                itemsToTransfer -= insertedAmount;
-                itemHandler.extractItem(i, insertedAmount, false);
-            }
-        }
-    }
+            int moved = ResourceHandlerUtil.move(itemHandler, destination, resource -> {
+                return canInsert(tileEntity.getLevel().registryAccess(), connection, resource.toStack(), tileEntity.getFilters(side, this)) != tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST);
+            }, itemsToTransfer, null);
 
-    private boolean isFull(IItemHandler itemHandler) {
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
-            if (stackInSlot.getCount() < itemHandler.getSlotLimit(i)) {
-                return false;
+            itemsToTransfer -= moved;
+
+            if (itemsToTransfer <= 0) {
+                break;
             }
         }
-        return true;
     }
 
     private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, ItemStack stack, List<Filter<?, ?>> filters) {

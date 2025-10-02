@@ -1,6 +1,5 @@
 package de.maxhenkel.pipez.blocks.tileentity.types;
 
-import de.maxhenkel.corelib.energy.EnergyUtils;
 import de.maxhenkel.corelib.helpers.Pair;
 import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.PipezMod;
@@ -17,7 +16,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
 
     @Override
     public BlockCapability<?, Direction> getCapability() {
-        return Capabilities.EnergyStorage.BLOCK;
+        return Capabilities.Energy.BLOCK;
     }
 
     @Nullable
@@ -75,8 +77,8 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
         if (extractingConnection == null) {
             return;
         }
-        IEnergyStorage energyStorage = extractingConnection.getEnergyHandler();
-        if (energyStorage == null || !energyStorage.canExtract()) {
+        EnergyHandler energyStorage = extractingConnection.getEnergyHandler();
+        if (energyStorage == null || energyStorage.getAmountAsLong() <= 0L) {
             return;
         }
 
@@ -89,7 +91,7 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
         }
     }
 
-    public int receive(PipeLogicTileEntity tileEntity, Direction side, int amount, boolean simulate) {
+    public int receive(PipeLogicTileEntity tileEntity, Direction side, int amount, TransactionContext transaction) {
         if (!tileEntity.isExtracting(side)) {
             return 0;
         }
@@ -102,13 +104,13 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
         int maxTransfer = Math.min(getRate(tileEntity, side), amount);
 
         if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
-            return receiveEqually(tileEntity, side, connections, maxTransfer, simulate);
+            return receiveEqually(tileEntity, side, connections, maxTransfer, transaction);
         } else {
-            return receiveOrdered(tileEntity, side, connections, maxTransfer, simulate);
+            return receiveOrdered(tileEntity, side, connections, maxTransfer, transaction);
         }
     }
 
-    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IEnergyStorage energyStorage) {
+    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, EnergyHandler energyHandler) {
         if (connections.isEmpty()) {
             return;
         }
@@ -117,24 +119,27 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
 
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
 
-        List<IEnergyStorage> destinations = new ArrayList<>(connections.size());
+        List<EnergyHandler> destinations = new ArrayList<>(connections.size());
         for (int i = 0; i < connections.size(); i++) {
             int index = (i + p) % connections.size();
 
             PipeTileEntity.Connection connection = connections.get(index);
-            IEnergyStorage destination = connection.getEnergyHandler();
-            if (destination != null && destination.canReceive() && destination.receiveEnergy(1, true) >= 1) {
-                destinations.add(destination);
+            EnergyHandler destination = connection.getEnergyHandler();
+            try (Transaction simulated = Transaction.open(null)) {
+                //TODO Do we really need to check if destination.insert works? EnergyHandlerUtil.isFull might be enough
+                if (destination != null && !EnergyHandlerUtil.isFull(destination) && destination.insert(1, simulated) >= 1) {
+                    destinations.add(destination);
+                }
             }
         }
 
-        for (IEnergyStorage destination : destinations) {
-            int simulatedExtract = energyStorage.extractEnergy(Math.min(Math.max(completeAmount / destinations.size(), 1), energyToTransfer), true);
+        for (EnergyHandler destination : destinations) {
+            int simulatedExtract;
+            try (Transaction simulated = Transaction.open(null)) {
+                simulatedExtract = energyHandler.extract(Math.min(Math.max(completeAmount / destinations.size(), 1), energyToTransfer), simulated);
+            }
             if (simulatedExtract > 0) {
-                int transferred = EnergyUtils.pushEnergy(energyStorage, destination, simulatedExtract);
-                if (transferred > 0) {
-                    energyToTransfer -= transferred;
-                }
+                energyToTransfer -= EnergyHandlerUtil.move(energyHandler, destination, simulatedExtract, null);
             }
 
             p = (p + 1) % connections.size();
@@ -147,7 +152,7 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
-    protected int receiveEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, int maxReceive, boolean simulate) {
+    protected int receiveEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, int maxReceive, TransactionContext transaction) {
         if (connections.isEmpty() || maxReceive <= 0) {
             return 0;
         }
@@ -158,24 +163,27 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
         int energyToTransfer = maxReceive;
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
 
-        List<Pair<IEnergyStorage, Integer>> destinations = new ArrayList<>(connections.size());
+        List<Pair<EnergyHandler, Integer>> destinations = new ArrayList<>(connections.size());
         for (int i = 0; i < connections.size(); i++) {
             int index = (i + p) % connections.size();
 
             PipeTileEntity.Connection connection = connections.get(index);
-            IEnergyStorage destination = connection.getEnergyHandler();
+            EnergyHandler destination = connection.getEnergyHandler();
             // destination.receiveEnergy(1, true) doesn't work for Mekanism machines, so we try to insert the maximum amount
-            if (destination != null && destination.canReceive() && destination.receiveEnergy(maxReceive, true) >= 1) {
-                destinations.add(new Pair<>(destination, index));
+            try (Transaction simulated = Transaction.open(transaction)) {
+                //TODO Do we really need to check if destination.insert works? EnergyHandlerUtil.isFull might be enough
+                if (destination != null && !EnergyHandlerUtil.isFull(destination) && destination.insert(maxReceive, simulated) >= 1) {
+                    destinations.add(new Pair<>(destination, index));
+                }
             }
         }
 
-        for (Pair<IEnergyStorage, Integer> destination : destinations) {
+        for (Pair<EnergyHandler, Integer> destination : destinations) {
             int maxTransfer = Math.min(Math.max(maxReceive / destinations.size(), 1), energyToTransfer);
-            int extracted = destination.getKey().receiveEnergy(Math.min(maxTransfer, maxReceive), simulate);
-            if (extracted > 0) {
-                energyToTransfer -= extracted;
-                actuallyTransferred += extracted;
+            int inserted = destination.getKey().insert(Math.min(maxTransfer, maxReceive), transaction);
+            if (inserted > 0) {
+                energyToTransfer -= inserted;
+                actuallyTransferred += inserted;
             }
 
             p = destination.getValue() + 1;
@@ -185,34 +193,34 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
             }
         }
 
-        if (!simulate) {
-            tileEntity.setRoundRobinIndex(side, this, p);
-        }
+        tileEntity.setEnergyRoundRobinIndex(side, p, transaction);
+
         tileEntity.popRecursion();
         return actuallyTransferred;
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IEnergyStorage energyStorage) {
+    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, EnergyHandler energyHandler) {
         int energyToTransfer = getRate(tileEntity, side);
 
         for (PipeTileEntity.Connection connection : connections) {
             if (energyToTransfer <= 0) {
                 break;
             }
-            IEnergyStorage destination = connection.getEnergyHandler();
-            if (destination == null || !destination.canReceive()) {
+            EnergyHandler destination = connection.getEnergyHandler();
+            if (destination == null || EnergyHandlerUtil.isFull(destination)) {
                 continue;
             }
-
-            int simulatedExtract = energyStorage.extractEnergy(energyToTransfer, true);
+            int simulatedExtract;
+            try (Transaction simulated = Transaction.open(null)) {
+                simulatedExtract = energyHandler.extract(energyToTransfer, simulated);
+            }
             if (simulatedExtract > 0) {
-                int extract = EnergyUtils.pushEnergy(energyStorage, destination, simulatedExtract);
-                energyToTransfer -= extract;
+                energyToTransfer -= EnergyHandlerUtil.move(energyHandler, destination, simulatedExtract, null);
             }
         }
     }
 
-    protected int receiveOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, int maxReceive, boolean simulate) {
+    protected int receiveOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, int maxReceive, TransactionContext transaction) {
         if (tileEntity.pushRecursion()) {
             return 0;
         }
@@ -223,12 +231,12 @@ public class EnergyPipeType extends PipeType<Void, EnergyData> {
             if (energyToTransfer <= 0) {
                 break;
             }
-            IEnergyStorage destination = connection.getEnergyHandler();
-            if (destination == null || !destination.canReceive()) {
+            EnergyHandler destination = connection.getEnergyHandler();
+            if (destination == null || EnergyHandlerUtil.isFull(destination)) {
                 continue;
             }
 
-            int extracted = destination.receiveEnergy(Math.min(energyToTransfer, maxReceive), simulate);
+            int extracted = destination.insert(Math.min(energyToTransfer, maxReceive), transaction);
             energyToTransfer -= extracted;
             actuallyTransferred += extracted;
         }

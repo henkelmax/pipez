@@ -17,9 +17,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -32,7 +32,7 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
 
     @Override
     public BlockCapability<?, Direction> getCapability() {
-        return Capabilities.FluidHandler.BLOCK;
+        return Capabilities.Fluid.BLOCK;
     }
 
     @Nullable
@@ -69,7 +69,7 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
             if (extractingConnection == null) {
                 continue;
             }
-            IFluidHandler fluidHandler = extractingConnection.getFluidHandler();
+            ResourceHandler<FluidResource> fluidHandler = extractingConnection.getFluidHandler();
             if (fluidHandler == null) {
                 continue;
             }
@@ -84,7 +84,7 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
         }
     }
 
-    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler) {
+    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, ResourceHandler<FluidResource> fluidHandler) {
         if (connections.isEmpty()) {
             return;
         }
@@ -94,26 +94,15 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
             PipeTileEntity.Connection connection = connections.get(p);
-            IFluidHandler destination = connection.getFluidHandler();
+            ResourceHandler<FluidResource> destination = connection.getFluidHandler();
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
-                for (int j = 0; j < fluidHandler.getTanks(); j++) {
-                    FluidStack fluidInTank = fluidHandler.getFluidInTank(j);
-                    FluidStack copy = fluidInTank.copy();
-                    copy.setAmount(Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer));
-                    FluidStack simulatedExtract = fluidHandler.drain(copy, IFluidHandler.FluidAction.SIMULATE);
-                    if (simulatedExtract.isEmpty()) {
-                        continue;
-                    }
-                    if (canInsert(tileEntity.getLevel().registryAccess(), connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
-                        continue;
-                    }
-                    FluidStack stack = FluidUtil.tryFluidTransfer(destination, fluidHandler, simulatedExtract, true);
-                    if (stack.getAmount() > 0) {
-                        mbToTransfer -= stack.getAmount();
-                        hasInserted = true;
-                        break;
-                    }
+                int moved = ResourceHandlerUtil.move(fluidHandler, destination, resource -> {
+                    return canInsert(tileEntity.getLevel().registryAccess(), connection, resource, tileEntity.getFilters(side, this)) != tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST);
+                }, Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer), null);
+                if (moved > 0) {
+                    mbToTransfer -= moved;
+                    hasInserted = true;
                 }
             }
             if (!hasInserted) {
@@ -125,39 +114,29 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
         tileEntity.setRoundRobinIndex(side, this, p);
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler) {
+    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, ResourceHandler<FluidResource> fluidHandler) {
         int mbToTransfer = getRate(tileEntity, side);
 
-        connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
-            IFluidHandler destination = connection.getFluidHandler();
+            ResourceHandler<FluidResource> destination = connection.getFluidHandler();
             if (destination == null) {
                 continue;
             }
 
-            for (int i = 0; i < fluidHandler.getTanks(); i++) {
-                if (mbToTransfer <= 0) {
-                    break connectionLoop;
-                }
-                FluidStack fluidInTank = fluidHandler.getFluidInTank(i);
-                FluidStack copy = fluidInTank.copy();
-                copy.setAmount(mbToTransfer);
-                FluidStack simulatedExtract = fluidHandler.drain(copy, IFluidHandler.FluidAction.SIMULATE);
-                if (simulatedExtract.isEmpty()) {
-                    continue;
-                }
-                if (canInsert(tileEntity.getLevel().registryAccess(), connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
-                    continue;
-                }
-                FluidStack stack = FluidUtil.tryFluidTransfer(destination, fluidHandler, simulatedExtract, true);
-                mbToTransfer -= stack.getAmount();
+            int moved = ResourceHandlerUtil.move(fluidHandler, destination, resource -> {
+                return canInsert(tileEntity.getLevel().registryAccess(), connection, resource, tileEntity.getFilters(side, this)) != tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST);
+            }, mbToTransfer, null);
+            mbToTransfer -= moved;
+
+            if (mbToTransfer <= 0) {
+                break;
             }
         }
     }
 
-    private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, FluidStack stack, List<Filter<?, ?>> filters) {
+    private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, FluidResource resource, List<Filter<?, ?>> filters) {
         for (Filter<?, Fluid> filter : filters.stream().map(filter -> (Filter<?, Fluid>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(provider, filter, stack)) {
+            if (matches(provider, filter, resource)) {
                 return false;
             }
         }
@@ -166,22 +145,22 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
             return true;
         }
         for (Filter<?, Fluid> filter : collect) {
-            if (matches(provider, filter, stack)) {
+            if (matches(provider, filter, resource)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean matches(HolderLookup.Provider provider, Filter<?, Fluid> filter, FluidStack stack) {
+    private boolean matches(HolderLookup.Provider provider, Filter<?, Fluid> filter, FluidResource resource) {
         CompoundTag metadata = filter.getMetadata();
         if (metadata == null) {
-            return filter.getTag() == null || filter.getTag().contains(stack.getFluid());
+            return filter.getTag() == null || filter.getTag().contains(resource.getFluid());
         }
-        CompoundTag stackNBT = ComponentUtils.getTag(provider, stack);
+        CompoundTag stackNBT = ComponentUtils.getTag(provider, resource.toStack(1));
         if (filter.isExactMetadata()) {
             if (deepExactCompare(metadata, stackNBT)) {
-                return filter.getTag() == null || filter.getTag().contains(stack.getFluid());
+                return filter.getTag() == null || filter.getTag().contains(resource.getFluid());
             } else {
                 return false;
             }
@@ -192,7 +171,7 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
             if (!deepFuzzyCompare(metadata, stackNBT)) {
                 return false;
             }
-            return filter.getTag() == null || filter.getTag().contains(stack.getFluid());
+            return filter.getTag() == null || filter.getTag().contains(resource.getFluid());
         }
     }
 

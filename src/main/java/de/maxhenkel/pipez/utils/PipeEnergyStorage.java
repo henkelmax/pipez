@@ -3,9 +3,10 @@ package de.maxhenkel.pipez.utils;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-public class PipeEnergyStorage implements IEnergyStorage {
+public class PipeEnergyStorage implements EnergyHandler {
 
     protected PipeLogicTileEntity pipe;
     protected Direction side;
@@ -23,33 +24,24 @@ public class PipeEnergyStorage implements IEnergyStorage {
     }
 
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
+    public long getAmountAsLong() {
+        return 0;
+    }
+
+    @Override
+    public long getCapacityAsLong() {
+        return Long.MAX_VALUE;
+    }
+
+    @Override
+    public int insert(int amount, TransactionContext transaction) {
+        //TODO Check if this needs to be rolled back
         lastReceived = pipe.getLevel().getGameTime();
-        return EnergyPipeType.INSTANCE.receive(pipe, side, maxReceive, simulate);
+        return EnergyPipeType.INSTANCE.receive(pipe, side, amount, transaction);
     }
 
     @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
+    public int extract(int amount, TransactionContext transaction) {
         return 0;
-    }
-
-    @Override
-    public int getEnergyStored() {
-        return 0;
-    }
-
-    @Override
-    public int getMaxEnergyStored() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public boolean canExtract() {
-        return false;
-    }
-
-    @Override
-    public boolean canReceive() {
-        return true;
     }
 }

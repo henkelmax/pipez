@@ -24,7 +24,7 @@ public class EnergyPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(Level world, BlockPos pos, Direction facing) {
-        return world.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(facing), facing.getOpposite()) != null;
+        return world.getCapability(Capabilities.Energy.BLOCK, pos.relative(facing), facing.getOpposite()) != null;
     }
 
     @Override

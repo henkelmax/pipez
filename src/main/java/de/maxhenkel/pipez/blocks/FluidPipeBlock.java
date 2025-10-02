@@ -24,7 +24,7 @@ public class FluidPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(Level world, BlockPos pos, Direction facing) {
-        return world.getCapability(Capabilities.FluidHandler.BLOCK, pos.relative(facing), facing.getOpposite()) != null;
+        return world.getCapability(Capabilities.Fluid.BLOCK, pos.relative(facing), facing.getOpposite()) != null;
     }
 
     @Override

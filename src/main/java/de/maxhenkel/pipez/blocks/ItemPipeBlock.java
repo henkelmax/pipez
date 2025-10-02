@@ -24,7 +24,7 @@ public class ItemPipeBlock extends PipeBlock {
 
     @Override
     public boolean canConnectTo(Level world, BlockPos pos, Direction facing) {
-        return world.getCapability(Capabilities.ItemHandler.BLOCK, pos.relative(facing), facing.getOpposite()) != null;
+        return world.getCapability(Capabilities.Item.BLOCK, pos.relative(facing), facing.getOpposite()) != null;
     }
 
     @Override

@@ -54,9 +54,9 @@ public class ModTileEntities {
     }
 
     public static <U extends PipeLogicTileEntity, T extends BlockEntityType<U>> void onRegisterPipeCapabilities(RegisterCapabilitiesEvent event, DeferredHolder<BlockEntityType<?>, T> holder) {
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.ItemHandler.BLOCK, context));
-        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.EnergyStorage.BLOCK, context));
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.FluidHandler.BLOCK, context));
+        event.registerBlockEntity(Capabilities.Item.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.Item.BLOCK, context));
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.Energy.BLOCK, context));
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, holder.get(), (object, context) -> object.onRegisterCapability(Capabilities.Fluid.BLOCK, context));
     }
 
 }

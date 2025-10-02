@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nullable;
 
@@ -27,11 +29,28 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     private int recursionDepth;
 
+    private final SnapshotJournal<Integer>[] energyRRIndexJournals;
+
     public PipeLogicTileEntity(BlockEntityType<?> tileEntityTypeIn, PipeType<?, ?>[] types, BlockPos pos, BlockState state) {
         super(tileEntityTypeIn, pos, state);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
         energyStorages = new PipeEnergyStorage[Direction.values().length];
+        energyRRIndexJournals = new SnapshotJournal[Direction.values().length];
+        for (Direction direction : Direction.values()) {
+            energyRRIndexJournals[direction.get3DDataValue()] = new SnapshotJournal<>() {
+
+                @Override
+                protected Integer createSnapshot() {
+                    return rrIndex[direction.get3DDataValue()][getIndex(EnergyPipeType.INSTANCE)];
+                }
+
+                @Override
+                protected void revertToSnapshot(Integer snapshot) {
+                    rrIndex[direction.get3DDataValue()][getIndex(EnergyPipeType.INSTANCE)] = snapshot;
+                }
+            };
+        }
     }
 
     @Nullable
@@ -42,18 +61,18 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         if (!isExtracting(side)) {
             return null;
         }
-        if (capability == Capabilities.EnergyStorage.BLOCK && hasType(EnergyPipeType.INSTANCE)) {
+        if (capability == Capabilities.Energy.BLOCK && hasType(EnergyPipeType.INSTANCE)) {
             if (side != null) {
                 if (energyStorages[side.get3DDataValue()] == null) {
                     energyStorages[side.get3DDataValue()] = new PipeEnergyStorage(this, side);
                 }
                 return (T) energyStorages[side.get3DDataValue()];
             }
-        } else if (capability == Capabilities.FluidHandler.BLOCK && hasType(FluidPipeType.INSTANCE)) {
+        } else if (capability == Capabilities.Fluid.BLOCK && hasType(FluidPipeType.INSTANCE)) {
             if (side != null) {
                 return (T) DummyFluidHandler.INSTANCE;
             }
-        } else if (capability == Capabilities.ItemHandler.BLOCK && hasType(ItemPipeType.INSTANCE)) {
+        } else if (capability == Capabilities.Fluid.BLOCK && hasType(ItemPipeType.INSTANCE)) {
             if (side != null) {
                 return (T) DummyItemHandler.INSTANCE;
             }
@@ -72,6 +91,11 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     public int getRoundRobinIndex(Direction direction, PipeType<?, ?> pipeType) {
         return rrIndex[direction.get3DDataValue()][getIndex(pipeType)];
+    }
+
+    public void setEnergyRoundRobinIndex(Direction direction, int value, TransactionContext transaction) {
+        energyRRIndexJournals[direction.get3DDataValue()].updateSnapshots(transaction);
+        rrIndex[direction.get3DDataValue()][getIndex(EnergyPipeType.INSTANCE)] = value;
     }
 
     public void setRoundRobinIndex(Direction direction, PipeType<?, ?> pipeType, int value) {
