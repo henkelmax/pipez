@@ -15,7 +15,7 @@ import mezz.jei.api.ingredients.ITypedIngredient;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 public class FilterScreenGhostIngredientHandler implements IGhostIngredientHandler<FilterScreen> {
 
@@ -39,7 +39,7 @@ public class FilterScreenGhostIngredientHandler implements IGhostIngredientHandl
 
     private boolean testItemStack(Filter<?, ?> filter, ItemStack stack) {
         if (filter instanceof FluidFilter) {
-            return FluidUtil.getFluidContained(stack).isPresent();
+            return !FluidUtil.getFirstStackContained(stack).isEmpty();
         } else if (filter instanceof GasFilter) {
             return GasUtils.getGasContained(stack) != null;
         } else {

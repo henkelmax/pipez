@@ -1,43 +1,45 @@
 package de.maxhenkel.pipez.utils;
 
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import javax.annotation.Nonnull;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-public class DummyItemHandler implements IItemHandler {
+public class DummyItemHandler implements ResourceHandler<ItemResource> {
 
     public static final DummyItemHandler INSTANCE = new DummyItemHandler();
 
     @Override
-    public int getSlots() {
-        return 0;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return ItemStack.EMPTY;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        return stack;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public int getSlotLimit(int slot) {
+    public int size() {
         return 0;
     }
 
     @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+    public ItemResource getResource(int index) {
+        return ItemResource.EMPTY;
+    }
+
+    @Override
+    public long getAmountAsLong(int index) {
+        return 0;
+    }
+
+    @Override
+    public long getCapacityAsLong(int index, ItemResource resource) {
+        return 0;
+    }
+
+    @Override
+    public boolean isValid(int index, ItemResource resource) {
         return false;
+    }
+
+    @Override
+    public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        return 0;
+    }
+
+    @Override
+    public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        return 0;
     }
 }

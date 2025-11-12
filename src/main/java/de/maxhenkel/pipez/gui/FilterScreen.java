@@ -32,7 +32,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -266,7 +266,10 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             item.setValue(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
             nbt.setValue(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).map(CompoundTag::toString).orElse(""));
         } else if (filter instanceof FluidFilter) {
-            FluidUtil.getFluidContained(stack).ifPresent(this::onInsertStack);
+            FluidStack fluidStack = FluidUtil.getFirstStackContained(stack);
+            if (!fluidStack.isEmpty()) {
+                onInsertStack(fluidStack);
+            }
         } else if (filter instanceof GasFilter) {
             ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
