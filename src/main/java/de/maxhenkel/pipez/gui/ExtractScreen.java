@@ -26,7 +26,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -282,11 +283,12 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             filter.setMetadata(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).orElse(null));
             ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
         } else if (filter instanceof FluidFilter) {
-            FluidUtil.getFluidContained(stack).ifPresent(s -> {
-                filter.setTag(new SingleElementTag(BuiltInRegistries.FLUID.getKey(s.getFluid()), s.getFluid()));
+            FluidStack firstStackContained = FluidUtil.getFirstStackContained(stack);
+            if (!firstStackContained.isEmpty()) {
+                filter.setTag(new SingleElementTag(BuiltInRegistries.FLUID.getKey(firstStackContained.getFluid()), firstStackContained.getFluid()));
                 filter.setMetadata(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).orElse(null));
                 ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
-            });
+            }
         } else if (filter instanceof GasFilter) {
             ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
