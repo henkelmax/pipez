@@ -12,7 +12,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.BlockAccessor;
@@ -25,7 +25,7 @@ public class DataProviderPipes implements IServerDataProvider<BlockAccessor> {
 
     static final DataProviderPipes INSTANCE = new DataProviderPipes();
 
-    private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "pipe_data");
+    private static final Identifier UID = Identifier.fromNamespaceAndPath(PipezMod.MODID, "pipe_data");
 
     @Override
     public void appendServerData(CompoundTag compound, BlockAccessor blockAccessor) {
@@ -72,7 +72,7 @@ public class DataProviderPipes implements IServerDataProvider<BlockAccessor> {
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return UID;
     }
 }

@@ -10,7 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
@@ -196,14 +196,14 @@ public abstract class Filter<F extends Filter<F, T>, T> {
     private static final Codec<TagData> TAG_DATA_CODEC = RecordCodecBuilder.create(i -> {
         return i.group(
                 Codec.STRING.fieldOf("type").xmap(TagType::valueOf, TagType::name).forGetter(TagData::tagType),
-                ResourceLocation.CODEC.fieldOf("tag").forGetter(TagData::location)
+                Identifier.CODEC.fieldOf("tag").forGetter(TagData::location)
         ).apply(i, TagData::new);
     });
 
     private static final StreamCodec<RegistryFriendlyByteBuf, TagData> TAG_DATA_STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.BOOL,
             TagData::isSingle,
-            ResourceLocation.STREAM_CODEC,
+            Identifier.STREAM_CODEC,
             TagData::location,
             TagData::new
     );
@@ -230,15 +230,15 @@ public abstract class Filter<F extends Filter<F, T>, T> {
 
     @FunctionalInterface
     public interface TagConverter<T> {
-        Tag<T> convert(boolean single, ResourceLocation location);
+        Tag<T> convert(boolean single, Identifier location);
     }
 
     protected enum TagType {
         SINGLE, TAG;
     }
 
-    protected record TagData(TagType tagType, ResourceLocation location) {
-        public TagData(boolean single, ResourceLocation location) {
+    protected record TagData(TagType tagType, Identifier location) {
+        public TagData(boolean single, Identifier location) {
             this(single ? TagType.SINGLE : TagType.TAG, location);
         }
 

@@ -11,7 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -20,7 +20,7 @@ import java.util.Optional;
 
 public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
 
-    public static final CustomPacketPayload.Type<UpdateFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "update_filter"));
+    public static final CustomPacketPayload.Type<UpdateFilterMessage> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(PipezMod.MODID, "update_filter"));
 
     private Filter filter;
     private CompoundTag filterTag;

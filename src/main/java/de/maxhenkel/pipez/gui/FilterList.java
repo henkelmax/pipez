@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 public class FilterList extends WidgetBase {
 
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/extract.png");
+    public static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/extract.png");
 
     protected Supplier<List<Filter<?, ?>>> filters;
     protected int offset;

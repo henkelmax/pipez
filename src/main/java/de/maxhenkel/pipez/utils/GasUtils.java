@@ -6,7 +6,7 @@ import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.*;
 import net.minecraft.core.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -21,15 +21,15 @@ public class GasUtils {
 
     @Nullable
     public static Tag<? extends Chemical> getGas(String name, boolean nullIfNotExists) {
-        ResourceLocation id;
+        Identifier id;
         if (name.startsWith("#")) {
-            ResourceLocation resourceLocation = ResourceLocation.tryParse(name.substring(1));
+            Identifier resourceLocation = Identifier.tryParse(name.substring(1));
             if (resourceLocation == null) {
                 return nullIfNotExists ? null : EMPTY_CHEMICAL_TAG;
             }
             return getGasTag(resourceLocation, nullIfNotExists);
         } else {
-            id = ResourceLocation.tryParse(name);
+            id = Identifier.tryParse(name);
             if (id == null) {
                 return nullIfNotExists ? null : EMPTY_CHEMICAL_TAG;
             }
@@ -42,7 +42,7 @@ public class GasUtils {
     }
 
     @Nullable
-    public static Tag<Chemical> getGasTag(ResourceLocation id, boolean nullIfNotExists) {
+    public static Tag<Chemical> getGasTag(Identifier id, boolean nullIfNotExists) {
         TagKey<? extends Chemical> tagKey = TagKey.create(MekanismAPI.CHEMICAL_REGISTRY_NAME, id);
         DefaultedRegistry<? extends Chemical> registry = MekanismAPI.CHEMICAL_REGISTRY;
         Optional<HolderSet.Named<Chemical>> tag = registry.get((TagKey) tagKey);

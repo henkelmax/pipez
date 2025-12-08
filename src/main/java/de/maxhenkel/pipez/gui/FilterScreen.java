@@ -11,11 +11,9 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.items.FilterDestinationToolItem;
 import de.maxhenkel.pipez.net.OpenExtractMessage;
 import de.maxhenkel.pipez.net.UpdateFilterMessage;
-import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.NbtUtils;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -26,7 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FilterScreen extends ScreenBase<FilterContainer> {
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/filter.png");
+    public static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/filter.png");
 
     private EditBox item;
     private EditBox nbt;
@@ -111,7 +109,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             if (s.startsWith("#")) {
                 s = s.substring(1);
             }
-            return ResourceLocation.tryParse(s) != null;
+            return Identifier.tryParse(s) != null;
         });
         addRenderableWidget(item);
 
@@ -230,7 +228,8 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                 item.setTextColor(FontColorUtils.WHITE);
             }
         } else if (filter instanceof GasFilter) {
-            filter.setTag((Tag) GasUtils.getGas(text, true));
+            // TODO Re-add once mekanism is updated
+            //filter.setTag((Tag) GasUtils.getGas(text, true));
             if (filter.getTag() == null) {
                 item.setTextColor(FontColorUtils.getFontColor(ChatFormatting.DARK_RED));
             } else {
@@ -271,10 +270,11 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
                 onInsertStack(fluidStack);
             }
         } else if (filter instanceof GasFilter) {
-            ChemicalStack gas = GasUtils.getGasContained(stack);
+            // TODO Re-add once mekanism is updated
+            /*ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 onInsertStack(gas);
-            }
+            }*/
         }
     }
 
@@ -294,10 +294,11 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             return;
         }
 
-        if (filter instanceof GasFilter) {
+        // TODO Re-add once mekanism is updated
+        /*if (filter instanceof GasFilter) {
             item.setValue(stack.getChemical().getRegistryName().toString());
             nbt.setValue("");
-        }
+        }*/
     }
 
     public void onInsertDestination(ItemStack stack) {
@@ -400,10 +401,10 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     @Override
-    public void resize(Minecraft mc, int x, int y) {
+    public void resize(int x, int y) {
         String itemTxt = item.getValue();
         String nbtTxt = nbt.getValue();
-        init(mc, x, y);
+        init(x, y);
         item.setValue(itemTxt);
         nbt.setValue(nbtTxt);
     }

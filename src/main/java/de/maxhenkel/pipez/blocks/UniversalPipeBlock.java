@@ -3,8 +3,6 @@ package de.maxhenkel.pipez.blocks;
 import de.maxhenkel.pipez.blocks.tileentity.UniversalPipeTileEntity;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
-import de.maxhenkel.pipez.utils.GasUtils;
-import de.maxhenkel.pipez.utils.MekanismUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -29,7 +27,7 @@ public class UniversalPipeBlock extends PipeBlock {
         return world.getCapability(Capabilities.Item.BLOCK, pos.relative(facing), facing.getOpposite()) != null
                 || world.getCapability(Capabilities.Fluid.BLOCK, pos.relative(facing), facing.getOpposite()) != null
                 || world.getCapability(Capabilities.Energy.BLOCK, pos.relative(facing), facing.getOpposite()) != null
-                || (MekanismUtils.isMekanismInstalled() && GasUtils.hasChemicalCapability(world, pos.relative(facing), facing.getOpposite()));
+                /*|| (MekanismUtils.isMekanismInstalled() && GasUtils.hasChemicalCapability(world, pos.relative(facing), facing.getOpposite()))*/;
     }
 
     @Override

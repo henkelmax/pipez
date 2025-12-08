@@ -10,13 +10,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class EditFilterMessage implements Message<EditFilterMessage> {
 
-    public static final CustomPacketPayload.Type<EditFilterMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "edit_filter_message"));
+    public static final CustomPacketPayload.Type<EditFilterMessage> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(PipezMod.MODID, "edit_filter_message"));
 
     private Filter filter;
     private CompoundTag filterTag;

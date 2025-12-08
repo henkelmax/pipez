@@ -10,7 +10,7 @@ import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -19,10 +19,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileInfoProvider implements IProbeInfoProvider {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "probeinfoprovider");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(PipezMod.MODID, "probeinfoprovider");
 
     @Override
-    public ResourceLocation getID() {
+    public Identifier getID() {
         return ID;
     }
 

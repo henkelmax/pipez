@@ -6,14 +6,14 @@ import de.maxhenkel.pipez.gui.FilterScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "pipez");
+    public Identifier getPluginUid() {
+        return Identifier.fromNamespaceAndPath(PipezMod.MODID, "pipez");
     }
 
     @Override

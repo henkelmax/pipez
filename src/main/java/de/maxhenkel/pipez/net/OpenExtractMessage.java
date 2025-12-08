@@ -8,13 +8,13 @@ import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class OpenExtractMessage implements Message<OpenExtractMessage> {
 
-    public static final CustomPacketPayload.Type<OpenExtractMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "open_extract"));
+    public static final CustomPacketPayload.Type<OpenExtractMessage> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(PipezMod.MODID, "open_extract"));
 
     private int index;
 

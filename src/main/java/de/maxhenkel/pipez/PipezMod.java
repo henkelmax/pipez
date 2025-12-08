@@ -5,7 +5,6 @@ import de.maxhenkel.pipez.blocks.ModBlocks;
 import de.maxhenkel.pipez.blocks.tileentity.ModTileEntities;
 import de.maxhenkel.pipez.events.BlockEvents;
 import de.maxhenkel.pipez.gui.Containers;
-import de.maxhenkel.pipez.integration.IMC;
 import de.maxhenkel.pipez.items.ModItems;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.recipes.ModRecipes;
@@ -33,7 +32,8 @@ public class PipezMod {
     public static ClientConfig CLIENT_CONFIG;
 
     public PipezMod(IEventBus eventBus) {
-        eventBus.addListener(IMC::enqueueIMC);
+        //TODO Add back
+        //eventBus.addListener(IMC::enqueueIMC);
 
         SERVER_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.SERVER, ServerConfig.class);
         CLIENT_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.CLIENT, ClientConfig.class);

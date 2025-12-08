@@ -6,7 +6,6 @@ import de.maxhenkel.pipez.*;
 import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
-import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.NbtUtils;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,7 +19,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -37,7 +36,7 @@ import java.util.function.Supplier;
 
 public class ExtractScreen extends ScreenBase<ExtractContainer> {
 
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/extract.png");
+    public static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/extract.png");
 
     private CycleIconButton redstoneButton;
     private CycleIconButton sortButton;
@@ -289,14 +288,16 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
                 filter.setMetadata(NbtUtils.componentPatchToNbtOptional(stack.getComponentsPatch()).orElse(null));
                 ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }
-        } else if (filter instanceof GasFilter) {
+        }
+        // TODO Re-add once mekanism is updated
+        /* else if (filter instanceof GasFilter) {
             ChemicalStack gas = GasUtils.getGasContained(stack);
             if (gas != null) {
                 filter.setTag(new SingleElementTag(gas.getChemical().getRegistryName(), gas.getChemical()));
                 filter.setMetadata(null);
                 ClientPacketDistributor.sendToServer(new UpdateFilterMessage(filter, currentindex));
             }
-        }
+        }*/
     }
 
     @Override

@@ -12,7 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -23,9 +23,9 @@ public class CopyComponentsRecipe extends CustomRecipe {
 
     private final Ingredient sourceIngredient;
     private final Ingredient targetIngredient;
-    private final List<ResourceLocation> components;
+    private final List<Identifier> components;
 
-    public CopyComponentsRecipe(Ingredient sourceIngredient, Ingredient targetIngredient, List<ResourceLocation> components) {
+    public CopyComponentsRecipe(Ingredient sourceIngredient, Ingredient targetIngredient, List<Identifier> components) {
         super(CraftingBookCategory.MISC);
         this.sourceIngredient = sourceIngredient;
         this.targetIngredient = targetIngredient;
@@ -99,7 +99,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
                 if (e.getValue().isEmpty()) {
                     continue;
                 }
-                ResourceLocation key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e.getKey());
+                Identifier key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e.getKey());
                 if (key == null) {
                     continue;
                 }
@@ -154,7 +154,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
                         Ingredient.CODEC
                                 .fieldOf("target")
                                 .forGetter((recipe) -> recipe.targetIngredient),
-                        Codec.list(ResourceLocation.CODEC)
+                        Codec.list(Identifier.CODEC)
                                 .fieldOf("components")
                                 .forGetter((recipe) -> recipe.components)
                 ).apply(builder, CopyComponentsRecipe::new));
@@ -164,7 +164,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
                 r -> r.sourceIngredient,
                 Ingredient.CONTENTS_STREAM_CODEC,
                 r -> r.targetIngredient,
-                ByteBufCodecs.collection(ArrayList::new, ResourceLocation.STREAM_CODEC),
+                ByteBufCodecs.collection(ArrayList::new, Identifier.STREAM_CODEC),
                 r -> r.components,
                 CopyComponentsRecipe::new
         );

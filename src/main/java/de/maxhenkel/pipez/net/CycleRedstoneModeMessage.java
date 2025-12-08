@@ -7,13 +7,13 @@ import de.maxhenkel.pipez.gui.ExtractContainer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class CycleRedstoneModeMessage implements Message<CycleRedstoneModeMessage> {
 
-    public static final CustomPacketPayload.Type<CycleRedstoneModeMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "cycle_redstone_mode"));
+    public static final CustomPacketPayload.Type<CycleRedstoneModeMessage> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(PipezMod.MODID, "cycle_redstone_mode"));
 
     private int index;
 

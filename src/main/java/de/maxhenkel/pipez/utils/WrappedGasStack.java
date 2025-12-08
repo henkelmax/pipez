@@ -7,11 +7,8 @@ import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -33,9 +30,10 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
 
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y) {
-        TextureAtlasSprite texture = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(stack.getChemical().getIcon());
+        // TODO Re-add once mekanism is updated
+        /*TextureAtlasSprite texture = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(stack.getChemical().getIcon());
         int chemicalTint = stack.getChemicalTint();
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, chemicalTint);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, x, y, 16, 16, chemicalTint);*/
     }
 
     @Override
@@ -45,7 +43,7 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
         tooltip.add(getDisplayName());
 
         if (Minecraft.getInstance().options.advancedItemTooltips) {
-            ResourceLocation registryName = MekanismAPI.CHEMICAL_REGISTRY.getKey(stack.getChemical());
+            Identifier registryName = MekanismAPI.CHEMICAL_REGISTRY.getKey(stack.getChemical());
             if (registryName != null) {
                 tooltip.add((Component.literal(registryName.toString())).withStyle(ChatFormatting.DARK_GRAY));
             }

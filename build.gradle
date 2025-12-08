@@ -41,3 +41,13 @@ processResources {
 shadowJar {
     relocate 'de.maxhenkel.corelib', 'de.maxhenkel.pipez.corelib'
 }
+
+sourceSets {
+    main {
+        java {
+            // TODO Add back Mekanism
+            exclude 'de/maxhenkel/pipez/utils/GasUtils.java'
+            exclude 'de/maxhenkel/pipez/integration/*/**'
+        }
+    }
+}

@@ -1,4 +1,4 @@
-- Fixed crash
+- Updated to 1.21.11
 
 **NOTE**
 

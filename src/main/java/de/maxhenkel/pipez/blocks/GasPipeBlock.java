@@ -3,7 +3,6 @@ package de.maxhenkel.pipez.blocks;
 import de.maxhenkel.pipez.blocks.tileentity.GasPipeTileEntity;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
-import de.maxhenkel.pipez.utils.GasUtils;
 import de.maxhenkel.pipez.utils.MekanismUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +27,9 @@ public class GasPipeBlock extends PipeBlock {
         if (!MekanismUtils.isMekanismInstalled()) {
             return false;
         }
-        return GasUtils.hasChemicalCapability(world, pos.relative(facing), facing.getOpposite());
+        // TODO Re-add once mekanism is updated
+        //return GasUtils.hasChemicalCapability(world, pos.relative(facing), facing.getOpposite());
+        return false;
     }
 
     @Override

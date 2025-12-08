@@ -2,7 +2,7 @@ package de.maxhenkel.pipez;
 
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.resources.model.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
@@ -12,23 +12,23 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ModelRegistry {
 
     public enum Model {
-        ENERGY_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/energy_pipe_extract")),
-        FLUID_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/fluid_pipe_extract")),
-        GAS_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/gas_pipe_extract")),
-        ITEM_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/item_pipe_extract")),
-        UNIVERSAL_PIPE_EXTRACT(ResourceLocation.fromNamespaceAndPath(PipezMod.MODID, "block/universal_pipe_extract"));
+        ENERGY_PIPE_EXTRACT(Identifier.fromNamespaceAndPath(PipezMod.MODID, "block/energy_pipe_extract")),
+        FLUID_PIPE_EXTRACT(Identifier.fromNamespaceAndPath(PipezMod.MODID, "block/fluid_pipe_extract")),
+        GAS_PIPE_EXTRACT(Identifier.fromNamespaceAndPath(PipezMod.MODID, "block/gas_pipe_extract")),
+        ITEM_PIPE_EXTRACT(Identifier.fromNamespaceAndPath(PipezMod.MODID, "block/item_pipe_extract")),
+        UNIVERSAL_PIPE_EXTRACT(Identifier.fromNamespaceAndPath(PipezMod.MODID, "block/universal_pipe_extract"));
 
-        private final ResourceLocation resource;
+        private final Identifier resource;
         private final StandaloneModelKey<QuadCollection> modelKey;
         private final AtomicReference<QuadCollection> model;
 
-        Model(ResourceLocation rl) {
+        Model(Identifier rl) {
             resource = rl;
             modelKey = new StandaloneModelKey<>(rl::toString);
             model = new AtomicReference<>();
         }
 
-        public ResourceLocation getResourceLocation() {
+        public Identifier getIdentifier() {
             return resource;
         }
 
@@ -44,9 +44,9 @@ public class ModelRegistry {
     public static void onModelRegister(ModelEvent.RegisterStandalone event) {
         for (Model model : Model.values()) {
             event.register(model.getModelKey(), new SimpleUnbakedStandaloneModel<>(model.resource, (resolvedModel, baker) -> {
-                ResolvedModel resolvedmodel = baker.getModel(model.getResourceLocation());
+                ResolvedModel resolvedmodel = baker.getModel(model.getIdentifier());
                 TextureSlots textureslots = resolvedmodel.getTopTextureSlots();
-                return resolvedModel.bakeTopGeometry(textureslots, baker, BlockModelRotation.X0_Y0);
+                return resolvedModel.bakeTopGeometry(textureslots, baker, BlockModelRotation.IDENTITY);
             }));
         }
     }

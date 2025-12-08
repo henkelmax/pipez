@@ -9,7 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -23,9 +23,9 @@ import java.util.Optional;
 public class ClearComponentsRecipe extends CustomRecipe {
 
     private final Ingredient ingredient;
-    private final List<ResourceLocation> components;
+    private final List<Identifier> components;
 
-    public ClearComponentsRecipe(Ingredient ingredient, List<ResourceLocation> components) {
+    public ClearComponentsRecipe(Ingredient ingredient, List<Identifier> components) {
         super(CraftingBookCategory.MISC);
         this.ingredient = ingredient;
         this.components = components;
@@ -62,7 +62,7 @@ public class ClearComponentsRecipe extends CustomRecipe {
         } else {
             ItemStack stack = ingredient.copy();
             for (Map.Entry<DataComponentType<?>, Optional<?>> e : stack.getComponentsPatch().entrySet()) {
-                ResourceLocation key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e.getKey());
+                Identifier key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e.getKey());
                 if (key == null) {
                     continue;
                 }
@@ -89,7 +89,7 @@ public class ClearComponentsRecipe extends CustomRecipe {
                         Ingredient.CODEC
                                 .fieldOf("item")
                                 .forGetter((recipe) -> recipe.ingredient),
-                        Codec.list(ResourceLocation.CODEC)
+                        Codec.list(Identifier.CODEC)
                                 .fieldOf("components")
                                 .forGetter((recipe) -> recipe.components)
                 ).apply(builder, ClearComponentsRecipe::new));
@@ -97,7 +97,7 @@ public class ClearComponentsRecipe extends CustomRecipe {
         private static final StreamCodec<RegistryFriendlyByteBuf, ClearComponentsRecipe> STREAM_CODEC = StreamCodec.composite(
                 Ingredient.CONTENTS_STREAM_CODEC,
                 r -> r.ingredient,
-                ByteBufCodecs.collection(ArrayList::new, ResourceLocation.STREAM_CODEC),
+                ByteBufCodecs.collection(ArrayList::new, Identifier.STREAM_CODEC),
                 r -> r.components,
                 ClearComponentsRecipe::new
         );
