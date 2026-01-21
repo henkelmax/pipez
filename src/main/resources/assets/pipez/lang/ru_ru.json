@@ -81,5 +81,8 @@
   "message.pipez.filter.destination": "Место назначения",
   "message.pipez.filter_destination_tool.destination": "Место назначения: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Место назначения: Любое",
-  "message.pipez.filter_destination_tool.destination.set": "Место назначения установлено"
+  "message.pipez.filter_destination_tool.destination.set": "Место назначения установлено",
+  "message.pipez.network_limit_exceeded": "Превышен лимит сети труб! %s/%s труб. Сеть отключена пока не уменьшите.",
+  "message.pipez.network_size": "Сеть: %s/%s труб",
+  "message.pipez.network_size_limit": "Лимит сети достигнут! %s/%s труб"
 }

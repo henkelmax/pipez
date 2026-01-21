@@ -81,5 +81,8 @@
   "message.pipez.filter.destination": "Destination",
   "message.pipez.filter_destination_tool.destination": "Destination: %s, %s, %s, %s",
   "message.pipez.filter_destination_tool.destination.any": "Destination: Any",
-  "message.pipez.filter_destination_tool.destination.set": "Destination set"
+  "message.pipez.filter_destination_tool.destination.set": "Destination set",
+  "message.pipez.network_limit_exceeded": "Pipe network limit exceeded! %s/%s pipes. Network is disabled until reduced.",
+  "message.pipez.network_size": "Network: %s/%s pipes",
+  "message.pipez.network_size_limit": "Network limit reached! %s/%s pipes"
 }
