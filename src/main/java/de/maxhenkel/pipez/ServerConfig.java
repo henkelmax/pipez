@@ -5,6 +5,14 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ServerConfig extends ConfigBase {
 
+    public final ModConfigSpec.BooleanValue pipeNetworkLimitEnabled;
+    public final ModConfigSpec.IntValue pipeNetworkMaxSize;
+
+    public final ModConfigSpec.BooleanValue backoffEnabled;
+    public final ModConfigSpec.IntValue backoffMaxDelay;
+    public final ModConfigSpec.IntValue backoffIncrement;
+    public final ModConfigSpec.IntValue backoffDecrement;
+
     public final ModConfigSpec.IntValue itemPipeSpeed;
     public final ModConfigSpec.IntValue itemPipeAmount;
     public final ModConfigSpec.IntValue itemPipeSpeedBasic;
@@ -36,6 +44,31 @@ public class ServerConfig extends ConfigBase {
 
     public ServerConfig(ModConfigSpec.Builder builder) {
         super(builder);
+
+        pipeNetworkLimitEnabled = builder
+                .comment("Whether to limit the maximum size of pipe networks")
+                .define("pipe_network.limit_enabled", false);
+
+        pipeNetworkMaxSize = builder
+                .comment("The maximum number of pipes allowed in a single network", "Only applies if pipe_network.limit_enabled is true")
+                .defineInRange("pipe_network.max_size", 256, 1, 10000);
+
+        backoffEnabled = builder
+                .comment("Whether to enable backoff mechanism for idle pipes", "When enabled, pipes will slow down when failing to transfer and speed up on successful transfers")
+                .define("backoff.enabled", true);
+
+        backoffMaxDelay = builder
+                .comment("Maximum delay in ticks when pipe is idle (failing to transfer)")
+                .defineInRange("backoff.max_delay", 100, 1, 1200);
+
+        backoffIncrement = builder
+                .comment("How many ticks to add to delay on failed transfer attempt")
+                .defineInRange("backoff.increment", 5, 1, 100);
+
+        backoffDecrement = builder
+                .comment("How many ticks to subtract from delay on successful transfer")
+                .defineInRange("backoff.decrement", 10, 1, 100);
+
         itemPipeSpeed = builder
                 .comment("The speed at which items are transferred", "A value of 1 means every tick")
                 .defineInRange("item_pipe.speed.no_upgrade", 20, 1, Integer.MAX_VALUE);

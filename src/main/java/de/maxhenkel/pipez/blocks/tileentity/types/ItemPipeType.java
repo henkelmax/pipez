@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ItemPipeType extends PipeType<Item, ItemData> {
 
@@ -64,7 +63,7 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
     @Override
     public void tick(PipeLogicTileEntity tileEntity) {
         for (Direction side : Direction.values()) {
-            if (tileEntity.getLevel().getGameTime() % getSpeed(tileEntity, side) != 0) {
+            if (!tileEntity.shouldTickWithBackoff(side, this, getSpeed(tileEntity, side))) {
                 continue;
             }
             if (!tileEntity.isExtracting(side)) {
@@ -75,28 +74,38 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
             }
             PipeTileEntity.Connection extractingConnection = tileEntity.getExtractingConnection(side);
             if (extractingConnection == null) {
+                tileEntity.onTransferFailed(side, this);
                 continue;
             }
             IItemHandler itemHandler = extractingConnection.getItemHandler();
             if (itemHandler == null) {
+                tileEntity.onTransferFailed(side, this);
                 continue;
             }
 
             List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
 
+            boolean success;
             if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
-                insertEqually(tileEntity, side, connections, itemHandler);
+                success = insertEqually(tileEntity, side, connections, itemHandler);
             } else {
-                insertOrdered(tileEntity, side, connections, itemHandler);
+                success = insertOrdered(tileEntity, side, connections, itemHandler);
+            }
+
+            if (success) {
+                tileEntity.onTransferSuccess(side, this);
+            } else {
+                tileEntity.onTransferFailed(side, this);
             }
         }
     }
 
-    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
+    protected boolean insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
         if (connections.isEmpty()) {
-            return;
+            return false;
         }
         int itemsToTransfer = getRate(tileEntity, side);
+        int initialItems = itemsToTransfer;
         boolean[] inventoriesFull = new boolean[connections.size()];
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
         while (itemsToTransfer > 0 && hasNotInserted(inventoriesFull)) {
@@ -129,10 +138,12 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
         }
 
         tileEntity.setRoundRobinIndex(side, this, p);
+        return itemsToTransfer < initialItems;
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
+    protected boolean insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IItemHandler itemHandler) {
         int itemsToTransfer = getRate(tileEntity, side);
+        int initialItems = itemsToTransfer;
 
         ArrayList<ItemStack> nonFittingItems = new ArrayList<>();
 
@@ -154,7 +165,7 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
                 if (simulatedExtract.isEmpty()) {
                     continue;
                 }
-                if (nonFittingItems.stream().anyMatch(stack -> ItemUtils.isStackable(stack, simulatedExtract))) {
+                if (containsStackable(nonFittingItems, simulatedExtract)) {
                     continue;
                 }
                 if (canInsert(tileEntity.getLevel().registryAccess(), connection, simulatedExtract, tileEntity.getFilters(side, this)) == tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST)) {
@@ -169,6 +180,7 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
                 itemHandler.extractItem(i, insertedAmount, false);
             }
         }
+        return itemsToTransfer < initialItems;
     }
 
     private boolean isFull(IItemHandler itemHandler) {
@@ -182,21 +194,25 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
     }
 
     private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, ItemStack stack, List<Filter<?, ?>> filters) {
-        for (Filter<?, Item> filter : filters.stream().map(filter -> (Filter<?, Item>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(provider, filter, stack)) {
-                return false;
+        boolean hasNonInvertFilter = false;
+        for (int i = 0; i < filters.size(); i++) {
+            @SuppressWarnings("unchecked")
+            Filter<?, Item> filter = (Filter<?, Item>) filters.get(i);
+            if (!matchesConnection(connection, filter)) {
+                continue;
+            }
+            if (filter.isInvert()) {
+                if (matches(provider, filter, stack)) {
+                    return false;
+                }
+            } else {
+                hasNonInvertFilter = true;
+                if (matches(provider, filter, stack)) {
+                    return true;
+                }
             }
         }
-        List<Filter<?, Item>> collect = filters.stream().map(filter -> (Filter<?, Item>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
-        if (collect.isEmpty()) {
-            return true;
-        }
-        for (Filter<?, Item> filter : collect) {
-            if (matches(provider, filter, stack)) {
-                return true;
-            }
-        }
-        return false;
+        return !hasNonInvertFilter;
     }
 
     private boolean matches(HolderLookup.Provider provider, Filter<?, Item> filter, ItemStack stack) {
@@ -225,6 +241,15 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
     private boolean hasNotInserted(boolean[] inventoriesFull) {
         for (boolean b : inventoriesFull) {
             if (!b) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsStackable(ArrayList<ItemStack> list, ItemStack stack) {
+        for (int i = 0; i < list.size(); i++) {
+            if (ItemUtils.isStackable(list.get(i), stack)) {
                 return true;
             }
         }

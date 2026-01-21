@@ -1,5 +1,6 @@
 package de.maxhenkel.pipez.blocks.tileentity;
 
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
 import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
@@ -23,6 +24,8 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     protected PipeType<?, ?>[] types;
     protected final int[][] rrIndex;
+    protected final int[][] backoffDelay;
+    protected final long[][] lastTickTime;
 
     protected PipeEnergyStorage[] energyStorages;
 
@@ -32,6 +35,8 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         super(tileEntityTypeIn, pos, state);
         this.types = types;
         rrIndex = new int[Direction.values().length][types.length];
+        backoffDelay = new int[Direction.values().length][types.length];
+        lastTickTime = new long[Direction.values().length][types.length];
         energyStorages = new PipeEnergyStorage[Direction.values().length];
     }
 
@@ -77,6 +82,44 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
 
     public void setRoundRobinIndex(Direction direction, PipeType<?, ?> pipeType, int value) {
         rrIndex[direction.get3DDataValue()][getIndex(pipeType)] = value;
+    }
+
+    public boolean shouldTickWithBackoff(Direction direction, PipeType<?, ?> pipeType, int baseSpeed) {
+        if (!Main.SERVER_CONFIG.backoffEnabled.get()) {
+            return level.getGameTime() % baseSpeed == 0;
+        }
+        int sideIndex = direction.get3DDataValue();
+        int typeIndex = getIndex(pipeType);
+        int delay = backoffDelay[sideIndex][typeIndex];
+        long lastTick = lastTickTime[sideIndex][typeIndex];
+        long currentTime = level.getGameTime();
+        int effectiveSpeed = baseSpeed + delay;
+        if (currentTime - lastTick >= effectiveSpeed) {
+            lastTickTime[sideIndex][typeIndex] = currentTime;
+            return true;
+        }
+        return false;
+    }
+
+    public void onTransferSuccess(Direction direction, PipeType<?, ?> pipeType) {
+        if (!Main.SERVER_CONFIG.backoffEnabled.get()) {
+            return;
+        }
+        int sideIndex = direction.get3DDataValue();
+        int typeIndex = getIndex(pipeType);
+        int decrement = Main.SERVER_CONFIG.backoffDecrement.get();
+        backoffDelay[sideIndex][typeIndex] = Math.max(0, backoffDelay[sideIndex][typeIndex] - decrement);
+    }
+
+    public void onTransferFailed(Direction direction, PipeType<?, ?> pipeType) {
+        if (!Main.SERVER_CONFIG.backoffEnabled.get()) {
+            return;
+        }
+        int sideIndex = direction.get3DDataValue();
+        int typeIndex = getIndex(pipeType);
+        int increment = Main.SERVER_CONFIG.backoffIncrement.get();
+        int maxDelay = Main.SERVER_CONFIG.backoffMaxDelay.get();
+        backoffDelay[sideIndex][typeIndex] = Math.min(maxDelay, backoffDelay[sideIndex][typeIndex] + increment);
     }
 
     public boolean isEnabled(Direction side, PipeType<?, ?> pipeType) {
@@ -129,6 +172,10 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         super.tick();
 
         if (level.isClientSide) {
+            return;
+        }
+
+        if (isNetworkLimitExceeded()) {
             return;
         }
 

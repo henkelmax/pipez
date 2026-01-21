@@ -1,7 +1,6 @@
 # Changelog
 
 ## [1.21.1-1.2.27] - 2026-01-21
-### Author: bazzz
 
 ### Added
 - **Pipe placement limit check** - Prevents placing pipes if it would exceed network limit

@@ -1,13 +1,16 @@
 package de.maxhenkel.pipez.blocks;
 
 import de.maxhenkel.pipez.blocks.tileentity.ItemPipeTileEntity;
+import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
+import de.maxhenkel.pipez.items.PipeBlockItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -19,6 +22,11 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 public class ItemPipeBlock extends PipeBlock {
 
     protected ItemPipeBlock() {
+    }
+
+    @Override
+    public Item toItem() {
+        return new PipeBlockItem(this, new Item.Properties(), ItemPipeType.INSTANCE);
     }
 
     @Override

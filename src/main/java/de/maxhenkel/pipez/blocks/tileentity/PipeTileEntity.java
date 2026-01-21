@@ -2,6 +2,7 @@ package de.maxhenkel.pipez.blocks.tileentity;
 
 import de.maxhenkel.corelib.blockentity.ITickableBlockEntity;
 import de.maxhenkel.pipez.DirectionalPosition;
+import de.maxhenkel.pipez.Main;
 import de.maxhenkel.pipez.blocks.PipeBlock;
 import de.maxhenkel.pipez.capabilities.ModCapabilities;
 import de.maxhenkel.pipez.utils.MekanismUtils;
@@ -16,6 +17,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,6 +45,8 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
     protected Connection[] extractingConnectionCache;
     protected boolean[] extractingSides;
     protected boolean[] disconnectedSides;
+    protected boolean networkLimitExceeded;
+    protected int networkSize;
 
     /**
      * Invalidating the cache five ticks after load, because Mekanism is broken!
@@ -159,11 +163,21 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
 
         addToQueue(serverLevel, worldPosition, queue, travelPositions, connections, 1);
 
-        while (queue.size() > 0) {
-            Map.Entry<BlockPos, Integer> blockPosIntegerEntry = queue.entrySet().stream().findAny().get();
+        int maxSize = Main.SERVER_CONFIG.pipeNetworkLimitEnabled.get() ? Main.SERVER_CONFIG.pipeNetworkMaxSize.get() : Integer.MAX_VALUE;
+
+        while (!queue.isEmpty()) {
+            Iterator<Map.Entry<BlockPos, Integer>> iterator = queue.entrySet().iterator();
+            Map.Entry<BlockPos, Integer> blockPosIntegerEntry = iterator.next();
+            iterator.remove();
             addToQueue(serverLevel, blockPosIntegerEntry.getKey(), queue, travelPositions, connections, blockPosIntegerEntry.getValue());
             travelPositions.add(blockPosIntegerEntry.getKey());
-            queue.remove(blockPosIntegerEntry.getKey());
+        }
+
+        networkSize = travelPositions.size();
+        networkLimitExceeded = Main.SERVER_CONFIG.pipeNetworkLimitEnabled.get() && networkSize > maxSize;
+
+        if (networkLimitExceeded) {
+            notifyNetworkLimitReached(serverLevel, maxSize, networkSize);
         }
 
         connectionCache = new ArrayList<>(connections.values());
@@ -227,6 +241,28 @@ public abstract class PipeTileEntity extends BlockEntity implements ITickableBlo
             }
         }
         return false;
+    }
+
+    private void notifyNetworkLimitReached(ServerLevel serverLevel, int maxSize, int currentSize) {
+        for (ServerPlayer player : serverLevel.players()) {
+            if (player.blockPosition().distSqr(worldPosition) <= 64 * 64) {
+                player.displayClientMessage(Component.translatable("message.pipez.network_limit_exceeded", currentSize, maxSize), false);
+            }
+        }
+    }
+
+    public boolean isNetworkLimitExceeded() {
+        if (connectionCache == null) {
+            getConnections();
+        }
+        return networkLimitExceeded;
+    }
+
+    public int getNetworkSize() {
+        if (connectionCache == null) {
+            getConnections();
+        }
+        return networkSize;
     }
 
     public abstract boolean canInsert(Level level, Connection connection);

@@ -25,7 +25,6 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GasPipeType extends PipeType<Chemical, GasData> {
 
@@ -62,6 +61,9 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
             return;
         }
         for (Direction side : Direction.values()) {
+            if (!tileEntity.shouldTickWithBackoff(side, this, 1)) {
+                continue;
+            }
             if (!tileEntity.isExtracting(side)) {
                 continue;
             }
@@ -70,28 +72,35 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
             }
             PipeTileEntity.Connection extractingConnection = tileEntity.getExtractingConnection(side);
             if (extractingConnection == null) {
+                tileEntity.onTransferFailed(side, this);
                 continue;
             }
             IChemicalHandler chemicalHandler = extractingConnection.getChemicalHandler();
             if (chemicalHandler == null) {
+                tileEntity.onTransferFailed(side, this);
                 continue;
             }
-            tickHandler(tileEntity, chemicalHandler, side);
+            boolean success = tickHandler(tileEntity, chemicalHandler, side);
+            if (success) {
+                tileEntity.onTransferSuccess(side, this);
+            } else {
+                tileEntity.onTransferFailed(side, this);
+            }
         }
     }
 
-    private void tickHandler(PipeLogicTileEntity tileEntity, IChemicalHandler gasHandler, Direction side) {
+    private boolean tickHandler(PipeLogicTileEntity tileEntity, IChemicalHandler gasHandler, Direction side) {
         List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
         if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
-            insertEqually(tileEntity, side, connections, gasHandler);
+            return insertEqually(tileEntity, side, connections, gasHandler);
         } else {
-            insertOrdered(tileEntity, side, connections, gasHandler);
+            return insertOrdered(tileEntity, side, connections, gasHandler);
         }
     }
 
-    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler) {
+    protected boolean insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler) {
         if (connections.isEmpty()) {
-            return;
+            return false;
         }
         long completeAmount = getRate(tileEntity, side);
         long mbToTransfer = completeAmount;
@@ -126,10 +135,12 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
         }
 
         tileEntity.setRoundRobinIndex(side, this, p);
+        return mbToTransfer < completeAmount;
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler) {
+    protected boolean insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IChemicalHandler gasHandler) {
         long mbToTransfer = getRate(tileEntity, side);
+        long initialAmount = mbToTransfer;
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
@@ -154,6 +165,7 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
                 mbToTransfer -= stack.getAmount();
             }
         }
+        return mbToTransfer < initialAmount;
     }
 
     private ChemicalStack transfer(IChemicalHandler source, IChemicalHandler destination, ChemicalStack transfer) {
@@ -167,21 +179,25 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
     }
 
     private boolean canInsert(PipeTileEntity.Connection connection, ChemicalStack stack, List<Filter<?, ?>> filters) {
-        for (Filter<?, Chemical> filter : filters.stream().map(filter -> (Filter<?, Chemical>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(filter, stack)) {
-                return false;
+        boolean hasNonInvertFilter = false;
+        for (int i = 0; i < filters.size(); i++) {
+            @SuppressWarnings("unchecked")
+            Filter<?, Chemical> filter = (Filter<?, Chemical>) filters.get(i);
+            if (!matchesConnection(connection, filter)) {
+                continue;
+            }
+            if (filter.isInvert()) {
+                if (matches(filter, stack)) {
+                    return false;
+                }
+            } else {
+                hasNonInvertFilter = true;
+                if (matches(filter, stack)) {
+                    return true;
+                }
             }
         }
-        List<Filter<?, Chemical>> collect = filters.stream().map(filter -> (Filter<?, Chemical>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
-        if (collect.isEmpty()) {
-            return true;
-        }
-        for (Filter<?, Chemical> filter : collect) {
-            if (matches(filter, stack)) {
-                return true;
-            }
-        }
-        return false;
+        return !hasNonInvertFilter;
     }
 
     private boolean matches(Filter<?, Chemical> filter, ChemicalStack stack) {

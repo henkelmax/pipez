@@ -24,7 +24,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FluidPipeType extends PipeType<Fluid, FluidData> {
 
@@ -59,6 +58,9 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
     @Override
     public void tick(PipeLogicTileEntity tileEntity) {
         for (Direction side : Direction.values()) {
+            if (!tileEntity.shouldTickWithBackoff(side, this, 1)) {
+                continue;
+            }
             if (!tileEntity.isExtracting(side)) {
                 continue;
             }
@@ -67,26 +69,35 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
             }
             PipeTileEntity.Connection extractingConnection = tileEntity.getExtractingConnection(side);
             if (extractingConnection == null) {
+                tileEntity.onTransferFailed(side, this);
                 continue;
             }
             IFluidHandler fluidHandler = extractingConnection.getFluidHandler();
             if (fluidHandler == null) {
+                tileEntity.onTransferFailed(side, this);
                 continue;
             }
 
             List<PipeTileEntity.Connection> connections = tileEntity.getSortedConnections(side, this);
 
+            boolean success;
             if (tileEntity.getDistribution(side, this).equals(UpgradeTileEntity.Distribution.ROUND_ROBIN)) {
-                insertEqually(tileEntity, side, connections, fluidHandler);
+                success = insertEqually(tileEntity, side, connections, fluidHandler);
             } else {
-                insertOrdered(tileEntity, side, connections, fluidHandler);
+                success = insertOrdered(tileEntity, side, connections, fluidHandler);
+            }
+
+            if (success) {
+                tileEntity.onTransferSuccess(side, this);
+            } else {
+                tileEntity.onTransferFailed(side, this);
             }
         }
     }
 
-    protected void insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler) {
+    protected boolean insertEqually(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler) {
         if (connections.isEmpty()) {
-            return;
+            return false;
         }
         int completeAmount = getRate(tileEntity, side);
         int mbToTransfer = completeAmount;
@@ -123,10 +134,12 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
         }
 
         tileEntity.setRoundRobinIndex(side, this, p);
+        return mbToTransfer < completeAmount;
     }
 
-    protected void insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler) {
+    protected boolean insertOrdered(PipeLogicTileEntity tileEntity, Direction side, List<PipeTileEntity.Connection> connections, IFluidHandler fluidHandler) {
         int mbToTransfer = getRate(tileEntity, side);
+        int initialAmount = mbToTransfer;
 
         connectionLoop:
         for (PipeTileEntity.Connection connection : connections) {
@@ -153,24 +166,29 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
                 mbToTransfer -= stack.getAmount();
             }
         }
+        return mbToTransfer < initialAmount;
     }
 
     private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, FluidStack stack, List<Filter<?, ?>> filters) {
-        for (Filter<?, Fluid> filter : filters.stream().map(filter -> (Filter<?, Fluid>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(provider, filter, stack)) {
-                return false;
+        boolean hasNonInvertFilter = false;
+        for (int i = 0; i < filters.size(); i++) {
+            @SuppressWarnings("unchecked")
+            Filter<?, Fluid> filter = (Filter<?, Fluid>) filters.get(i);
+            if (!matchesConnection(connection, filter)) {
+                continue;
+            }
+            if (filter.isInvert()) {
+                if (matches(provider, filter, stack)) {
+                    return false;
+                }
+            } else {
+                hasNonInvertFilter = true;
+                if (matches(provider, filter, stack)) {
+                    return true;
+                }
             }
         }
-        List<Filter<?, Fluid>> collect = filters.stream().map(filter -> (Filter<?, Fluid>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
-        if (collect.isEmpty()) {
-            return true;
-        }
-        for (Filter<?, Fluid> filter : collect) {
-            if (matches(provider, filter, stack)) {
-                return true;
-            }
-        }
-        return false;
+        return !hasNonInvertFilter;
     }
 
     private boolean matches(HolderLookup.Provider provider, Filter<?, Fluid> filter, FluidStack stack) {

@@ -1,10 +1,15 @@
 package de.maxhenkel.pipez.items;
 
 import de.maxhenkel.pipez.Upgrade;
+import de.maxhenkel.pipez.blocks.tileentity.types.EnergyPipeType;
+import de.maxhenkel.pipez.blocks.tileentity.types.FluidPipeType;
+import de.maxhenkel.pipez.blocks.tileentity.types.GasPipeType;
+import de.maxhenkel.pipez.blocks.tileentity.types.ItemPipeType;
 import de.maxhenkel.pipez.datacomponents.EnergyData;
 import de.maxhenkel.pipez.datacomponents.FluidData;
 import de.maxhenkel.pipez.datacomponents.GasData;
 import de.maxhenkel.pipez.datacomponents.ItemData;
+import de.maxhenkel.pipez.utils.MekanismUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -36,6 +41,14 @@ public class UpgradeItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, context, tooltip, flagIn);
+
+        // Add transfer rate tooltips
+        tooltip.add(ItemPipeType.INSTANCE.getTransferText(tier).copy().withStyle(ChatFormatting.GRAY));
+        tooltip.add(FluidPipeType.INSTANCE.getTransferText(tier).copy().withStyle(ChatFormatting.GRAY));
+        tooltip.add(EnergyPipeType.INSTANCE.getTransferText(tier).copy().withStyle(ChatFormatting.GRAY));
+        if (MekanismUtils.isMekanismInstalled()) {
+            tooltip.add(GasPipeType.INSTANCE.getTransferText(tier).copy().withStyle(ChatFormatting.GRAY));
+        }
 
         List<MutableComponent> list = new ArrayList<>();
 

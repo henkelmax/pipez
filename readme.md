@@ -51,6 +51,8 @@ This mod adds simple and highly configurable pipes that are designed to create a
   - Pipes don't load unnecessary chunks
   - Server friendly
   - Efficient rendering
+  - Configurable pipe network size limits
+  - Automatic backoff for idle pipes
 
 ## Configuring Pipes
 

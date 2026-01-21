@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class UpgradeTileEntity extends PipeTileEntity {
 
@@ -138,19 +137,28 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         return upgradeItem.getTier();
     }
 
+    private static final Comparator<PipeTileEntity.Connection> NEAREST_COMPARATOR = Comparator.comparingInt(PipeTileEntity.Connection::getDistance);
+    private static final Comparator<PipeTileEntity.Connection> FURTHEST_COMPARATOR = (o1, o2) -> Integer.compare(o2.getDistance(), o1.getDistance());
+
     public List<PipeTileEntity.Connection> getSortedConnections(Direction side, PipeType pipeType) {
         UpgradeTileEntity.Distribution distribution = getDistribution(side, pipeType);
+        List<PipeTileEntity.Connection> connections = getConnections();
+        if (connections.isEmpty()) {
+            return connections;
+        }
+        ArrayList<PipeTileEntity.Connection> result = new ArrayList<>(connections);
         switch (distribution) {
             case FURTHEST:
-                return getConnections().stream().sorted((o1, o2) -> Integer.compare(o2.getDistance(), o1.getDistance())).collect(Collectors.toList());
+                result.sort(FURTHEST_COMPARATOR);
+                return result;
             case RANDOM:
-                ArrayList<PipeTileEntity.Connection> shuffle = new ArrayList<>(getConnections());
-                Collections.shuffle(shuffle);
-                return shuffle;
+                Collections.shuffle(result);
+                return result;
             case NEAREST:
             case ROUND_ROBIN:
             default:
-                return getConnections().stream().sorted(Comparator.comparingInt(PipeTileEntity.Connection::getDistance)).collect(Collectors.toList());
+                result.sort(NEAREST_COMPARATOR);
+                return result;
         }
     }
 
