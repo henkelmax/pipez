@@ -7,8 +7,7 @@ import de.maxhenkel.pipez.blocks.tileentity.PipeLogicTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.net.*;
 import de.maxhenkel.pipez.utils.NbtUtils;
-import mekanism.api.chemical.ChemicalStack;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -58,9 +57,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     private FilterList filterList;
 
     public ExtractScreen(ExtractContainer container, Inventory playerInventory, Component title) {
-        super(BACKGROUND, container, playerInventory, title);
-        imageWidth = 176;
-        imageHeight = 196;
+        super(BACKGROUND, container, playerInventory, title, 176, 196);
 
         pipeTypes = container.getPipe().getPipeTypes();
         if (pipeTypes.length > 1) {
@@ -177,17 +174,17 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
-        guiGraphics.drawString(font, playerInventoryTitle, 8, imageHeight - 96 + 3, FONT_COLOR, false);
+    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+        super.extractLabels(guiGraphics, mouseX, mouseY);
+        guiGraphics.text(font, playerInventoryTitle, 8, imageHeight - 96 + 3, FONT_COLOR, false);
 
-        filterList.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
+        filterList.extractGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
-        filterList.drawGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTicks);
+        filterList.extractGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
         if (hasTabs()) {
             for (int i = 0; i < pipeTypes.length; i++) {
@@ -199,20 +196,20 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
             }
             for (int i = 0; i < pipeTypes.length; i++) {
                 if (i == currentindex) {
-                    guiGraphics.renderItem(pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4, 0);
-                    guiGraphics.renderItemDecorations(font, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4);
+                    guiGraphics.item(pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4, 0);
+                    guiGraphics.itemDecorations(font, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4, topPos + 5 + 25 * i + 4);
                 } else {
-                    guiGraphics.renderItem(pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4, 0);
-                    guiGraphics.renderItemDecorations(font, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4);
+                    guiGraphics.item(pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4, 0);
+                    guiGraphics.itemDecorations(font, pipeTypes[i].getIcon(), leftPos - 26 + 3 + 4 + 2, topPos + 5 + 25 * i + 4);
                 }
             }
         }
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        super.render(guiGraphics, x, y, partialTicks);
-        drawHoverAreas(guiGraphics, x, y);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int x, int y, float partialTicks) {
+        super.extractRenderState(guiGraphics, x, y, partialTicks);
+        extractHoverAreas(guiGraphics, x, y);
     }
 
     public int getTabsX() {

@@ -56,7 +56,7 @@ public class BlockEvents {
         }
 
         FilterDestinationToolItem.setDestination(heldItem, new DirectionalPosition(event.getPos().immutable(), event.getFace()));
-        event.getEntity().displayClientMessage(Component.translatable("message.pipez.filter_destination_tool.destination.set"), true);
+        event.getEntity().sendOverlayMessage(Component.translatable("message.pipez.filter_destination_tool.destination.set"));
         event.setUseItem(TriState.TRUE);
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);

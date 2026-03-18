@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.maxhenkel.corelib.helpers.Pair;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
@@ -21,15 +20,44 @@ import java.util.*;
 
 public class CopyComponentsRecipe extends CustomRecipe {
 
+    private static final MapCodec<CopyComponentsRecipe> CODEC = RecordCodecBuilder.mapCodec((builder) -> builder
+            .group(
+                    Ingredient.CODEC
+                            .fieldOf("source")
+                            .forGetter((recipe) -> recipe.sourceIngredient),
+                    Ingredient.CODEC
+                            .fieldOf("target")
+                            .forGetter((recipe) -> recipe.targetIngredient),
+                    Codec.list(Identifier.CODEC)
+                            .fieldOf("components")
+                            .forGetter((recipe) -> recipe.components)
+            ).apply(builder, CopyComponentsRecipe::new));
+
+    private static final StreamCodec<RegistryFriendlyByteBuf, CopyComponentsRecipe> STREAM_CODEC = StreamCodec.composite(
+            Ingredient.CONTENTS_STREAM_CODEC,
+            r -> r.sourceIngredient,
+            Ingredient.CONTENTS_STREAM_CODEC,
+            r -> r.targetIngredient,
+            ByteBufCodecs.collection(ArrayList::new, Identifier.STREAM_CODEC),
+            r -> r.components,
+            CopyComponentsRecipe::new
+    );
+
+    public static final RecipeSerializer<CopyComponentsRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
+
     private final Ingredient sourceIngredient;
     private final Ingredient targetIngredient;
     private final List<Identifier> components;
 
     public CopyComponentsRecipe(Ingredient sourceIngredient, Ingredient targetIngredient, List<Identifier> components) {
-        super(CraftingBookCategory.MISC);
         this.sourceIngredient = sourceIngredient;
         this.targetIngredient = targetIngredient;
         this.components = components;
+    }
+
+    @Override
+    public CraftingBookCategory category() {
+        return CraftingBookCategory.MISC;
     }
 
     public Pair<ItemStack, List<ItemStack>> getResult(CraftingInput inv) {
@@ -80,8 +108,8 @@ public class CopyComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider provider) {
-        Pair<ItemStack, List<ItemStack>> result = getResult(inv);
+    public ItemStack assemble(CraftingInput input) {
+        Pair<ItemStack, List<ItemStack>> result = getResult(input);
         if (result.getKey() == null) {
             return ItemStack.EMPTY;
         }
@@ -144,43 +172,4 @@ public class CopyComponentsRecipe extends CustomRecipe {
         return ModRecipes.COPY_NBT.get();
     }
 
-    public static class Serializer implements RecipeSerializer<CopyComponentsRecipe> {
-
-        private static final MapCodec<CopyComponentsRecipe> CODEC = RecordCodecBuilder.mapCodec((builder) -> builder
-                .group(
-                        Ingredient.CODEC
-                                .fieldOf("source")
-                                .forGetter((recipe) -> recipe.sourceIngredient),
-                        Ingredient.CODEC
-                                .fieldOf("target")
-                                .forGetter((recipe) -> recipe.targetIngredient),
-                        Codec.list(Identifier.CODEC)
-                                .fieldOf("components")
-                                .forGetter((recipe) -> recipe.components)
-                ).apply(builder, CopyComponentsRecipe::new));
-
-        private static final StreamCodec<RegistryFriendlyByteBuf, CopyComponentsRecipe> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC,
-                r -> r.sourceIngredient,
-                Ingredient.CONTENTS_STREAM_CODEC,
-                r -> r.targetIngredient,
-                ByteBufCodecs.collection(ArrayList::new, Identifier.STREAM_CODEC),
-                r -> r.components,
-                CopyComponentsRecipe::new
-        );
-
-        public Serializer() {
-
-        }
-
-        @Override
-        public MapCodec<CopyComponentsRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CopyComponentsRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
-    }
 }

@@ -2,7 +2,7 @@ package de.maxhenkel.pipez.gui;
 
 import de.maxhenkel.corelib.inventory.ScreenBase;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 
@@ -30,11 +30,11 @@ public abstract class WidgetBase {
 
     }
 
-    protected void drawGuiContainerForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void extractGuiContainerForegroundLayer(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
 
     }
 
-    protected void drawGuiContainerBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+    protected void extractGuiContainerBackgroundLayer(GuiGraphicsExtractor guiGraphics, float partialTicks, int mouseX, int mouseY) {
 
     }
 

@@ -6,16 +6,17 @@ import de.maxhenkel.pipez.ModelRegistry.Model;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.model.quad.MutableQuad;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
@@ -71,7 +72,9 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
         List<BakedQuad> quads = model.getQuads(null);
         collector.submitCustomGeometry(stack, RenderTypes.solidMovingBlock(), (pose, vertexConsumer) -> {
             for (BakedQuad quad : quads) {
-                vertexConsumer.putBulkData(pose, quad, 1F, 1F, 1F, 1F, combinedLight, combinedOverlay);
+                MutableQuad mutableQuad = new MutableQuad();
+                mutableQuad.setFrom(quad);
+                vertexConsumer.putBulkData(pose, mutableQuad, 1F, 1F, 1F, 1F, combinedLight, combinedOverlay);
             }
         });
 

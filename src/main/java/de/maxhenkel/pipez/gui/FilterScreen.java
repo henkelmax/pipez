@@ -14,7 +14,7 @@ import de.maxhenkel.pipez.net.UpdateFilterMessage;
 import de.maxhenkel.pipez.utils.NbtUtils;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
@@ -59,9 +59,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     private Filter<?, ?> filter;
 
     public FilterScreen(FilterContainer container, Inventory playerInventory, Component title) {
-        super(BACKGROUND, container, playerInventory, title);
-        imageWidth = 176;
-        imageHeight = 222;
+        super(BACKGROUND, container, playerInventory, title, 176, 222);
 
         filter = getMenu().getFilter();
     }
@@ -311,17 +309,17 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
-        guiGraphics.drawString(font, Component.translatable("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR, false);
-        guiGraphics.drawString(font, Component.translatable("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR, false);
-        guiGraphics.drawString(font, Component.translatable("message.pipez.filter.destination"), 8, 71, FONT_COLOR, false);
-        guiGraphics.drawString(font, playerInventoryTitle.getVisualOrderText(), 8, imageHeight - 96 + 3, FONT_COLOR, false);
+    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+        super.extractLabels(guiGraphics, mouseX, mouseY);
+        guiGraphics.text(font, Component.translatable("message.pipez.filter.item_tag"), 8, 7, FONT_COLOR, false);
+        guiGraphics.text(font, Component.translatable("message.pipez.filter.nbt_string"), 8, 39, FONT_COLOR, false);
+        guiGraphics.text(font, Component.translatable("message.pipez.filter.destination"), 8, 71, FONT_COLOR, false);
+        guiGraphics.text(font, playerInventoryTitle.getVisualOrderText(), 8, imageHeight - 96 + 3, FONT_COLOR, false);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTicks);
 
         AbstractStack<?> stack = FilterList.getStack(filter);
         if (stack != null) {
@@ -333,9 +331,9 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         guiGraphics.pose().scale(0.5F, 0.5F);
         if (filter.getDestination() != null) {
             DirectionalPosition dst = filter.getDestination();
-            guiGraphics.drawString(font, Component.translatable("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.literal(String.valueOf(dst.getDirection().name().charAt(0))).withStyle(ChatFormatting.DARK_GREEN)), 0, 0, FontColorUtils.WHITE, false);
+            guiGraphics.text(font, Component.translatable("message.pipez.filter_destination_tool.destination", number(dst.getPos().getX()), number(dst.getPos().getY()), number(dst.getPos().getZ()), Component.literal(String.valueOf(dst.getDirection().name().charAt(0))).withStyle(ChatFormatting.DARK_GREEN)), 0, 0, FontColorUtils.WHITE, false);
         } else {
-            guiGraphics.drawString(font, Component.translatable("message.pipez.filter_destination_tool.destination.any"), 0, 0, FontColorUtils.WHITE, false);
+            guiGraphics.text(font, Component.translatable("message.pipez.filter_destination_tool.destination.any"), 0, 0, FontColorUtils.WHITE, false);
         }
         guiGraphics.pose().popMatrix();
 
@@ -348,16 +346,16 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        super.render(guiGraphics, x, y, partialTicks);
-        drawHoverAreas(guiGraphics, x, y);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int x, int y, float partialTicks) {
+        super.extractRenderState(guiGraphics, x, y, partialTicks);
+        extractHoverAreas(guiGraphics, x, y);
     }
 
     private MutableComponent number(int num) {
         return Component.literal(String.valueOf(num)).withStyle(ChatFormatting.DARK_GREEN);
     }
 
-    private void drawHoverSlot(GuiGraphics guiGraphics, int posX, int posY) {
+    private void drawHoverSlot(GuiGraphicsExtractor guiGraphics, int posX, int posY) {
         guiGraphics.fillGradient(posX, posY, posX + 16, posY + 16, slotColor, -2130706433);
     }
 

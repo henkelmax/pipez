@@ -1,7 +1,9 @@
 package de.maxhenkel.pipez;
 
-import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;

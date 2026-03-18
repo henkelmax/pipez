@@ -23,9 +23,9 @@ dependencies {
     //runtimeOnly "mekanism:Mekanism:${mekanism_version}:generators"
     //runtimeOnly "mekanism:Mekanism:${mekanism_version}:tools"
 
-    shadow "de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}:api"
-    runtimeOnly "de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}"
-    compileOnly "de.maxhenkel.corelib:corelib:${minecraft_version}-${corelib_version}:javadoc"
+    shadow "de.maxhenkel.corelib:corelib:${corelib_version}+${minecraft_version}:api"
+    runtimeOnly "de.maxhenkel.corelib:corelib:${corelib_version}+${minecraft_version}"
+    compileOnly "de.maxhenkel.corelib:corelib:${corelib_version}+${minecraft_version}:javadoc"
 }
 
 processResources {

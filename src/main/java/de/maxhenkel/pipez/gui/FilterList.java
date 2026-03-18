@@ -17,7 +17,7 @@ import de.maxhenkel.pipez.utils.MekanismUtils;
 import de.maxhenkel.pipez.utils.WrappedGasStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
@@ -71,8 +71,8 @@ public class FilterList extends WidgetBase {
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
+    protected void extractGuiContainerForegroundLayer(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+        super.extractGuiContainerForegroundLayer(guiGraphics, mouseX, mouseY);
         List<Filter<?, ?>> f = filters.get();
         for (int i = 0; i < hoverAreas.length; i++) {
             if (getOffset() + i >= f.size()) {
@@ -147,8 +147,8 @@ public class FilterList extends WidgetBase {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        super.drawGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
+    protected void extractGuiContainerBackgroundLayer(GuiGraphicsExtractor guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        super.extractGuiContainerBackgroundLayer(guiGraphics, partialTicks, mouseX, mouseY);
 
         List<Filter<?, ?>> f = filters.get();
         for (int i = getOffset(); i < f.size() && i < getOffset() + columnCount; i++) {
@@ -189,8 +189,8 @@ public class FilterList extends WidgetBase {
 
             if (filter.getDestination() != null) {
                 Pair<BlockState, ItemStack> dstPair = getBlockAt(filter.getDestination());
-                guiGraphics.renderItem(dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, 0);
-                guiGraphics.renderItemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
+                guiGraphics.item(dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, 0);
+                guiGraphics.itemDecorations(mc.font, dstPair.getValue(), guiLeft + xSize - 3 - 16 - 11, startY + 3, String.valueOf(filter.getDestination().getDirection().name().charAt(0)));
             }
         }
 
@@ -242,11 +242,11 @@ public class FilterList extends WidgetBase {
         return selected;
     }
 
-    private void drawStringSmall(GuiGraphics guiGraphics, int x, int y, Component text) {
+    private void drawStringSmall(GuiGraphicsExtractor guiGraphics, int x, int y, Component text) {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(x, y);
         guiGraphics.pose().scale(0.5F, 0.5F);
-        guiGraphics.drawString(mc.font, text, 0, 0, FontColorUtils.BLACK, false);
+        guiGraphics.text(mc.font, text, 0, 0, FontColorUtils.BLACK, false);
         guiGraphics.pose().popMatrix();
     }
 

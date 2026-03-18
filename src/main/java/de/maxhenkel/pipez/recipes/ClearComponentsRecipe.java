@@ -22,13 +22,37 @@ import java.util.Optional;
 
 public class ClearComponentsRecipe extends CustomRecipe {
 
+    private static final MapCodec<ClearComponentsRecipe> CODEC = RecordCodecBuilder.mapCodec((builder) -> builder
+            .group(
+                    Ingredient.CODEC
+                            .fieldOf("item")
+                            .forGetter((recipe) -> recipe.ingredient),
+                    Codec.list(Identifier.CODEC)
+                            .fieldOf("components")
+                            .forGetter((recipe) -> recipe.components)
+            ).apply(builder, ClearComponentsRecipe::new));
+
+    private static final StreamCodec<RegistryFriendlyByteBuf, ClearComponentsRecipe> STREAM_CODEC = StreamCodec.composite(
+            Ingredient.CONTENTS_STREAM_CODEC,
+            r -> r.ingredient,
+            ByteBufCodecs.collection(ArrayList::new, Identifier.STREAM_CODEC),
+            r -> r.components,
+            ClearComponentsRecipe::new
+    );
+
+    public static final RecipeSerializer<ClearComponentsRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
+
     private final Ingredient ingredient;
     private final List<Identifier> components;
 
     public ClearComponentsRecipe(Ingredient ingredient, List<Identifier> components) {
-        super(CraftingBookCategory.MISC);
         this.ingredient = ingredient;
         this.components = components;
+    }
+
+    @Override
+    public CraftingBookCategory category() {
+        return CraftingBookCategory.MISC;
     }
 
     @Nullable
@@ -55,8 +79,8 @@ public class ClearComponentsRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider provider) {
-        ItemStack ingredient = getIngredient(inv);
+    public ItemStack assemble(CraftingInput input) {
+        ItemStack ingredient = getIngredient(input);
         if (ingredient == null) {
             return ItemStack.EMPTY;
         } else {
@@ -82,39 +106,4 @@ public class ClearComponentsRecipe extends CustomRecipe {
         return ModRecipes.CLEAR_NBT.get();
     }
 
-    public static class Serializer implements RecipeSerializer<ClearComponentsRecipe> {
-
-        private static final MapCodec<ClearComponentsRecipe> CODEC = RecordCodecBuilder.mapCodec((builder) -> builder
-                .group(
-                        Ingredient.CODEC
-                                .fieldOf("item")
-                                .forGetter((recipe) -> recipe.ingredient),
-                        Codec.list(Identifier.CODEC)
-                                .fieldOf("components")
-                                .forGetter((recipe) -> recipe.components)
-                ).apply(builder, ClearComponentsRecipe::new));
-
-        private static final StreamCodec<RegistryFriendlyByteBuf, ClearComponentsRecipe> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC,
-                r -> r.ingredient,
-                ByteBufCodecs.collection(ArrayList::new, Identifier.STREAM_CODEC),
-                r -> r.components,
-                ClearComponentsRecipe::new
-        );
-
-        public Serializer() {
-
-        }
-
-        @Override
-        public MapCodec<ClearComponentsRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, ClearComponentsRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
-
-    }
 }

@@ -6,7 +6,7 @@ import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -29,7 +29,7 @@ public class WrappedGasStack extends AbstractStack<ChemicalStack> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int x, int y) {
+    public void render(GuiGraphicsExtractor guiGraphics, int x, int y) {
         // TODO Re-add once mekanism is updated
         /*TextureAtlasSprite texture = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(stack.getChemical().getIcon());
         int chemicalTint = stack.getChemicalTint();

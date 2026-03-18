@@ -1,6 +1,6 @@
 package de.maxhenkel.pipez.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.InputWithModifiers;
@@ -26,8 +26,8 @@ public class CycleIconButton extends AbstractButton {
     }
 
     @Override
-    public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        renderDefaultSprite(guiGraphics);
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        extractDefaultSprite(guiGraphics);
         Icon icon = icons.get(index.get());
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, icon.texture, getX() + 2, getY() + 2, icon.offsetX, icon.offsetY, 16, 16, 256, 256);
     }
