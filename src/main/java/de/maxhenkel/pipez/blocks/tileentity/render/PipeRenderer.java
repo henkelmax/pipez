@@ -1,6 +1,7 @@
 package de.maxhenkel.pipez.blocks.tileentity.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.math.Axis;
 import de.maxhenkel.pipez.ModelRegistry.Model;
 import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
@@ -74,7 +75,11 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
             for (BakedQuad quad : quads) {
                 MutableQuad mutableQuad = new MutableQuad();
                 mutableQuad.setFrom(quad);
-                vertexConsumer.putBulkData(pose, mutableQuad, 1F, 1F, 1F, 1F, combinedLight, combinedOverlay);
+                QuadInstance quadInstance = new QuadInstance();
+                quadInstance.setColor(0xFFFFFFFF);
+                quadInstance.setLightCoords(combinedLight);
+                quadInstance.setOverlayCoords(combinedOverlay);
+                vertexConsumer.putMutableQuad(pose, mutableQuad, quadInstance);
             }
         });
 
