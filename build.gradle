@@ -33,7 +33,8 @@ processResources {
         expand 'mod_version': mod_version,
                 'neoforge_dependency': neoforge_dependency,
                 'minecraft_version': minecraft_version,
-                'mekanism_dependency': mekanism_dependency
+                'mekanism_dependency': mekanism_dependency,
+                'minecraft_dependency': minecraft_dependency
     }
 }
 
