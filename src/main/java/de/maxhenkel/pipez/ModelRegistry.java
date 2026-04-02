@@ -45,7 +45,7 @@ public class ModelRegistry {
 
     public static void onModelRegister(ModelEvent.RegisterStandalone event) {
         for (Model model : Model.values()) {
-            event.register(model.getModelKey(), new SimpleUnbakedStandaloneModel<>(model.resource, (resolvedModel, baker) -> {
+            event.register(model.getModelKey(), new SimpleUnbakedStandaloneModel<>(model.resource, (resolvedModel, baker, name) -> {
                 ResolvedModel resolvedmodel = baker.getModel(model.getIdentifier());
                 TextureSlots textureslots = resolvedmodel.getTopTextureSlots();
                 return resolvedModel.bakeTopGeometry(textureslots, baker, BlockModelRotation.IDENTITY);
