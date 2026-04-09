@@ -1,4 +1,4 @@
-- Added support for latest NeoForge update
+- Fixed upgrades not dropping when breaking pipes
 
 **NOTE**
 
