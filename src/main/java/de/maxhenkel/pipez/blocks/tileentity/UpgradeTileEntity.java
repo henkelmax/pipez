@@ -133,7 +133,9 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        Containers.dropContents(level, pos, inventory);
+        if (level != null) {
+            Containers.dropContents(level, pos, inventory);
+        }
     }
 
     @Nullable
