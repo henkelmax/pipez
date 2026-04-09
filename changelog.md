@@ -1,4 +1,4 @@
-- Fixed crash
+- Fixed upgrades not dropping when breaking pipes
 
 **NOTE**
 
