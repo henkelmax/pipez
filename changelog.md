@@ -1,4 +1,4 @@
-- Updated to 1.21.11
+- Fixed upgrades not dropping when breaking pipes
 
 **NOTE**
 
