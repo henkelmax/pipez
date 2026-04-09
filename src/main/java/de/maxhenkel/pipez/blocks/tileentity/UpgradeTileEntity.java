@@ -130,6 +130,12 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
         ItemUtils.saveInventory(valueOutput, "Upgrades", upgradeInventory);
     }
 
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        Containers.dropContents(level, pos, inventory);
+    }
+
     @Nullable
     public Upgrade getUpgrade(Direction direction) {
         ItemStack stack = upgradeInventory.get(direction.get3DDataValue());

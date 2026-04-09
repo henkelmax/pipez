@@ -1,4 +1,4 @@
-- Updated Brazilian Portuguese translation
+- Fixed upgrades not dropping when breaking pipes
 
 **NOTE**
 

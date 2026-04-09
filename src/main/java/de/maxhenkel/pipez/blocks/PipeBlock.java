@@ -10,10 +10,8 @@ import de.maxhenkel.pipez.items.UpgradeItem;
 import de.maxhenkel.pipez.items.WrenchItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -498,16 +496,6 @@ public abstract class PipeBlock extends Block implements SimpleWaterloggedBlock,
             return Double.MAX_VALUE;
         }
         return blockRayTraceResult.getLocation().distanceTo(start);
-    }
-
-    // TODO Put logic into block entity using preRemoveSideEffects
-    @Override
-    protected void affectNeighborsAfterRemoval(BlockState blockState, ServerLevel level, BlockPos pos, boolean moving) {
-        BlockEntity blockentity = level.getBlockEntity(pos);
-        if (blockentity instanceof UpgradeTileEntity upgrade) {
-            Containers.dropContents(level, pos, upgrade.getUpgradeInventory());
-        }
-        super.affectNeighborsAfterRemoval(blockState, level, pos, moving);
     }
 
     @Override
