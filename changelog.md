@@ -1,4 +1,4 @@
-- Fixed upgrades not dropping when breaking pipes
+- Added support for 26.1.2
 
 **NOTE**
 
