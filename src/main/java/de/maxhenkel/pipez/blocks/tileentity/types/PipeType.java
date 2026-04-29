@@ -257,24 +257,25 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
             return true;
         }
 
-        var noUninvertedFilters = true;
+        var noNormalFilters = true;
         for (var erased : filters) {
             var filter = (Filter<?, T>) erased;
             if (!matchesConnection(connection, filter)) {
                 continue;
             }
 
-            if (!filter.isInvert()) {
-                noUninvertedFilters = false;
-                if (matcher.test(context, filter, stack)) {
-                    return true;
-                }
-            } else if (matcher.test(context, filter, stack)) {
-                return false;
+            var isNormal = !filter.isInvert();
+
+            if (matcher.test(context, filter, stack)) {
+                return isNormal;
+            }
+
+            if (isNormal) {
+                noNormalFilters = false;
             }
         }
 
-        return noUninvertedFilters;
+        return noNormalFilters;
     }
 
     final <S> boolean canInsertProto(PipeTileEntity.Connection connection, S stack, List<Filter<?, ?>> filters, BiPredicate<Filter<?, T>, S> matcher) {
