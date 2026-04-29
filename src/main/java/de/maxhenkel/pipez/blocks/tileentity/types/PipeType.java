@@ -269,10 +269,8 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
                 if (matcher.test(context, filter, stack)) {
                     return true;
                 }
-            } else {
-                if (matcher.test(context, filter, stack)) {
-                    return false;
-                }
+            } else if (matcher.test(context, filter, stack)) {
+                return false;
             }
         }
 
