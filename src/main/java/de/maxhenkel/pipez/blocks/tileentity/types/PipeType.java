@@ -264,15 +264,11 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
                 continue;
             }
 
-            var isNormal = !filter.isInvert();
-
             if (matcher.test(context, filter, stack)) {
-                return isNormal;
+                return !filter.isInvert();
             }
 
-            if (isNormal) {
-                noNormalFilters = false;
-            }
+            noNormalFilters &= filter.isInvert();
         }
 
         return noNormalFilters;
