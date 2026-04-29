@@ -25,7 +25,6 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GasPipeType extends PipeType<Chemical, GasData> {
 
@@ -167,21 +166,7 @@ public class GasPipeType extends PipeType<Chemical, GasData> {
     }
 
     private boolean canInsert(PipeTileEntity.Connection connection, ChemicalStack stack, List<Filter<?, ?>> filters) {
-        for (Filter<?, Chemical> filter : filters.stream().map(filter -> (Filter<?, Chemical>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(filter, stack)) {
-                return false;
-            }
-        }
-        List<Filter<?, Chemical>> collect = filters.stream().map(filter -> (Filter<?, Chemical>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
-        if (collect.isEmpty()) {
-            return true;
-        }
-        for (Filter<?, Chemical> filter : collect) {
-            if (matches(filter, stack)) {
-                return true;
-            }
-        }
-        return false;
+        return super.canInsertProto(connection, stack, filters, this::matches);
     }
 
     private boolean matches(Filter<?, Chemical> filter, ChemicalStack stack) {

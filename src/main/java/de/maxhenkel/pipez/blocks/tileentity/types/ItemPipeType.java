@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ItemPipeType extends PipeType<Item, ItemData> {
 
@@ -182,21 +181,7 @@ public class ItemPipeType extends PipeType<Item, ItemData> {
     }
 
     private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, ItemStack stack, List<Filter<?, ?>> filters) {
-        for (Filter<?, Item> filter : filters.stream().map(filter -> (Filter<?, Item>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
-            if (matches(provider, filter, stack)) {
-                return false;
-            }
-        }
-        List<Filter<?, Item>> collect = filters.stream().map(filter -> (Filter<?, Item>) filter).filter(f -> !f.isInvert()).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList());
-        if (collect.isEmpty()) {
-            return true;
-        }
-        for (Filter<?, Item> filter : collect) {
-            if (matches(provider, filter, stack)) {
-                return true;
-            }
-        }
-        return false;
+        return super.canInsertProto(provider, connection, stack, filters, this::matches);
     }
 
     private boolean matches(HolderLookup.Provider provider, Filter<?, Item> filter, ItemStack stack) {

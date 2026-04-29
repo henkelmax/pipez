@@ -16,12 +16,14 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.common.util.TriPredicate;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
 
@@ -248,5 +250,36 @@ public abstract class PipeType<T, D extends AbstractPipeTypeData<T>> {
             return;
         }
         stack.set(getDataComponentType(), (D) getOrDefault(stack).builder().distribution(value).build());
+    }
+
+    final <S, C> boolean canInsertProto(C context, PipeTileEntity.Connection connection, S stack, List<Filter<?, ?>> filters, TriPredicate<C, Filter<?, T>, S> matcher) {
+        if (filters.isEmpty()) {
+            return true;
+        }
+
+        var noUninvertedFilters = true;
+        for (var erased : filters) {
+            var filter = (Filter<?, T>) erased;
+            if (!matchesConnection(connection, filter)) {
+                continue;
+            }
+
+            if (!filter.isInvert()) {
+                noUninvertedFilters = false;
+                if (matcher.test(context, filter, stack)) {
+                    return true;
+                }
+            } else {
+                if (matcher.test(context, filter, stack)) {
+                    return false;
+                }
+            }
+        }
+
+        return noUninvertedFilters;
+    }
+
+    final <S> boolean canInsertProto(PipeTileEntity.Connection connection, S stack, List<Filter<?, ?>> filters, BiPredicate<Filter<?, T>, S> matcher) {
+        return this.canInsertProto(null, connection, stack, filters, (ignored, filter, st) -> matcher.test(filter, st));
     }
 }
