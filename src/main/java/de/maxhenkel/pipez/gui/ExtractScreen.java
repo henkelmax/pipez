@@ -254,7 +254,7 @@ public class ExtractScreen extends ScreenBase<ExtractContainer> {
         }
 
         if (event.hasShiftDown()) {
-            Slot sl = this.getSlotUnderMouse();
+            Slot sl = getHoveredSlot();
             if (sl != null && !(sl instanceof UpgradeSlot)) {
                 addQuickFilter(sl.getItem());
             }

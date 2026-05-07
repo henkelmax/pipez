@@ -22,8 +22,8 @@ public abstract class WidgetBase {
 
         width = screen.width;
         height = screen.height;
-        guiLeft = screen.getGuiLeft() + posX;
-        guiTop = screen.getGuiTop() + posY;
+        guiLeft = screen.getLeftPos() + posX;
+        guiTop = screen.getTopPos() + posY;
     }
 
     public void tick() {

@@ -37,7 +37,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FilterScreen extends ScreenBase<FilterContainer> {
+
     public static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(PipezMod.MODID, "textures/gui/container/filter.png");
+
+    private static final int SLOT_COLOR = -2130706433;
 
     private EditBox item;
     private EditBox nbt;
@@ -356,7 +359,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
     }
 
     private void drawHoverSlot(GuiGraphicsExtractor guiGraphics, int posX, int posY) {
-        guiGraphics.fillGradient(posX, posY, posX + 16, posY + 16, slotColor, -2130706433);
+        guiGraphics.fillGradient(posX, posY, posX + 16, posY + 16, SLOT_COLOR, -2130706433);
     }
 
     @Override
@@ -376,7 +379,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }
 
         if (event.hasShiftDown()) {
-            Slot sl = this.getSlotUnderMouse();
+            Slot sl = getHoveredSlot();
             if (sl != null) {
                 onInsertStack(sl.getItem());
             }
