@@ -24,6 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -216,7 +217,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             Tag tag = TagUtils.getItem(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
-                item.setTextColor(FontColorUtils.getFontColor(ChatFormatting.DARK_RED));
+                item.setTextColor(FontColorUtils.getFontColor(TextColor.DARK_RED));
             } else {
                 item.setTextColor(FontColorUtils.WHITE);
             }
@@ -224,7 +225,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             Tag tag = TagUtils.getFluid(text, true);
             filter.setTag(tag);
             if (filter.getTag() == null) {
-                item.setTextColor(FontColorUtils.getFontColor(ChatFormatting.DARK_RED));
+                item.setTextColor(FontColorUtils.getFontColor(TextColor.DARK_RED));
             } else {
                 item.setTextColor(FontColorUtils.WHITE);
             }
@@ -232,7 +233,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             // TODO Re-add once mekanism is updated
             //filter.setTag((Tag) GasUtils.getGas(text, true));
             if (filter.getTag() == null) {
-                item.setTextColor(FontColorUtils.getFontColor(ChatFormatting.DARK_RED));
+                item.setTextColor(FontColorUtils.getFontColor(TextColor.DARK_RED));
             } else {
                 item.setTextColor(FontColorUtils.WHITE);
             }
@@ -252,7 +253,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             filter.setMetadata(TagParser.parseCompoundFully(text));
             nbt.setTextColor(FontColorUtils.WHITE);
         } catch (CommandSyntaxException e) {
-            nbt.setTextColor(FontColorUtils.getFontColor(ChatFormatting.DARK_RED));
+            nbt.setTextColor(FontColorUtils.getFontColor(TextColor.DARK_RED));
             filter.setMetadata(null);
         }
     }

@@ -206,7 +206,7 @@ public class FilterList extends WidgetBase {
 
     private Pair<BlockState, ItemStack> getBlockAt(DirectionalPosition destination) {
         return filterPosCache.get(destination, () -> {
-            ItemStack stack = new ItemStack(Items.WHITE_CONCRETE);
+            ItemStack stack = new ItemStack(Items.CONCRETE.white());
             BlockState state = null;
             if (mc.level.isAreaLoaded(destination.getPos(), 1)) {
                 state = mc.level.getBlockState(destination.getPos());

@@ -1,4 +1,4 @@
-- Added support for latest NeoForge version
+- Updated to 26.2
 
 **NOTE**
 
