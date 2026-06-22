@@ -3,6 +3,8 @@ package de.maxhenkel.pipez;
 import de.maxhenkel.corelib.config.ConfigBase;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import javax.annotation.Nullable;
+
 public class ServerConfig extends ConfigBase {
 
     public final ModConfigSpec.IntValue itemPipeSpeed;
@@ -33,6 +35,12 @@ public class ServerConfig extends ConfigBase {
     public final ModConfigSpec.IntValue gasPipeAmountImproved;
     public final ModConfigSpec.IntValue gasPipeAmountAdvanced;
     public final ModConfigSpec.IntValue gasPipeAmountUltimate;
+
+    public final ModConfigSpec.IntValue filterLimitBasic;
+    public final ModConfigSpec.IntValue filterLimitImproved;
+    public final ModConfigSpec.IntValue filterLimitAdvanced;
+    public final ModConfigSpec.IntValue filterLimitUltimate;
+    public final ModConfigSpec.IntValue filterLimitInfinity;
 
     public ServerConfig(ModConfigSpec.Builder builder) {
         super(builder);
@@ -135,6 +143,45 @@ public class ServerConfig extends ConfigBase {
         gasPipeAmountUltimate = builder
                 .comment("The amount of mB transferred each tick", "Only available if Mekanism is installed")
                 .defineInRange("gas_pipe.amount.ultimate", 40000, 1, Integer.MAX_VALUE);
+
+        filterLimitBasic = builder
+                .comment("The maximum amount of filters per basic upgrade")
+                .defineInRange("filter.limit.basic", 16, 0, Integer.MAX_VALUE);
+
+        filterLimitImproved = builder
+                .comment("The maximum amount of filters per improved upgrade")
+                .defineInRange("filter.limit.improved", 32, 0, Integer.MAX_VALUE);
+
+        filterLimitAdvanced = builder
+                .comment("The maximum amount of filters per advanced upgrade")
+                .defineInRange("filter.limit.advanced", 64, 0, Integer.MAX_VALUE);
+
+        filterLimitUltimate = builder
+                .comment("The maximum amount of filters per ultimate upgrade")
+                .defineInRange("filter.limit.ultimate", 128, 0, Integer.MAX_VALUE);
+
+        filterLimitInfinity = builder
+                .comment("The maximum amount of filters per infinity upgrade")
+                .defineInRange("filter.limit.infinity", 256, 0, Integer.MAX_VALUE);
+    }
+
+    public int getFilterLimit(@Nullable Upgrade upgrade) {
+        if (upgrade == null) {
+            return 0;
+        }
+        switch (upgrade) {
+            case BASIC:
+                return filterLimitBasic.get();
+            case IMPROVED:
+                return filterLimitImproved.get();
+            case ADVANCED:
+                return filterLimitAdvanced.get();
+            case ULTIMATE:
+                return filterLimitUltimate.get();
+            case INFINITY:
+            default:
+                return filterLimitInfinity.get();
+        }
     }
 
 }
