@@ -74,6 +74,7 @@
   "message.pipez.filter.add": "Add",
   "message.pipez.filter.edit": "Edit",
   "message.pipez.filter.remove": "Remove",
+  "message.pipez.filter.limit_reached": "Filter limit reached (%s)",
   "message.pipez.filter.cancel": "Cancel",
   "message.pipez.filter.submit": "Submit",
   "message.pipez.filter.item_tag": "Item/Tag",

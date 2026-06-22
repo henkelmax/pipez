@@ -5,10 +5,12 @@ import de.maxhenkel.pipez.Filter;
 import de.maxhenkel.pipez.PipezMod;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.gui.ExtractContainer;
+import de.maxhenkel.pipez.gui.FilterContainer;
 import de.maxhenkel.pipez.gui.IPipeContainer;
 import de.maxhenkel.pipez.gui.containerfactory.PipeContainerProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
@@ -49,7 +51,7 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
             return;
         }
         PipeType<?, ?>[] pipeTypes = pipeContainer.getPipe().getPipeTypes();
-        if (index >= pipeTypes.length) {
+        if (index < 0 || index >= pipeTypes.length) {
             return;
         }
         PipeType<?, ?> pipeType = pipeTypes[index];
@@ -70,6 +72,14 @@ public class UpdateFilterMessage implements Message<UpdateFilterMessage> {
                 filters.add(filter);
             }
         } else {
+            int filterLimit = PipezMod.SERVER_CONFIG.getFilterLimit(pipeContainer.getPipe().getUpgrade(pipeContainer.getSide()));
+            if (filters.size() >= filterLimit) {
+                sender.sendSystemMessage(Component.translatable("message.pipez.filter.limit_reached", filterLimit));
+                if (sender.containerMenu instanceof FilterContainer) {
+                    PipeContainerProvider.openGui(sender, pipeContainer.getPipe(), pipeContainer.getSide(), index, (id, playerInventory, playerEntity) -> new ExtractContainer(id, playerInventory, pipeContainer.getPipe(), pipeContainer.getSide(), index));
+                }
+                return;
+            }
             filters.add(filter);
         }
         pipeContainer.getPipe().setFilters(pipeContainer.getSide(), pipeType, filters);
