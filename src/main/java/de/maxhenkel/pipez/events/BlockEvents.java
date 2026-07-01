@@ -29,7 +29,7 @@ public class BlockEvents {
 
         PipeBlock pipe = (PipeBlock) state.getBlock();
 
-        Direction side = pipe.getSelection(state, event.getLevel(), event.getPos(), event.getEntity()).getKey();
+        Direction side = pipe.getSelection(state, event.getLevel(), event.getPos(), event.getHitVec().getLocation()).getKey();
         InteractionResult result = pipe.onPipeSideForceActivated(state, event.getLevel(), event.getPos(), event.getEntity(), event.getHand(), event.getHitVec(), side);
         if (result.consumesAction()) {
             event.setUseItem(TriState.TRUE);
