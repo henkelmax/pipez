@@ -9,6 +9,7 @@ import de.maxhenkel.pipez.blocks.tileentity.PipeTileEntity;
 import de.maxhenkel.pipez.blocks.tileentity.UpgradeTileEntity;
 import de.maxhenkel.pipez.items.UpgradeItem;
 import de.maxhenkel.pipez.items.WrenchItem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
@@ -36,6 +37,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
@@ -84,7 +86,7 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        Direction side = getSelection(state, level, pos, player).getKey();
+        Direction side = getSelection(state, level, pos, hit.getLocation()).getKey();
         if (side != null) {
             return onPipeSideActivated(itemStack, state, level, pos, player, hand, hit, side);
         } else {
@@ -404,7 +406,11 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
     }
 
     public VoxelShape getSelectionShape(BlockState state, BlockGetter world, BlockPos pos, Player player) {
-        Pair<Direction, VoxelShape> selection = getSelection(state, world, pos, player);
+        HitResult hitresult = Minecraft.getInstance().hitResult;
+        if (hitresult == null || hitresult.getType() != HitResult.Type.BLOCK) {
+            return getShape(world, pos, state, true);
+        }
+        Pair<Direction, VoxelShape> selection = getSelection(state, world, pos, hitresult.getLocation());
 
         if (selection.getKey() == null) {
             return getShape(world, pos, state, true);
@@ -437,15 +443,14 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
             new Pair<>(SHAPE_EXTRACT_DOWN, Direction.DOWN)
     );
 
-    public Pair<Direction, VoxelShape> getSelection(BlockState state, BlockGetter blockReader, BlockPos pos, Player player) {
-        Vec3 start = player.getEyePosition(1F);
-        Vec3 end = start.add(player.getLookAngle().normalize().scale(getBlockReachDistance(player)));
 
+    public Pair<Direction, VoxelShape> getSelection(BlockState state, BlockGetter blockReader, BlockPos pos, Vec3 hitLocation) {
         Direction direction = null;
         VoxelShape selection = null;
         double shortest = Double.MAX_VALUE;
 
-        double d = checkShape(state, blockReader, pos, start, end, SHAPE_CORE, null);
+        Vec3 vec3 = hitLocation.subtract(pos.getX(), pos.getY(), pos.getZ());
+        double d = checkShape(state, vec3, SHAPE_CORE, null);
         if (d < shortest) {
             shortest = d;
         }
@@ -460,14 +465,14 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
             Pair<VoxelShape, Direction> extract = EXTRACT_SHAPES.get(i);
             Triple<VoxelShape, BooleanProperty, Direction> shape = SHAPES.get(i);
             if (pipe != null && pipe.isExtracting(extract.getValue())) {
-                d = checkShape(state, blockReader, pos, start, end, extract.getKey(), pipe, extract.getValue());
+                d = checkShape(vec3, extract.getKey(), pipe, extract.getValue());
                 if (d < shortest) {
                     shortest = d;
                     direction = extract.getValue();
                     selection = extract.getKey();
                 }
             } else {
-                d = checkShape(state, blockReader, pos, start, end, shape.getValue1(), shape.getValue2());
+                d = checkShape(state, vec3, shape.getValue1(), shape.getValue2());
                 if (d < shortest) {
                     shortest = d;
                     direction = shape.getValue3();
@@ -478,34 +483,18 @@ public abstract class PipeBlock extends Block implements IItemBlock, SimpleWater
         return new Pair<>(direction, selection);
     }
 
-    public float getBlockReachDistance(Player player) {
-        AttributeInstance attribute = player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
-        if (attribute == null) {
-            return (float) Attributes.BLOCK_INTERACTION_RANGE.value().getDefaultValue();
-        }
-        return (float) attribute.getValue();
-    }
-
-    private double checkShape(BlockState state, BlockGetter world, BlockPos pos, Vec3 start, Vec3 end, VoxelShape shape, BooleanProperty direction) {
+    private double checkShape(BlockState state, Vec3 hit, VoxelShape shape, BooleanProperty direction) {
         if (direction != null && !state.getValue(direction)) {
             return Double.MAX_VALUE;
         }
-        BlockHitResult blockRayTraceResult = world.clipWithInteractionOverride(start, end, pos, shape, state);
-        if (blockRayTraceResult == null) {
-            return Double.MAX_VALUE;
-        }
-        return blockRayTraceResult.getLocation().distanceTo(start);
+        return shape.closestPointTo(hit).map(vec3 -> vec3.distanceToSqr(hit)).orElse(Double.MAX_VALUE);
     }
 
-    private double checkShape(BlockState state, BlockGetter world, BlockPos pos, Vec3 start, Vec3 end, VoxelShape shape, @Nullable PipeTileEntity pipe, Direction side) {
+    private double checkShape(Vec3 hit, VoxelShape shape, @Nullable PipeTileEntity pipe, Direction side) {
         if (pipe != null && !pipe.isExtracting(side)) {
             return Double.MAX_VALUE;
         }
-        BlockHitResult blockRayTraceResult = world.clipWithInteractionOverride(start, end, pos, shape, state);
-        if (blockRayTraceResult == null) {
-            return Double.MAX_VALUE;
-        }
-        return blockRayTraceResult.getLocation().distanceTo(start);
+        return shape.closestPointTo(hit).map(vec3 -> vec3.distanceToSqr(hit)).orElse(Double.MAX_VALUE);
     }
 
     @Override

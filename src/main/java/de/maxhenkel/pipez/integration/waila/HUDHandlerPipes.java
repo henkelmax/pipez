@@ -42,7 +42,7 @@ public class HUDHandlerPipes implements IBlockComponentProvider, IServerDataProv
     public void appendServerData(CompoundTag compound, BlockAccessor blockAccessor) {
         if (blockAccessor.getBlockState().getBlock() instanceof PipeBlock pipe) {
             BlockEntity te = blockAccessor.getBlockEntity();
-            Direction selectedSide = pipe.getSelection(te.getBlockState(), blockAccessor.getLevel(), te.getBlockPos(), blockAccessor.getPlayer()).getKey();
+            Direction selectedSide = pipe.getSelection(te.getBlockState(), blockAccessor.getLevel(), te.getBlockPos(), blockAccessor.getHitResult().getLocation()).getKey();
             if (selectedSide == null) {
                 return;
             }

@@ -32,7 +32,7 @@ public class TileInfoProvider implements IProbeInfoProvider {
 
         if (state.getBlock() instanceof PipeBlock) {
             PipeBlock pipe = (PipeBlock) state.getBlock();
-            Direction selectedSide = pipe.getSelection(state, world, hitData.getPos(), player).getKey();
+            Direction selectedSide = pipe.getSelection(state, world, hitData.getPos(), hitData.getHitVec()).getKey();
             if (selectedSide == null) {
                 return;
             }
