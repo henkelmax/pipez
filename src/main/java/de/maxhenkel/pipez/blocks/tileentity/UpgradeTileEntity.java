@@ -11,6 +11,7 @@ import de.maxhenkel.pipez.blocks.tileentity.configuration.RedstoneModeCache;
 import de.maxhenkel.pipez.blocks.tileentity.types.PipeType;
 import de.maxhenkel.pipez.items.UpgradeItem;
 import net.minecraft.core.*;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class UpgradeTileEntity extends PipeTileEntity {
+public abstract class UpgradeTileEntity extends PipeTileEntity implements Clearable {
 
     protected final NonNullList<ItemStack> upgradeInventory;
     protected final ItemListInventory inventory;
@@ -145,6 +146,11 @@ public abstract class UpgradeTileEntity extends PipeTileEntity {
             return null;
         }
         return upgradeItem.getTier();
+    }
+
+    @Override
+    public void clearContent() {
+        upgradeInventory.clear();
     }
 
     public List<PipeTileEntity.Connection> getSortedConnections(Direction side, PipeType pipeType) {
