@@ -95,7 +95,7 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
         }).bounds(leftPos + 91, topPos + 105, 60, 20).build();
         addRenderableWidget(submitButton);
 
-        item = new EditBox(font, leftPos + 29, topPos + 17, 140, 18, Component.empty());
+        item = new ItemEditBox(font, leftPos + 29, topPos + 17, 140, 18, Component.empty());
         item.setTextColor(FontColorUtils.WHITE);
         item.setBordered(true);
         item.setMaxLength(Integer.MAX_VALUE);
@@ -107,12 +107,6 @@ public class FilterScreen extends ScreenBase<FilterContainer> {
             }
         }
         item.setResponder(this::onItemTextChanged);
-        item.setFilter(s -> {
-            if (s.startsWith("#")) {
-                s = s.substring(1);
-            }
-            return Identifier.tryParse(s) != null;
-        });
         addRenderableWidget(item);
 
         nbt = new EditBox(font, leftPos + 7, topPos + 49, 162, 18, Component.empty());

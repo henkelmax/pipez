@@ -8,7 +8,7 @@ version = "${mod_version}"
 displayName = "Pipez"
 updateJSONURL = "https://update.maxhenkel.de/neoforge/pipez"
 displayURL = "https://www.curseforge.com/minecraft/mc-mods/pipez"
-logoFile = "icon.png"
+iconFile = "icon.png"
 authors = "Max Henkel"
 description = '''Simple and efficient pipes'''
 [[dependencies.pipez]]

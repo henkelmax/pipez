@@ -1,1 +1,1 @@
-- Added compatibility with sable (Thanks 1foxy2)
+- Fixed crash on newer NeoForge versions
