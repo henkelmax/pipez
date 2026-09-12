@@ -68,7 +68,7 @@ public abstract class PipeRenderer implements BlockEntityRenderer<PipeTileEntity
         stack.pushPose();
         stack.translate(direction.getStepX() * 0.001D, direction.getStepY() * 0.001D, direction.getStepZ() * 0.001D);
         stack.translate(0.5D, 0.5D, 0.5D);
-        stack.mulPose(getRotation(direction));
+        stack.rotate(getRotation(direction));
         stack.translate(-0.5D, -0.5D, -0.5D);
         List<BakedQuad> quads = model.getQuads(null);
         collector.submitCustomGeometry(stack, RenderTypes.solidMovingBlock(), (pose, vertexConsumer) -> {

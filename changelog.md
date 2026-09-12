@@ -1,1 +1,1 @@
-- Fixed crash on newer NeoForge versions
+- Updated to 26.3

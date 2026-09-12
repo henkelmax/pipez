@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -54,7 +55,7 @@ public abstract class PipeBlock extends Block implements SimpleWaterloggedBlock,
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     protected PipeBlock(Properties properties) {
-        super(properties.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK));
+        super(properties.mapColor(MapColor.COLOR_GRAY).strength(0.5F).sound(SoundType.METAL).pushReaction(PushReaction.IMMOVEABLE));
 
         registerDefaultState(stateDefinition.any()
                 .setValue(UP, false)
@@ -145,7 +146,7 @@ public abstract class PipeBlock extends Block implements SimpleWaterloggedBlock,
                 player.setItemInHand(hand, oldUpgrade);
             } else {
                 if (!player.getInventory().add(oldUpgrade)) {
-                    player.drop(oldUpgrade, true);
+                    player.drop(oldUpgrade, true, Prediction.SERVER_ONLY);
                 }
             }
             return InteractionResult.SUCCESS;

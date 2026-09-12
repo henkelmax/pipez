@@ -3,7 +3,6 @@ package de.maxhenkel.pipez.recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -17,8 +16,6 @@ import net.minecraft.world.level.Level;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class ClearComponentsRecipe extends CustomRecipe {
 
@@ -85,15 +82,15 @@ public class ClearComponentsRecipe extends CustomRecipe {
             return ItemStack.EMPTY;
         } else {
             ItemStack stack = ingredient.copy();
-            for (Map.Entry<DataComponentType<?>, Optional<?>> e : stack.getComponentsPatch().entrySet()) {
-                Identifier key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e.getKey());
+            for (DataComponentType<?> e : stack.getComponentsPatch().keySet()) {
+                Identifier key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e);
                 if (key == null) {
                     continue;
                 }
                 if (!components.contains(key)) {
                     continue;
                 }
-                stack.remove(e.getKey());
+                stack.remove(e);
             }
 
             stack.setCount(1);

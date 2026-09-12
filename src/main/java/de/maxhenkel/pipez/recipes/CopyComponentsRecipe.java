@@ -93,7 +93,7 @@ public class CopyComponentsRecipe extends CustomRecipe {
     }
 
     private boolean hasComponent(ItemStack stack) {
-        return stack.getComponentsPatch().entrySet().stream().map(Map.Entry::getKey).map(BuiltInRegistries.DATA_COMPONENT_TYPE::getKey).anyMatch(components::contains);
+        return stack.getComponentsPatch().keySet().stream().map(BuiltInRegistries.DATA_COMPONENT_TYPE::getKey).anyMatch(components::contains);
     }
 
     @Override
@@ -123,18 +123,16 @@ public class CopyComponentsRecipe extends CustomRecipe {
             stack.setCount(1);
             DataComponentPatch patch = result.getKey().getComponentsPatch();
 
-            for (Map.Entry<DataComponentType<?>, Optional<?>> e : patch.entrySet()) {
-                if (e.getValue().isEmpty()) {
-                    continue;
-                }
-                Identifier key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e.getKey());
+            for (DataComponentType<?> e : patch.keySet()) {
+                Object value = patch.getPatch(e);
+                Identifier key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(e);
                 if (key == null) {
                     continue;
                 }
                 if (!components.contains(key)) {
                     continue;
                 }
-                stack.set((DataComponentType) e.getKey(), e.getValue().get());
+                stack.set((DataComponentType<Object>) e, value);
             }
             return stack;
         }
