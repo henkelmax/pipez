@@ -35,7 +35,7 @@ public class PipezMod {
         //TODO Add back
         //eventBus.addListener(IMC::enqueueIMC);
 
-        SERVER_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.SERVER, ServerConfig.class);
+        SERVER_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.SYNCED, ServerConfig.class);
         CLIENT_CONFIG = CommonRegistry.registerConfig(MODID, ModConfig.Type.CLIENT, ClientConfig.class);
 
         ModBlocks.init(eventBus);
