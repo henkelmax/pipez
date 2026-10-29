@@ -13,6 +13,12 @@ repositories {
 }
 
 dependencies {
+    testImplementation platform('org.junit:junit-bom:5.14.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core:5.21.0'
+    testImplementation "de.maxhenkel.corelib:corelib:${corelib_version}+${minecraft_version}:api"
+    testImplementation "net.neoforged:testframework:${neoforge_version}"
     compileOnly "maven.modrinth:jei:${jei_version}"
     compileOnly "maven.modrinth:the-one-probe:${theoneprobe_version}"
     compileOnly "maven.modrinth:jade:${jade_version}"
@@ -26,6 +32,17 @@ dependencies {
     shadow "de.maxhenkel.corelib:corelib:${corelib_version}+${minecraft_version}:api"
     runtimeOnly "de.maxhenkel.corelib:corelib:${corelib_version}+${minecraft_version}"
     compileOnly "de.maxhenkel.corelib:corelib:${corelib_version}+${minecraft_version}:javadoc"
+}
+
+neoForge {
+    unitTest {
+        enable()
+        testedMod = mods.pipez
+    }
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
 }
 
 processResources {

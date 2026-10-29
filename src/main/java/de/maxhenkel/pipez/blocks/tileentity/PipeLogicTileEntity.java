@@ -162,9 +162,10 @@ public abstract class PipeLogicTileEntity extends UpgradeTileEntity {
         if (hasType(EnergyPipeType.INSTANCE)) {
             for (Direction side : Direction.values()) {
                 if (isExtracting(side)) {
-                    if (energyStorages[side.get3DDataValue()] != null) {
-                        energyStorages[side.get3DDataValue()].tick();
+                    if (energyStorages[side.get3DDataValue()] == null) {
+                        energyStorages[side.get3DDataValue()] = new PipeEnergyStorage(this, side);
                     }
+                    energyStorages[side.get3DDataValue()].tick();
                 }
             }
         }
