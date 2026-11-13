@@ -91,22 +91,24 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
         int completeAmount = getRate(tileEntity, side);
         int mbToTransfer = completeAmount;
         boolean[] connectionsFull = new boolean[connections.size()];
+        int connectionsNotFull = connections.size();
         int p = tileEntity.getRoundRobinIndex(side, this) % connections.size();
-        while (mbToTransfer > 0 && hasNotInserted(connectionsFull)) {
+        while (mbToTransfer > 0 && connectionsNotFull > 0) {
             PipeTileEntity.Connection connection = connections.get(p);
             ResourceHandler<FluidResource> destination = connection.getFluidHandler();
             boolean hasInserted = false;
             if (destination != null && !connectionsFull[p]) {
                 int moved = ResourceHandlerUtil.move(fluidHandler, destination, resource -> {
                     return canInsert(tileEntity.getLevel().registryAccess(), connection, resource, tileEntity.getFilters(side, this)) != tileEntity.getFilterMode(side, this).equals(UpgradeTileEntity.FilterMode.BLACKLIST);
-                }, Math.min(Math.max(completeAmount / getConnectionsNotFullCount(connectionsFull), 1), mbToTransfer), null);
+                }, Math.min(Math.max(completeAmount / connectionsNotFull, 1), mbToTransfer), null);
                 if (moved > 0) {
                     mbToTransfer -= moved;
                     hasInserted = true;
                 }
             }
-            if (!hasInserted) {
+            if (!hasInserted && !connectionsFull[p]) {
                 connectionsFull[p] = true;
+                connectionsNotFull--;
             }
             p = (p + 1) % connections.size();
         }
@@ -135,6 +137,9 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
     }
 
     private boolean canInsert(HolderLookup.Provider provider, PipeTileEntity.Connection connection, FluidResource resource, List<Filter<?, ?>> filters) {
+        if (filters.isEmpty()) {
+            return true;
+        }
         for (Filter<?, Fluid> filter : filters.stream().map(filter -> (Filter<?, Fluid>) filter).filter(Filter::isInvert).filter(f -> matchesConnection(connection, f)).collect(Collectors.toList())) {
             if (matches(provider, filter, resource)) {
                 return false;
@@ -173,15 +178,6 @@ public class FluidPipeType extends PipeType<Fluid, FluidData> {
             }
             return filter.getTag() == null || filter.getTag().contains(resource.getFluid());
         }
-    }
-
-    private boolean hasNotInserted(boolean[] inventoriesFull) {
-        for (boolean b : inventoriesFull) {
-            if (!b) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
