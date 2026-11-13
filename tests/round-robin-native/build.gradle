@@ -1,0 +1,5 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.148' }
+java { toolchain.languageVersion=JavaLanguageVersion.of(25) }
+neoForge { version='26.1.2.126' }
+dependencies { compileOnly fileTree(providers.gradleProperty('testMods').get()) { include '*.jar' } }
+base { archivesName='excluded-pipez-round-robin-tests' }; version='1.0.0'
